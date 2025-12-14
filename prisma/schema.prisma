@@ -1,0 +1,60 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Plan {
+  id                  Int      @id @default(autoincrement())
+  destination_slug    String   @db.VarChar(50)
+  locale              String   @db.VarChar(10)
+  currency            String   @db.Char(3)
+  price_5day          Decimal? @db.Decimal(10, 2)
+  price_7day          Decimal? @db.Decimal(10, 2)
+  price_15day         Decimal? @db.Decimal(10, 2)
+  competitor_name     String?  @db.VarChar(50)
+  competitor_daily_rate Decimal? @db.Decimal(10, 2)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  @@unique([destination_slug, locale])
+  @@index([destination_slug])
+  @@index([locale])
+}
+
+model Destination {
+  id        Int      @id @default(autoincrement())
+  slug      String   @db.VarChar(50)
+  locale    String   @db.VarChar(10)
+  name      String   @db.VarChar(100)
+  tagline   String?  @db.VarChar(200)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([slug, locale])
+  @@index([slug])
+  @@index([locale])
+}
+
+model Post {
+  id          Int       @id @default(autoincrement())
+  slug        String    @db.VarChar(100)
+  locale      String    @db.VarChar(10)
+  title       String    @db.VarChar(200)
+  content     String    @db.Text
+  published_at DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([slug, locale])
+  @@index([slug])
+  @@index([locale])
+  @@index([published_at])
+}
+

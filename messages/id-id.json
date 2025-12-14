@@ -1,0 +1,41 @@
+{
+  "common": {
+    "nav": {
+      "home": "Beranda",
+      "destinations": "Destinasi",
+      "blog": "Blog",
+      "pricing": "Harga"
+    },
+    "buttons": {
+      "buy": "Beli Sekarang",
+      "learnMore": "Pelajari Lebih Lanjut",
+      "checkout": "Checkout",
+      "continue": "Lanjutkan",
+      "back": "Kembali"
+    },
+    "forms": {
+      "email": "Email",
+      "password": "Kata Sandi",
+      "name": "Nama",
+      "submit": "Kirim"
+    }
+  },
+  "home": {
+    "title": "Selamat Datang di Trvel",
+    "subtitle": "Bepergian dengan percaya diri"
+  },
+  "destination": {
+    "title": "Destinasi",
+    "pricing": "Harga",
+    "selectPlan": "Pilih Paket"
+  },
+  "blog": {
+    "title": "Blog",
+    "readMore": "Baca Selengkapnya"
+  },
+  "checkout": {
+    "title": "Checkout",
+    "completePurchase": "Selesaikan Pembelian"
+  }
+}
+

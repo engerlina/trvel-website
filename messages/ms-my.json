@@ -1,0 +1,41 @@
+{
+  "common": {
+    "nav": {
+      "home": "Laman Utama",
+      "destinations": "Destinasi",
+      "blog": "Blog",
+      "pricing": "Harga"
+    },
+    "buttons": {
+      "buy": "Beli Sekarang",
+      "learnMore": "Ketahui Lebih Lanjut",
+      "checkout": "Bayar",
+      "continue": "Teruskan",
+      "back": "Kembali"
+    },
+    "forms": {
+      "email": "E-mel",
+      "password": "Kata Laluan",
+      "name": "Nama",
+      "submit": "Hantar"
+    }
+  },
+  "home": {
+    "title": "Selamat Datang ke Trvel",
+    "subtitle": "Melancong dengan yakin"
+  },
+  "destination": {
+    "title": "Destinasi",
+    "pricing": "Harga",
+    "selectPlan": "Pilih Pelan"
+  },
+  "blog": {
+    "title": "Blog",
+    "readMore": "Baca Lagi"
+  },
+  "checkout": {
+    "title": "Bayar",
+    "completePurchase": "Lengkapkan Pembelian"
+  }
+}
+

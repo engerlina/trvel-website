@@ -1,0 +1,41 @@
+{
+  "common": {
+    "nav": {
+      "home": "Home",
+      "destinations": "Destinations",
+      "blog": "Blog",
+      "pricing": "Pricing"
+    },
+    "buttons": {
+      "buy": "Buy Now",
+      "learnMore": "Learn More",
+      "checkout": "Checkout",
+      "continue": "Continue",
+      "back": "Back"
+    },
+    "forms": {
+      "email": "Email",
+      "password": "Password",
+      "name": "Name",
+      "submit": "Submit"
+    }
+  },
+  "home": {
+    "title": "Welcome to Trvel",
+    "subtitle": "Travel with confidence"
+  },
+  "destination": {
+    "title": "Destination",
+    "pricing": "Pricing",
+    "selectPlan": "Select a Plan"
+  },
+  "blog": {
+    "title": "Blog",
+    "readMore": "Read More"
+  },
+  "checkout": {
+    "title": "Checkout",
+    "completePurchase": "Complete Purchase"
+  }
+}
+
