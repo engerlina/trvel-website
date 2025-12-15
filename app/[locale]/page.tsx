@@ -1,20 +1,28 @@
-import { getTranslations } from 'next-intl/server';
+import { Header, Footer } from '@/components/layout';
+import {
+  Hero,
+  Plans,
+  WhyTrvel,
+  Comparison,
+  HowItWorks,
+  Testimonials,
+  Destinations,
+} from '@/components/sections';
 
-export default async function HomePage({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}) {
-  const { locale } = await params;
-  const t = await getTranslations('home');
-
+export default async function HomePage() {
   return (
-    <main className="min-h-screen p-8">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-4xl font-bold mb-4">{t('title')}</h1>
-        <p className="text-xl text-gray-600">{t('subtitle')}</p>
-      </div>
-    </main>
+    <>
+      <Header />
+      <main className="pt-16 md:pt-18">
+        <Hero />
+        <Plans />
+        <WhyTrvel />
+        <Comparison />
+        <HowItWorks />
+        <Testimonials />
+        <Destinations />
+      </main>
+      <Footer />
+    </>
   );
 }
-

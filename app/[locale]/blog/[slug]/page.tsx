@@ -1,3 +1,4 @@
+import { getTranslations } from 'next-intl/server';
 import { prisma } from '@/lib/db';
 import { notFound } from 'next/navigation';
 
@@ -10,7 +11,7 @@ interface BlogPostPageProps {
 
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const { locale, slug } = await params;
-  const t = useTranslations('blog');
+  const t = await getTranslations('blog');
 
   const post = await prisma.post.findUnique({
     where: {
