@@ -6,6 +6,8 @@ import { Check, Zap, Star, TrendingUp } from 'lucide-react';
 import { Button } from '@/components/ui';
 import { Badge } from '@/components/ui';
 import { Card } from '@/components/ui';
+import { useDestination } from '@/contexts/DestinationContext';
+import { destinations } from './Hero';
 
 const plans = [
   {
@@ -51,18 +53,39 @@ export function Plans({
   savings = '$85'
 }: PlansProps) {
   const t = useTranslations('home.plans');
+  const { selectedDestination, destinationName } = useDestination();
+
+  // Find the flag component for the selected destination
+  const selectedDest = destinations.find(d => d.slug === selectedDestination);
+  const FlagIcon = selectedDest?.Flag;
 
   return (
-    <section className="section bg-white">
+    <section id="plans" aria-labelledby="plans-heading" className="section bg-base-100 scroll-mt-20">
       <div className="container-wide">
         {/* Section Header */}
         <div className="text-center mb-16">
-          <h2 className="text-heading-xl md:text-display font-bold text-gray-900 mb-4">
-            {t('title')}
-          </h2>
-          <p className="text-body-lg text-gray-600 max-w-2xl mx-auto">
-            {t('subtitle')}
-          </p>
+          {selectedDestination ? (
+            <>
+              <div className="flex items-center justify-center gap-3 mb-4">
+                {FlagIcon && <FlagIcon className="w-10 h-auto rounded shadow-sm" />}
+                <h2 id="plans-heading" className="text-heading-xl md:text-display font-bold text-base-content">
+                  {destinationName} eSIM Plans
+                </h2>
+              </div>
+              <p className="text-body-lg text-base-content/70 max-w-2xl mx-auto">
+                Choose the perfect plan for your trip to {destinationName}. All plans include unlimited data.
+              </p>
+            </>
+          ) : (
+            <>
+              <h2 id="plans-heading" className="text-heading-xl md:text-display font-bold text-base-content mb-4">
+                {t('title')}
+              </h2>
+              <p className="text-body-lg text-base-content/70 max-w-2xl mx-auto">
+                {t('subtitle')}
+              </p>
+            </>
+          )}
         </div>
 
         {/* Plans Grid */}

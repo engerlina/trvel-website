@@ -5,3 +5,4 @@ export { Comparison } from './Comparison';
 export { HowItWorks } from './HowItWorks';
 export { Testimonials } from './Testimonials';
 export { Destinations } from './Destinations';
+export { FloatingDestinationSelector } from './FloatingDestinationSelector';
