@@ -1,25 +1,26 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/routing';
-import { ChevronDown, Shield, Zap } from 'lucide-react';
+import { ChevronDown, Shield, Zap, X } from 'lucide-react';
 import { Button } from '@/components/ui';
 import { Badge } from '@/components/ui';
+import { JP, TH, KR, SG, ID, MY, VN, PH, GB, FR, IT, US, type FlagComponent } from 'country-flag-icons/react/3x2';
 
-const destinations = [
-  { name: 'Japan', slug: 'japan', flag: '🇯🇵' },
-  { name: 'Thailand', slug: 'thailand', flag: '🇹🇭' },
-  { name: 'South Korea', slug: 'south-korea', flag: '🇰🇷' },
-  { name: 'Singapore', slug: 'singapore', flag: '🇸🇬' },
-  { name: 'Indonesia', slug: 'indonesia', flag: '🇮🇩' },
-  { name: 'Malaysia', slug: 'malaysia', flag: '🇲🇾' },
-  { name: 'Vietnam', slug: 'vietnam', flag: '🇻🇳' },
-  { name: 'Philippines', slug: 'philippines', flag: '🇵🇭' },
-  { name: 'United Kingdom', slug: 'united-kingdom', flag: '🇬🇧' },
-  { name: 'France', slug: 'france', flag: '🇫🇷' },
-  { name: 'Italy', slug: 'italy', flag: '🇮🇹' },
-  { name: 'United States', slug: 'united-states', flag: '🇺🇸' },
+const destinations: { name: string; slug: string; Flag: FlagComponent }[] = [
+  { name: 'Japan', slug: 'japan', Flag: JP },
+  { name: 'Thailand', slug: 'thailand', Flag: TH },
+  { name: 'South Korea', slug: 'south-korea', Flag: KR },
+  { name: 'Singapore', slug: 'singapore', Flag: SG },
+  { name: 'Indonesia', slug: 'indonesia', Flag: ID },
+  { name: 'Malaysia', slug: 'malaysia', Flag: MY },
+  { name: 'Vietnam', slug: 'vietnam', Flag: VN },
+  { name: 'Philippines', slug: 'philippines', Flag: PH },
+  { name: 'United Kingdom', slug: 'united-kingdom', Flag: GB },
+  { name: 'France', slug: 'france', Flag: FR },
+  { name: 'Italy', slug: 'italy', Flag: IT },
+  { name: 'United States', slug: 'united-states', Flag: US },
 ];
 
 export function Hero() {
@@ -40,6 +41,18 @@ export function Hero() {
   };
 
   const selected = destinations.find(d => d.slug === selectedDestination);
+
+  // Lock body scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
 
   return (
     <section className="relative min-h-[90vh] flex items-center overflow-hidden">
@@ -84,7 +97,7 @@ export function Hero() {
                 <span className="flex items-center gap-3">
                   {selected ? (
                     <>
-                      <span className="text-2xl">{selected.flag}</span>
+                      <selected.Flag className="w-7 h-auto rounded-sm" />
                       <span className="text-body-lg font-medium text-gray-900">{selected.name}</span>
                     </>
                   ) : (
@@ -94,19 +107,49 @@ export function Hero() {
                 <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
               </button>
 
-              {/* Dropdown */}
+              {/* Modal */}
               {isOpen && (
-                <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl border border-gray-100 shadow-soft-lg z-50 max-h-72 overflow-y-auto">
-                  {destinations.map((destination) => (
-                    <button
-                      key={destination.slug}
-                      onClick={() => handleDestinationSelect(destination.slug)}
-                      className="w-full flex items-center gap-3 px-6 py-3 text-left hover:bg-brand-50 transition-colors first:rounded-t-2xl last:rounded-b-2xl"
-                    >
-                      <span className="text-xl">{destination.flag}</span>
-                      <span className="text-body font-medium text-gray-900">{destination.name}</span>
-                    </button>
-                  ))}
+                <div className="fixed inset-0 z-[100] flex items-start justify-center pt-[10vh]">
+                  {/* Backdrop */}
+                  <div
+                    className="absolute inset-0 bg-black/50 animate-fade-in"
+                    onClick={() => setIsOpen(false)}
+                  />
+                  {/* Modal Content */}
+                  <div className="relative mx-4 w-full max-w-md bg-white rounded-2xl shadow-2xl animate-fade-up max-h-[80vh] flex flex-col">
+                    {/* Modal Header */}
+                    <div className="flex items-center justify-between p-4 border-b border-gray-100">
+                      <h3 className="text-heading font-semibold text-gray-900">Select destination</h3>
+                      <button
+                        onClick={() => setIsOpen(false)}
+                        className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                      >
+                        <X className="w-5 h-5" />
+                      </button>
+                    </div>
+                    {/* Destination List */}
+                    <div className="overflow-y-auto flex-1 py-2">
+                      {destinations.map((destination) => (
+                        <button
+                          key={destination.slug}
+                          onClick={() => handleDestinationSelect(destination.slug)}
+                          className={`w-full flex items-center gap-4 px-5 py-3 text-left hover:bg-brand-50 transition-colors ${
+                            selectedDestination === destination.slug ? 'bg-brand-50' : ''
+                          }`}
+                        >
+                          <destination.Flag className="w-8 h-auto rounded-sm shadow-sm" />
+                          <span className="text-body-lg font-medium text-gray-900">{destination.name}</span>
+                          {selectedDestination === destination.slug && (
+                            <span className="ml-auto text-brand-600">
+                              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                              </svg>
+                            </span>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               )}
             </div>

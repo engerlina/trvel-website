@@ -4,14 +4,17 @@
       "home": "Beranda",
       "destinations": "Destinasi",
       "blog": "Blog",
-      "pricing": "Harga"
+      "pricing": "Harga",
+      "howItWorks": "Cara Kerja",
+      "help": "Bantuan"
     },
     "buttons": {
       "buy": "Beli Sekarang",
       "learnMore": "Pelajari Lebih Lanjut",
       "checkout": "Checkout",
       "continue": "Lanjutkan",
-      "back": "Kembali"
+      "back": "Kembali",
+      "getStarted": "Mulai"
     },
     "forms": {
       "email": "Email",
@@ -21,8 +24,122 @@
     }
   },
   "home": {
-    "title": "Selamat Datang di Trvel",
-    "subtitle": "Bepergian dengan percaya diri"
+    "hero": {
+      "headline": "Works when you land. Guaranteed.",
+      "subheadline": "Unlimited data for your next adventure. No roaming bills. No stress.",
+      "trustBadge": "10-minute connection guarantee or full refund",
+      "destinationPlaceholder": "Where are you going?",
+      "cta": "Get Your eSIM",
+      "ctaSubtext": "Setup takes just 2 minutes"
+    },
+    "plans": {
+      "title": "Pick your trip. That's it.",
+      "subtitle": "Simple pricing, unlimited data, instant delivery. Choose your duration and go.",
+      "mostPopular": "Most Popular",
+      "days": "days",
+      "unlimitedData": "Unlimited data",
+      "selectPlan": "Select Plan",
+      "savingsCallout": "Save {amount} vs carrier roaming",
+      "dataDisclaimer": "1GB high-speed daily, then unlimited at standard speed. No throttling, no caps.",
+      "short": {
+        "name": "Short Trip"
+      },
+      "week": {
+        "name": "Week Away"
+      },
+      "extended": {
+        "name": "Extended Stay"
+      },
+      "features": {
+        "unlimitedData": "Unlimited data included",
+        "instantActivation": "Instant activation via QR",
+        "whatsappSupport": "WhatsApp human support",
+        "moneyBackGuarantee": "Money-back guarantee"
+      }
+    },
+    "whyTrvel": {
+      "title": "Why travelers choose Trvel",
+      "subtitle": "We built the eSIM experience we wish existed. Here's what makes us different.",
+      "guarantee": {
+        "title": "10-Min Guarantee",
+        "description": "Connected in 10 minutes after landing or get a full refund. No questions asked."
+      },
+      "support": {
+        "title": "Human Support",
+        "description": "Real people on WhatsApp, not chatbots. Average response time: 3 minutes."
+      },
+      "network": {
+        "title": "Premium Networks",
+        "description": "See your actual carrier (Docomo, AIS, etc). We only use tier-1 networks."
+      },
+      "rollover": {
+        "title": "Data Rollover",
+        "description": "Unused data rolls to your next trip. Nothing wasted, ever."
+      }
+    },
+    "comparison": {
+      "title": "Why pay {competitor} $10/day?",
+      "subtitle": "Compare Trvel to {competitor} roaming and see how much you could save on your next trip.",
+      "feature": "Feature",
+      "savingsLabel": "Your savings on a week trip",
+      "features": {
+        "dailyCost": "Daily cost",
+        "data": "Unlimited data",
+        "support": "Human WhatsApp support",
+        "setup": "Setup time",
+        "guarantee": "Money-back guarantee"
+      }
+    },
+    "howItWorks": {
+      "title": "Ready in 3 simple steps",
+      "subtitle": "No SIM swapping, no store visits, no waiting. Just scan, connect, and go.",
+      "cta": "See detailed guide",
+      "buy": {
+        "title": "Buy before you fly",
+        "description": "Choose your destination and plan. Receive your eSIM QR code instantly via email."
+      },
+      "land": {
+        "title": "Land and connect",
+        "description": "Scan the QR code when you land. Your eSIM activates automatically."
+      },
+      "connect": {
+        "title": "Stay connected",
+        "description": "Enjoy unlimited data throughout your trip. WhatsApp us anytime if you need help."
+      }
+    },
+    "testimonials": {
+      "title": "Loved by 50,000+ travelers",
+      "subtitle": "Don't just take our word for it. Here's what our customers say.",
+      "sarah": {
+        "name": "Sarah M.",
+        "quote": "Landed in Tokyo, connected before I left the plane. Finally, an eSIM that just works."
+      },
+      "james": {
+        "name": "James K.",
+        "quote": "The WhatsApp support is incredible. Had a question at 2am and got a response in minutes."
+      },
+      "emma": {
+        "name": "Emma L.",
+        "quote": "Saved over $100 compared to Telstra. Setup was easier than I expected."
+      },
+      "michael": {
+        "name": "Michael R.",
+        "quote": "Used Trvel for 5 trips now. Consistently reliable, great speeds everywhere."
+      },
+      "stats": {
+        "travelers": "Happy travelers",
+        "rating": "Average rating",
+        "countries": "Countries covered",
+        "response": "Avg. response time"
+      }
+    },
+    "destinations": {
+      "title": "Popular destinations",
+      "subtitle": "Premium eSIMs for the world's most visited places",
+      "viewAll": "See all destinations",
+      "from": "From",
+      "viewPlans": "View plans"
+    }
   },
   "destination": {
     "title": "Destinasi",
@@ -38,4 +155,3 @@
     "completePurchase": "Selesaikan Pembelian"
   }
 }
-

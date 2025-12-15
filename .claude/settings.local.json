@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "SlashCommand(/init)",
+      "Bash(find:*)",
+      "Bash(npm run db:generate:*)",
+      "Bash(npm run db:push:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run lint)",
+      "Bash(npx tsc:*)"
+    ]
+  }
+}

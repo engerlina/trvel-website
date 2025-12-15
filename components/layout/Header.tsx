@@ -5,13 +5,14 @@ import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import { Menu, X, Globe, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui';
+import { AU, SG, GB, MY, ID } from 'country-flag-icons/react/3x2';
 
 const locales = [
-  { code: 'en-au', label: 'Australia', flag: '🇦🇺', currency: 'AUD' },
-  { code: 'en-sg', label: 'Singapore', flag: '🇸🇬', currency: 'SGD' },
-  { code: 'en-gb', label: 'United Kingdom', flag: '🇬🇧', currency: 'GBP' },
-  { code: 'ms-my', label: 'Malaysia', flag: '🇲🇾', currency: 'MYR' },
-  { code: 'id-id', label: 'Indonesia', flag: '🇮🇩', currency: 'IDR' },
+  { code: 'en-au', label: 'Australia', Flag: AU, currency: 'AUD' },
+  { code: 'en-sg', label: 'Singapore', Flag: SG, currency: 'SGD' },
+  { code: 'en-gb', label: 'United Kingdom', Flag: GB, currency: 'GBP' },
+  { code: 'ms-my', label: 'Malaysia', Flag: MY, currency: 'MYR' },
+  { code: 'id-id', label: 'Indonesia', Flag: ID, currency: 'IDR' },
 ];
 
 export function Header() {
@@ -56,7 +57,8 @@ export function Header() {
                 className="flex items-center gap-2 px-3 py-2 text-body-sm text-gray-600 hover:text-brand-600 transition-colors"
               >
                 <Globe className="w-4 h-4" />
-                <span>🇦🇺 AUD</span>
+                <AU className="w-5 h-auto rounded-sm" />
+                <span>AUD</span>
                 <ChevronDown className="w-4 h-4" />
               </button>
               {localeMenuOpen && (
@@ -69,7 +71,7 @@ export function Header() {
                       className="flex items-center gap-3 px-4 py-2 text-body-sm text-gray-700 hover:bg-brand-50 hover:text-brand-600 transition-colors"
                       onClick={() => setLocaleMenuOpen(false)}
                     >
-                      <span>{locale.flag}</span>
+                      <locale.Flag className="w-5 h-auto rounded-sm" />
                       <span>{locale.label}</span>
                       <span className="ml-auto text-gray-400">{locale.currency}</span>
                     </Link>
