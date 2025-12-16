@@ -376,14 +376,22 @@ export default async function DestinationPage({ params }: DestinationPageProps) 
 }
 
 // Generate static params for all destinations
+// Returns empty array if database is unavailable (e.g., during Vercel build)
+// Pages will be generated on-demand with ISR
 export async function generateStaticParams() {
-  const destinations = await prisma.destination.findMany({
-    select: { slug: true, locale: true },
-    distinct: ['slug', 'locale'],
-  });
+  try {
+    const destinations = await prisma.destination.findMany({
+      select: { slug: true, locale: true },
+      distinct: ['slug', 'locale'],
+    });
 
-  return destinations.map((dest) => ({
-    locale: dest.locale,
-    destination: dest.slug,
-  }));
+    return destinations.map((dest) => ({
+      locale: dest.locale,
+      destination: dest.slug,
+    }));
+  } catch (error) {
+    // Database unavailable during build - pages will render dynamically
+    console.log('generateStaticParams: Database unavailable, using dynamic rendering');
+    return [];
+  }
 }

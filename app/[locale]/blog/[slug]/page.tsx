@@ -305,14 +305,20 @@ export default async function BlogPostPage({ params }: PageProps) {
 }
 
 // Generate static params for all posts
+// Returns empty array if database is unavailable (e.g., during Vercel build)
 export async function generateStaticParams() {
-  const posts = await prisma.post.findMany({
-    where: { published_at: { not: null } },
-    select: { slug: true, locale: true },
-  });
+  try {
+    const posts = await prisma.post.findMany({
+      where: { published_at: { not: null } },
+      select: { slug: true, locale: true },
+    });
 
-  return posts.map((post) => ({
-    locale: post.locale,
-    slug: post.slug,
-  }));
+    return posts.map((post) => ({
+      locale: post.locale,
+      slug: post.slug,
+    }));
+  } catch (error) {
+    console.log('generateStaticParams: Database unavailable, using dynamic rendering');
+    return [];
+  }
 }
