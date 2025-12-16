@@ -144,14 +144,140 @@
   "destination": {
     "title": "Destinasi",
     "pricing": "Harga",
-    "selectPlan": "Pilih Paket"
+    "selectPlan": "Pilih Paket",
+    "hero": {
+      "rating": "Rating 4.9/5",
+      "setupTime": "Setup 2 menit",
+      "guarantee": "Jaminan uang kembali",
+      "startingFrom": "Mulai dari"
+    },
+    "plans": {
+      "title": "Pilih Paket Anda",
+      "subtitle": "Semua paket termasuk data tak terbatas, akses jaringan premium, dan dukungan 24/7",
+      "mostPopular": "Paling Populer",
+      "5day": "5 Hari",
+      "7day": "7 Hari",
+      "15day": "15 Hari",
+      "perDay": "/hari",
+      "unlimitedData": "Data tak terbatas",
+      "premiumNetwork": "Jaringan premium",
+      "whatsappSupport": "Dukungan WhatsApp 24/7",
+      "getStarted": "Mulai",
+      "compareTo": "Bandingkan dengan roaming {competitor} pada"
+    },
+    "features": {
+      "title": "Kenapa Pilih Trvel",
+      "subtitle": "Semua yang Anda butuhkan untuk konektivitas lancar di {destination}",
+      "instantActivation": {
+        "title": "Aktivasi Instan",
+        "description": "Pindai kode QR dan terhubung dalam waktu kurang dari 2 menit"
+      },
+      "unlimitedData": {
+        "title": "Data Tak Terbatas",
+        "description": "Tanpa throttling, tanpa batas data, tanpa kejutan"
+      },
+      "premiumNetwork": {
+        "title": "Jaringan Premium",
+        "description": "Terhubung ke operator lokal tier-1"
+      },
+      "guarantee": {
+        "title": "Jaminan 10 Menit",
+        "description": "Terhubung dalam 10 menit atau uang kembali penuh"
+      },
+      "humanSupport": {
+        "title": "Dukungan Manusia",
+        "description": "Orang sungguhan di WhatsApp 24/7"
+      },
+      "keepNumber": {
+        "title": "Pertahankan Nomor Anda",
+        "description": "Berfungsi bersama SIM yang ada"
+      }
+    },
+    "howItWorks": {
+      "title": "Terhubung dalam 3 Langkah",
+      "step1": {
+        "title": "Beli",
+        "description": "Pilih paket Anda dan selesaikan checkout dalam waktu kurang dari 60 detik"
+      },
+      "step2": {
+        "title": "Pindai",
+        "description": "Terima kode QR Anda langsung via email dan pindai"
+      },
+      "step3": {
+        "title": "Terhubung",
+        "description": "Aktifkan data roaming saat Anda mendarat dan Anda online!"
+      }
+    },
+    "cta": {
+      "title": "Siap untuk {destination}?",
+      "subtitle": "Dapatkan eSIM Anda sekarang dan terhubung saat Anda mendarat. Pengiriman instan, jaringan premium, dukungan manusia.",
+      "button": "Dapatkan eSIM Anda"
+    }
+  },
+  "destinations": {
+    "pageTitle": "Semua Destinasi eSIM | Trvel",
+    "pageDescription": "Jelajahi semua destinasi eSIM perjalanan. Paket data tak terbatas premium untuk Asia, Eropa, Amerika dan lainnya. Pengiriman instan, dukungan manusia.",
+    "badge": "12+ Destinasi",
+    "title": "Pilih Destinasi Anda",
+    "subtitle": "eSIM premium dengan data tak terbatas untuk destinasi perjalanan paling populer di dunia. Semua paket termasuk pengiriman instan dan dukungan manusia 24/7.",
+    "stats": {
+      "rating": "Rating 4.9/5",
+      "instant": "Pengiriman instan",
+      "guarantee": "Jaminan uang kembali"
+    },
+    "from": "Dari",
+    "viewPlans": "Lihat Paket",
+    "country": "destinasi",
+    "countries": "destinasi",
+    "cta": {
+      "title": "Tidak menemukan destinasi Anda?",
+      "subtitle": "Kami terus menambahkan destinasi baru. Hubungi kami dan kami akan memberitahu Anda ketika destinasi Anda tersedia.",
+      "button": "Hubungi Kami"
+    }
   },
   "blog": {
     "title": "Blog",
-    "readMore": "Baca Selengkapnya"
+    "readMore": "Baca Selengkapnya",
+    "pageTitle": "Tips Perjalanan & Panduan eSIM | Blog Trvel",
+    "pageDescription": "Tips perjalanan ahli, panduan destinasi, dan saran eSIM untuk pelancong Indonesia. Tetap terhubung di luar negeri dengan Trvel.",
+    "heroTitle": "Cerita & Tips Perjalanan",
+    "heroSubtitle": "Saran ahli, panduan destinasi, dan wawasan perjalanan untuk membantu Anda tetap terhubung dalam petualangan berikutnya.",
+    "allPosts": "Semua Artikel",
+    "emptyTitle": "Segera Hadir",
+    "emptyDescription": "Kami sedang membuat konten perjalanan yang bermanfaat untuk Anda. Kembali lagi untuk tips, panduan, dan cerita perjalanan.",
+    "exploreDestinations": "Jelajahi Destinasi",
+    "newsletterTitle": "Dapatkan Tips Perjalanan di Inbox Anda",
+    "newsletterDescription": "Bergabung dengan 10.000+ pelancong yang mendapatkan tips terbaik, penawaran, dan panduan destinasi setiap minggu.",
+    "emailPlaceholder": "Masukkan email Anda",
+    "subscribe": "Berlangganan",
+    "noSpam": "Tanpa spam, berhenti berlangganan kapan saja.",
+    "backToBlog": "Kembali ke Blog",
+    "minRead": "menit baca",
+    "share": "Bagikan",
+    "writtenBy": "Ditulis oleh",
+    "authorBio": "Penggemar perjalanan dan ahli konektivitas di Trvel, membantu orang Indonesia tetap terhubung di luar negeri.",
+    "relatedPosts": "Anda Mungkin Juga Suka",
+    "ctaTitle": "Siap Bepergian dengan Terhubung?",
+    "ctaDescription": "Dapatkan eSIM Anda sebelum terbang. Pengiriman instan, jaringan premium, dukungan manusia.",
+    "ctaButton": "Dapatkan eSIM Anda"
   },
   "checkout": {
     "title": "Checkout",
-    "completePurchase": "Selesaikan Pembelian"
+    "completePurchase": "Selesaikan Pembelian",
+    "success": {
+      "title": "Pembayaran Berhasil!",
+      "message": "Terima kasih atas pembelian Anda. Detail eSIM telah dikirim ke email Anda.",
+      "nextSteps": "Apa yang terjadi selanjutnya?",
+      "step1": "Cek email Anda untuk kode QR eSIM (tiba dalam 2 menit)",
+      "step2": "Saat Anda mendarat, pindai kode QR untuk menginstal eSIM",
+      "step3": "Aktifkan roaming data dan Anda sudah terhubung!",
+      "backHome": "Kembali ke Beranda"
+    },
+    "cancel": {
+      "title": "Pembayaran Dibatalkan",
+      "message": "Pembayaran Anda tidak selesai. Tidak ada biaya yang dikenakan ke akun Anda.",
+      "tryAgain": "Coba Lagi",
+      "getHelp": "Dapatkan Bantuan"
+    }
   }
 }

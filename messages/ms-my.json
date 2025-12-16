@@ -144,14 +144,140 @@
   "destination": {
     "title": "Destinasi",
     "pricing": "Harga",
-    "selectPlan": "Pilih Pelan"
+    "selectPlan": "Pilih Pelan",
+    "hero": {
+      "rating": "Penilaian 4.9/5",
+      "setupTime": "Persediaan 2 min",
+      "guarantee": "Jaminan wang dikembalikan",
+      "startingFrom": "Bermula dari"
+    },
+    "plans": {
+      "title": "Pilih Pelan Anda",
+      "subtitle": "Semua pelan termasuk data tanpa had, akses rangkaian premium, dan sokongan 24/7",
+      "mostPopular": "Paling Popular",
+      "5day": "5 Hari",
+      "7day": "7 Hari",
+      "15day": "15 Hari",
+      "perDay": "/hari",
+      "unlimitedData": "Data tanpa had",
+      "premiumNetwork": "Rangkaian premium",
+      "whatsappSupport": "Sokongan WhatsApp 24/7",
+      "getStarted": "Mula",
+      "compareTo": "Bandingkan dengan roaming {competitor} pada"
+    },
+    "features": {
+      "title": "Kenapa Pilih Trvel",
+      "subtitle": "Semua yang anda perlukan untuk kesambungan lancar di {destination}",
+      "instantActivation": {
+        "title": "Pengaktifan Segera",
+        "description": "Imbas kod QR dan berhubung dalam masa kurang 2 minit"
+      },
+      "unlimitedData": {
+        "title": "Data Tanpa Had",
+        "description": "Tiada throttling, tiada had data, tiada kejutan"
+      },
+      "premiumNetwork": {
+        "title": "Rangkaian Premium",
+        "description": "Berhubung dengan pembawa tempatan tier-1"
+      },
+      "guarantee": {
+        "title": "Jaminan 10 Minit",
+        "description": "Berhubung dalam 10 minit atau wang dikembalikan sepenuhnya"
+      },
+      "humanSupport": {
+        "title": "Sokongan Manusia",
+        "description": "Orang sebenar di WhatsApp 24/7"
+      },
+      "keepNumber": {
+        "title": "Kekalkan Nombor Anda",
+        "description": "Berfungsi bersama SIM sedia ada anda"
+      }
+    },
+    "howItWorks": {
+      "title": "Berhubung dalam 3 Langkah",
+      "step1": {
+        "title": "Beli",
+        "description": "Pilih pelan anda dan selesaikan pembayaran dalam masa kurang 60 saat"
+      },
+      "step2": {
+        "title": "Imbas",
+        "description": "Terima kod QR anda serta-merta melalui e-mel dan imbas"
+      },
+      "step3": {
+        "title": "Berhubung",
+        "description": "Aktifkan data roaming apabila anda mendarat dan anda dalam talian!"
+      }
+    },
+    "cta": {
+      "title": "Bersedia untuk {destination}?",
+      "subtitle": "Dapatkan eSIM anda sekarang dan berhubung sebaik sahaja anda mendarat. Penghantaran segera, rangkaian premium, sokongan manusia.",
+      "button": "Dapatkan eSIM Anda"
+    }
+  },
+  "destinations": {
+    "pageTitle": "Semua Destinasi eSIM | Trvel",
+    "pageDescription": "Layari semua destinasi eSIM perjalanan. Pelan data tanpa had premium untuk Asia, Eropah, Amerika dan lain-lain. Penghantaran segera, sokongan manusia.",
+    "badge": "12+ Destinasi",
+    "title": "Pilih Destinasi Anda",
+    "subtitle": "eSIM premium dengan data tanpa had untuk destinasi pelancongan paling popular di dunia. Semua pelan termasuk penghantaran segera dan sokongan manusia 24/7.",
+    "stats": {
+      "rating": "Penilaian 4.9/5",
+      "instant": "Penghantaran segera",
+      "guarantee": "Jaminan wang dikembalikan"
+    },
+    "from": "Dari",
+    "viewPlans": "Lihat Pelan",
+    "country": "destinasi",
+    "countries": "destinasi",
+    "cta": {
+      "title": "Tidak jumpa destinasi anda?",
+      "subtitle": "Kami sentiasa menambah destinasi baru. Hubungi kami dan kami akan maklumkan apabila destinasi anda tersedia.",
+      "button": "Hubungi Kami"
+    }
   },
   "blog": {
     "title": "Blog",
-    "readMore": "Baca Lagi"
+    "readMore": "Baca Lagi",
+    "pageTitle": "Tips Perjalanan & Panduan eSIM | Blog Trvel",
+    "pageDescription": "Tips perjalanan pakar, panduan destinasi, dan nasihat eSIM untuk pelancong Malaysia. Kekal berhubung di luar negara dengan Trvel.",
+    "heroTitle": "Cerita & Tips Perjalanan",
+    "heroSubtitle": "Nasihat pakar, panduan destinasi, dan pandangan perjalanan untuk membantu anda kekal berhubung dalam pengembaraan seterusnya.",
+    "allPosts": "Semua Artikel",
+    "emptyTitle": "Akan Datang",
+    "emptyDescription": "Kami sedang mencipta kandungan perjalanan yang berguna untuk anda. Sila semak semula untuk tips, panduan, dan cerita perjalanan.",
+    "exploreDestinations": "Teroka Destinasi",
+    "newsletterTitle": "Dapatkan Tips Perjalanan ke E-mel Anda",
+    "newsletterDescription": "Sertai 10,000+ pelancong yang mendapat tips terbaik, tawaran, dan panduan destinasi setiap minggu.",
+    "emailPlaceholder": "Masukkan e-mel anda",
+    "subscribe": "Langgan",
+    "noSpam": "Tiada spam, berhenti langgan bila-bila masa.",
+    "backToBlog": "Kembali ke Blog",
+    "minRead": "min baca",
+    "share": "Kongsi",
+    "writtenBy": "Ditulis oleh",
+    "authorBio": "Peminat perjalanan dan pakar kesambungan di Trvel, membantu rakyat Malaysia kekal berhubung di luar negara.",
+    "relatedPosts": "Anda Mungkin Juga Suka",
+    "ctaTitle": "Bersedia untuk Melancong Berhubung?",
+    "ctaDescription": "Dapatkan eSIM anda sebelum terbang. Penghantaran segera, rangkaian premium, sokongan manusia.",
+    "ctaButton": "Dapatkan eSIM Anda"
   },
   "checkout": {
     "title": "Bayar",
-    "completePurchase": "Lengkapkan Pembelian"
+    "completePurchase": "Lengkapkan Pembelian",
+    "success": {
+      "title": "Pembayaran Berjaya!",
+      "message": "Terima kasih atas pembelian anda. Butiran eSIM telah dihantar ke e-mel anda.",
+      "nextSteps": "Apa yang berlaku seterusnya?",
+      "step1": "Semak e-mel anda untuk kod QR eSIM (tiba dalam 2 minit)",
+      "step2": "Apabila anda mendarat, imbas kod QR untuk memasang eSIM",
+      "step3": "Aktifkan perayauan data dan anda sudah berhubung!",
+      "backHome": "Kembali ke Laman Utama"
+    },
+    "cancel": {
+      "title": "Pembayaran Dibatalkan",
+      "message": "Pembayaran anda tidak selesai. Tiada caj dikenakan ke akaun anda.",
+      "tryAgain": "Cuba Lagi",
+      "getHelp": "Dapatkan Bantuan"
+    }
   }
 }

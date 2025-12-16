@@ -25,23 +25,23 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
     const variants: Record<ButtonVariant, string> = {
       primary: `
-        bg-gradient-to-r from-brand-500 via-brand-600 to-brand-700
+        bg-gradient-to-r from-accent-500 via-accent-600 to-accent-700
         text-white shadow-md
-        hover:shadow-lg hover:shadow-brand-500/25 hover:-translate-y-0.5
+        hover:shadow-lg hover:shadow-glow-accent hover:-translate-y-0.5
         active:translate-y-0 active:shadow-md
-        focus-visible:ring-brand-500
+        focus-visible:ring-accent-500
       `,
       secondary: `
-        bg-white text-brand-600
-        border-2 border-brand-500
-        hover:bg-brand-50 hover:border-brand-600 hover:-translate-y-0.5
+        bg-white text-brand-400
+        border-2 border-brand-400
+        hover:bg-brand-50 hover:border-brand-500 hover:-translate-y-0.5
         active:translate-y-0 active:bg-brand-100
-        focus-visible:ring-brand-500
+        focus-visible:ring-brand-400
       `,
       ghost: `
-        bg-transparent text-base-content
-        hover:bg-base-200
-        focus-visible:ring-base-content
+        bg-transparent text-navy-500
+        hover:bg-cream-200
+        focus-visible:ring-brand-400
       `,
     };
 

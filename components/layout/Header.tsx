@@ -1,8 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { Link } from '@/i18n/routing';
+import Image from 'next/image';
 import { Menu, X, Globe } from 'lucide-react';
 import { Button } from '@/components/ui';
 import { AU, SG, GB, MY, ID } from 'country-flag-icons/react/3x2';
@@ -17,7 +18,12 @@ const locales = [
 
 export function Header() {
   const t = useTranslations('common.nav');
+  const locale = useLocale();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Find the current locale config
+  const currentLocale = locales.find(l => l.code === locale) || locales[0];
+  const CurrentFlag = currentLocale.Flag;
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-base-100/80 backdrop-blur-lg border-b border-base-200">
@@ -25,10 +31,14 @@ export function Header() {
         {/* Logo */}
         <div className="navbar-start">
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center">
-              <span className="text-white font-bold text-lg">T</span>
-            </div>
-            <span className="text-xl font-bold text-base-content">Trvel</span>
+            <Image
+              src="/logo.svg"
+              alt="Trvel"
+              width={28}
+              height={40}
+              className="w-7 h-10"
+            />
+            <span className="text-xl font-bold text-navy-500">Trvel</span>
           </Link>
         </div>
 
@@ -48,8 +58,8 @@ export function Header() {
           <div className="dropdown dropdown-end hidden md:block">
             <div tabIndex={0} role="button" className="btn btn-ghost btn-sm gap-2">
               <Globe className="w-4 h-4" />
-              <AU className="w-5 h-auto rounded-sm" />
-              <span>AUD</span>
+              <CurrentFlag className="w-5 h-auto rounded-sm" />
+              <span>{currentLocale.currency}</span>
             </div>
             <ul tabIndex={0} className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow-soft-lg border border-base-200 mt-2">
               {locales.map((locale) => (

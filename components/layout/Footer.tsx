@@ -1,5 +1,7 @@
 import { Link } from '@/i18n/routing';
+import Image from 'next/image';
 import { Shield, Lock, MessageCircle, Mail, ChevronRight } from 'lucide-react';
+import { AU, SG, GB, MY, ID, type FlagComponent } from 'country-flag-icons/react/3x2';
 
 const destinations = [
   { name: 'Japan', slug: 'japan' },
@@ -24,46 +26,55 @@ const legal = [
   { name: 'Refund Policy', href: '/refunds' },
 ];
 
-const locales = [
-  { code: 'en-au', label: 'Australia', flag: '🇦🇺', currency: 'AUD' },
-  { code: 'en-sg', label: 'Singapore', flag: '🇸🇬', currency: 'SGD' },
-  { code: 'en-gb', label: 'United Kingdom', flag: '🇬🇧', currency: 'GBP' },
-  { code: 'ms-my', label: 'Malaysia', flag: '🇲🇾', currency: 'MYR' },
-  { code: 'id-id', label: 'Indonesia', flag: '🇮🇩', currency: 'IDR' },
+const locales: { code: string; label: string; Flag: FlagComponent; currency: string }[] = [
+  { code: 'en-au', label: 'Australia', Flag: AU, currency: 'AUD' },
+  { code: 'en-sg', label: 'Singapore', Flag: SG, currency: 'SGD' },
+  { code: 'en-gb', label: 'United Kingdom', Flag: GB, currency: 'GBP' },
+  { code: 'ms-my', label: 'Malaysia', Flag: MY, currency: 'MYR' },
+  { code: 'id-id', label: 'Indonesia', Flag: ID, currency: 'IDR' },
 ];
 
 export function Footer() {
   return (
-    <footer className="bg-gray-900 text-gray-300">
+    <footer
+      className="bg-navy-500 text-cream-300"
+      style={{
+        backgroundImage: 'none',
+        background: '#010326',
+        backgroundSize: 'auto',
+        backgroundRepeat: 'no-repeat',
+        backgroundPosition: '0 0'
+      }}
+    >
       {/* Trust Bar */}
-      <div className="border-b border-gray-800">
+      <div className="border-b border-navy-400">
         <div className="container-wide py-8">
           <div className="flex flex-wrap items-center justify-center gap-8 md:gap-16">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-brand-600/20 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-full bg-brand-400/20 flex items-center justify-center">
                 <Shield className="w-5 h-5 text-brand-400" />
               </div>
               <div>
-                <p className="text-body-sm font-semibold text-white">Money-Back Guarantee</p>
-                <p className="text-body-sm text-gray-400">10-min connection or full refund</p>
+                <p className="text-body-sm font-semibold text-cream-100">Money-Back Guarantee</p>
+                <p className="text-body-sm text-cream-400">10-min connection or full refund</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-success-600/20 flex items-center justify-center">
-                <Lock className="w-5 h-5 text-success-500" />
+              <div className="w-10 h-10 rounded-full bg-brand-400/20 flex items-center justify-center">
+                <Lock className="w-5 h-5 text-brand-400" />
               </div>
               <div>
-                <p className="text-body-sm font-semibold text-white">Secure Payment</p>
-                <p className="text-body-sm text-gray-400">256-bit SSL encryption</p>
+                <p className="text-body-sm font-semibold text-cream-100">Secure Payment</p>
+                <p className="text-body-sm text-cream-400">256-bit SSL encryption</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-accent-600/20 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-full bg-accent-400/20 flex items-center justify-center">
                 <MessageCircle className="w-5 h-5 text-accent-400" />
               </div>
               <div>
-                <p className="text-body-sm font-semibold text-white">Human Support</p>
-                <p className="text-body-sm text-gray-400">Real people on WhatsApp</p>
+                <p className="text-body-sm font-semibold text-cream-100">Human Support</p>
+                <p className="text-body-sm text-cream-400">Real people on WhatsApp</p>
               </div>
             </div>
           </div>
@@ -76,26 +87,30 @@ export function Footer() {
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
             <Link href="/" className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center">
-                <span className="text-white font-bold text-lg">T</span>
-              </div>
-              <span className="text-xl font-bold text-white">Trvel</span>
+              <Image
+                src="/logo.svg"
+                alt="Trvel"
+                width={28}
+                height={40}
+                className="w-7 h-10"
+              />
+              <span className="text-xl font-bold text-cream-100">Trvel</span>
             </Link>
-            <p className="text-body-sm text-gray-400 mb-6">
+            <p className="text-body-sm text-cream-400 mb-6">
               Travel light. Stay connected. Premium eSIMs for travelers who demand reliability.
             </p>
             {/* Contact */}
             <div className="space-y-3">
               <a
                 href="https://wa.me/61400000000"
-                className="flex items-center gap-2 text-body-sm text-gray-400 hover:text-brand-400 transition-colors"
+                className="flex items-center gap-2 text-body-sm text-cream-400 hover:text-brand-400 transition-colors"
               >
                 <MessageCircle className="w-4 h-4" />
                 WhatsApp Support
               </a>
               <a
                 href="mailto:support@trvel.co"
-                className="flex items-center gap-2 text-body-sm text-gray-400 hover:text-brand-400 transition-colors"
+                className="flex items-center gap-2 text-body-sm text-cream-400 hover:text-brand-400 transition-colors"
               >
                 <Mail className="w-4 h-4" />
                 support@trvel.co
@@ -105,13 +120,13 @@ export function Footer() {
 
           {/* Destinations */}
           <div>
-            <h4 className="text-body font-semibold text-white mb-4">Destinations</h4>
+            <h4 className="text-body font-semibold text-cream-100 mb-4">Destinations</h4>
             <ul className="space-y-3">
               {destinations.map((destination) => (
                 <li key={destination.slug}>
                   <Link
                     href={`/${destination.slug}`}
-                    className="text-body-sm text-gray-400 hover:text-brand-400 transition-colors"
+                    className="text-body-sm text-cream-400 hover:text-brand-400 transition-colors"
                   >
                     {destination.name}
                   </Link>
@@ -130,13 +145,13 @@ export function Footer() {
 
           {/* Company */}
           <div>
-            <h4 className="text-body font-semibold text-white mb-4">Company</h4>
+            <h4 className="text-body font-semibold text-cream-100 mb-4">Company</h4>
             <ul className="space-y-3">
               {company.map((item) => (
                 <li key={item.href}>
                   <Link
                     href={item.href}
-                    className="text-body-sm text-gray-400 hover:text-brand-400 transition-colors"
+                    className="text-body-sm text-cream-400 hover:text-brand-400 transition-colors"
                   >
                     {item.name}
                   </Link>
@@ -147,13 +162,13 @@ export function Footer() {
 
           {/* Legal */}
           <div>
-            <h4 className="text-body font-semibold text-white mb-4">Legal</h4>
+            <h4 className="text-body font-semibold text-cream-100 mb-4">Legal</h4>
             <ul className="space-y-3">
               {legal.map((item) => (
                 <li key={item.href}>
                   <Link
                     href={item.href}
-                    className="text-body-sm text-gray-400 hover:text-brand-400 transition-colors"
+                    className="text-body-sm text-cream-400 hover:text-brand-400 transition-colors"
                   >
                     {item.name}
                   </Link>
@@ -164,16 +179,16 @@ export function Footer() {
 
           {/* Region */}
           <div>
-            <h4 className="text-body font-semibold text-white mb-4">Region</h4>
+            <h4 className="text-body font-semibold text-cream-100 mb-4">Region</h4>
             <ul className="space-y-3">
               {locales.map((locale) => (
                 <li key={locale.code}>
                   <Link
                     href="/"
                     locale={locale.code}
-                    className="flex items-center gap-2 text-body-sm text-gray-400 hover:text-brand-400 transition-colors"
+                    className="flex items-center gap-2 text-body-sm text-cream-400 hover:text-brand-400 transition-colors"
                   >
-                    <span>{locale.flag}</span>
+                    <locale.Flag className="w-5 h-auto rounded-sm" />
                     <span>{locale.currency}</span>
                   </Link>
                 </li>
@@ -184,18 +199,18 @@ export function Footer() {
       </div>
 
       {/* Bottom Bar */}
-      <div className="border-t border-gray-800">
+      <div className="border-t border-navy-400">
         <div className="container-wide py-6">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-body-sm text-gray-500">
+            <p className="text-body-sm text-cream-500">
               © {new Date().getFullYear()} Trvel. All rights reserved.
             </p>
             <div className="flex items-center gap-6">
-              <span className="text-body-sm text-gray-500">Payments secured by</span>
+              <span className="text-body-sm text-cream-500">Payments secured by</span>
               <div className="flex items-center gap-3">
-                <div className="px-3 py-1 bg-gray-800 rounded text-body-sm text-gray-400">Stripe</div>
-                <div className="px-3 py-1 bg-gray-800 rounded text-body-sm text-gray-400">Apple Pay</div>
-                <div className="px-3 py-1 bg-gray-800 rounded text-body-sm text-gray-400">Google Pay</div>
+                <div className="px-3 py-1 bg-navy-400 rounded text-body-sm text-cream-400">Stripe</div>
+                <div className="px-3 py-1 bg-navy-400 rounded text-body-sm text-cream-400">Apple Pay</div>
+                <div className="px-3 py-1 bg-navy-400 rounded text-body-sm text-cream-400">Google Pay</div>
               </div>
             </div>
           </div>

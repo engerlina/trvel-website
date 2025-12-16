@@ -4,20 +4,128 @@
 
 @layer base {
   :root {
-    --gradient-brand: linear-gradient(135deg, #0ea5e9 0%, #0284c7 50%, #0369a1 100%);
-    --gradient-accent: linear-gradient(135deg, #d946ef 0%, #a21caf 100%);
-    --gradient-success: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
-    --gradient-hero: linear-gradient(180deg, #f0f9ff 0%, #ffffff 100%);
+    /* New color scheme - Travel Illustrations palette */
+    --color-navy: #010326;
+    --color-teal: #63BFBF;
+    --color-cream: #F2E2CE;
+    --color-coral: #F28379;
+    --color-coral-red: #F25757;
+
+    /* Gradients */
+    --gradient-brand: linear-gradient(135deg, #63BFBF 0%, #4fa9a9 100%);
+    --gradient-accent: linear-gradient(135deg, #F28379 0%, #F25757 100%);
+    --gradient-cta: linear-gradient(135deg, #F25757 0%, #d93d3d 100%);
+    --gradient-success: linear-gradient(135deg, #63BFBF 0%, #4fa9a9 100%);
+    --gradient-hero: linear-gradient(180deg, #F2E2CE 0%, #ffffff 100%);
   }
 
   html {
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    background-image: none !important;
+    background: #ffffff !important;
   }
 
   body {
     @apply bg-base-100 text-base-content;
+    background-image: none !important;
+    background: #ffffff !important;
+  }
+
+  /* Disable DaisyUI noise/texture effects */
+  :root {
+    --noise: 0 !important;
+    --fx-noise: none !important;
+    --depth: 0 !important;
+  }
+
+  /* Remove any DaisyUI background patterns */
+  html::before,
+  html::after,
+  body::before,
+  body::after {
+    display: none !important;
+    content: none !important;
+    background-image: none !important;
+  }
+
+  /* Disable DaisyUI background texture/pattern completely */
+  html,
+  body,
+  [data-theme] {
+    background-image: none !important;
+    background-size: auto !important;
+  }
+
+  /* Remove DaisyUI noise pattern if applied via pseudo-elements */
+  html::before,
+  html::after,
+  body::before,
+  body::after {
+    background: none !important;
+    background-image: none !important;
+  }
+
+  /* Remove patterns from footer and all elements (but preserve gradients) */
+  footer,
+  footer::before,
+  footer::after {
+    background-image: none !important;
+    background-size: auto !important;
+  }
+
+  footer::before,
+  footer::after {
+    display: none !important;
+    content: none !important;
+  }
+
+  /* Ensure solid backgrounds don't have patterns - but preserve gradients */
+  [class*="bg-gray"]:not([class*="gradient"]):not([class*="bg-gradient"]),
+  [class*="bg-base"]:not([class*="gradient"]):not([class*="bg-gradient"]) {
+    background-image: none !important;
+  }
+  
+  /* Force remove patterns from footer specifically */
+  footer {
+    background-image: none !important;
+    position: relative;
+  }
+  
+  footer::before,
+  footer::after {
+    display: none !important;
+    content: none !important;
+    background-image: none !important;
+  }
+  
+  /* Remove patterns from footer children but preserve their backgrounds */
+  footer > * {
+    background-image: none !important;
+  }
+
+  /* Nuclear option: Disable all DaisyUI background patterns */
+  footer,
+  footer * {
+    --pattern-opacity: 0 !important;
+    --pattern-size: 0 !important;
+    background-image: none !important;
+  }
+
+  /* Target DaisyUI's specific pattern application method */
+  footer::after {
+    content: none !important;
+    display: none !important;
+    opacity: 0 !important;
+    background: none !important;
+    background-image: none !important;
+    background-size: 0 !important;
+  }
+  
+  /* Override any inline styles or computed styles that might apply patterns */
+  footer[style] {
+    background-image: none !important;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -75,4 +183,79 @@
   .animate-delay-400 {
     animation-delay: 400ms;
   }
+}
+
+/* Force remove DaisyUI patterns with maximum specificity - outside of layers for highest priority */
+footer.bg-gray-900,
+footer[class*="bg-gray"],
+footer {
+  background-image: none !important;
+  background-size: auto !important;
+  background-position: 0 0 !important;
+  background-repeat: no-repeat !important;
+  /* Prevent any transitions or animations on background */
+  transition: none !important;
+  animation: none !important;
+}
+
+footer.bg-gray-900::before,
+footer.bg-gray-900::after,
+footer::before,
+footer::after {
+  display: none !important;
+  content: none !important;
+  background: none !important;
+  background-image: none !important;
+  background-size: 0 !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  /* Prevent any transitions on pseudo-elements */
+  transition: none !important;
+  animation: none !important;
+}
+
+/* Prevent DaisyUI from applying patterns on scroll/intersection */
+footer[data-theme],
+footer[data-set-theme] {
+  background-image: none !important;
+}
+
+/* Override any DaisyUI utility classes that might add patterns */
+footer.bg-base-300,
+footer.bg-base-200,
+footer.bg-base-100,
+footer.bg-gray-900,
+footer.bg-gray-800 {
+  background-image: none !important;
+  background: var(--tw-bg-opacity, 1) * var(--fallback-bc, oklch(var(--bc) / var(--tw-bg-opacity))) !important;
+}
+
+/* Ensure the background color is solid without any pattern overlay */
+footer {
+  background: #010326 !important; /* Navy - new brand color */
+  background-image: none !important;
+}
+
+/* Prevent any viewport-based or scroll-based pattern application */
+@supports (background-image: none) {
+  footer {
+    background-image: none !important;
+  }
+}
+
+/* Override Tailwind's bg-gray-900 class to prevent DaisyUI from adding patterns */
+footer.bg-gray-900 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(17 24 39 / var(--tw-bg-opacity)) !important;
+  background-image: none !important;
+}
+
+/* Ensure no pattern is applied on any state change */
+footer:hover,
+footer:focus,
+footer:focus-within,
+footer[data-visible],
+footer[data-in-view] {
+  background-image: none !important;
+  background: #010326 !important;
 }

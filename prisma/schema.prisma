@@ -10,22 +10,78 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// eSIM-Go catalog bundles (wholesale prices in USD cents)
+model EsimBundle {
+  id              Int      @id @default(autoincrement())
+  name            String   @unique @db.VarChar(100) // Bundle identifier from API
+  description     String?  @db.Text
+  group           String   @db.VarChar(100) // e.g., "Standard Unlimited Essential"
+  country_iso     String   @db.Char(2) // Primary country ISO code
+  country_name    String   @db.VarChar(100)
+  region          String?  @db.VarChar(50)
+  duration        Int // Days
+  price_usd_cents Int // Wholesale price in USD cents
+  data_amount_mb  Int? // Data in MB (null if unlimited)
+  unlimited       Boolean  @default(false)
+  speed           String[] // Array of speeds e.g., ["4G", "5G"]
+  autostart       Boolean  @default(false)
+  raw_data        Json? // Full API response for reference
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([country_iso])
+  @@index([duration])
+  @@index([group])
+}
+
+// Currency exchange rates from USD
+model ExchangeRate {
+  id        Int      @id @default(autoincrement())
+  currency  String   @unique @db.Char(3)
+  rate      Decimal  @db.Decimal(10, 4) // Rate from USD (e.g., USD to AUD = 1.55)
+  updatedAt DateTime @updatedAt
+
+  @@index([currency])
+}
+
+// Competitor/incumbent carriers by currency region
+model Competitor {
+  id         Int      @id @default(autoincrement())
+  currency   String   @unique @db.Char(3) // AUD, GBP, SGD, MYR, IDR
+  name       String   @db.VarChar(50) // e.g., Telstra, Vodafone, Singtel
+  daily_rate Decimal  @db.Decimal(10, 2) // Daily roaming rate in local currency
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
 model Plan {
-  id                  Int      @id @default(autoincrement())
-  destination_slug    String   @db.VarChar(50)
-  locale              String   @db.VarChar(10)
-  currency            String   @db.Char(3)
-  price_5day          Decimal? @db.Decimal(10, 2)
-  price_7day          Decimal? @db.Decimal(10, 2)
-  price_15day         Decimal? @db.Decimal(10, 2)
-  competitor_name     String?  @db.VarChar(50)
-  competitor_daily_rate Decimal? @db.Decimal(10, 2)
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
+  id                    Int      @id @default(autoincrement())
+  destination_slug      String   @db.VarChar(50)
+  locale                String   @db.VarChar(10)
+  currency              String   @db.Char(3)
+  // Wholesale prices in USD cents (from eSIM-Go)
+  wholesale_5day_cents  Int?
+  wholesale_7day_cents  Int?
+  wholesale_15day_cents Int?
+  // Retail prices with markup (in local currency)
+  price_5day            Decimal? @db.Decimal(10, 2)
+  price_7day            Decimal? @db.Decimal(10, 2)
+  price_15day           Decimal? @db.Decimal(10, 2)
+  // Bundle references
+  bundle_5day           String?  @db.VarChar(100) // EsimBundle.name
+  bundle_7day           String?  @db.VarChar(100)
+  bundle_15day          String?  @db.VarChar(100)
+  // Stripe price IDs for checkout
+  stripe_price_5day     String?  @db.VarChar(100)
+  stripe_price_7day     String?  @db.VarChar(100)
+  stripe_price_15day    String?  @db.VarChar(100)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
 
   @@unique([destination_slug, locale])
   @@index([destination_slug])
   @@index([locale])
+  @@index([currency])
 }
 
 model Destination {
@@ -42,19 +98,147 @@ model Destination {
   @@index([locale])
 }
 
+model Author {
+  id         Int      @id @default(autoincrement())
+  slug       String   @unique @db.VarChar(50)
+  name       String   @db.VarChar(100)
+  bio        String?  @db.VarChar(500)
+  avatar_url String?  @db.VarChar(500)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  posts Post[]
+
+  @@index([slug])
+}
+
+model Category {
+  id          Int      @id @default(autoincrement())
+  slug        String   @db.VarChar(50)
+  locale      String   @db.VarChar(10)
+  name        String   @db.VarChar(100)
+  description String?  @db.VarChar(300)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  posts Post[]
+
+  @@unique([slug, locale])
+  @@index([slug])
+  @@index([locale])
+}
+
 model Post {
-  id          Int       @id @default(autoincrement())
-  slug        String    @db.VarChar(100)
-  locale      String    @db.VarChar(10)
-  title       String    @db.VarChar(200)
-  content     String    @db.Text
-  published_at DateTime?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id             Int       @id @default(autoincrement())
+  slug           String    @db.VarChar(100)
+  locale         String    @db.VarChar(10)
+  title          String    @db.VarChar(200)
+  excerpt        String?   @db.VarChar(300)
+  content        String    @db.Text
+  featured_image String?   @db.VarChar(500)
+  read_time      Int?      // minutes
+  published_at   DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  // Relations
+  author_id   Int?
+  author      Author?   @relation(fields: [author_id], references: [id])
+  category_id Int?
+  category    Category? @relation(fields: [category_id], references: [id])
 
   @@unique([slug, locale])
   @@index([slug])
   @@index([locale])
   @@index([published_at])
+  @@index([author_id])
+  @@index([category_id])
+}
+
+// Customer information
+model Customer {
+  id                 Int      @id @default(autoincrement())
+  email              String   @unique @db.VarChar(255)
+  name               String?  @db.VarChar(200)
+  phone              String?  @db.VarChar(50)
+  stripe_customer_id String?  @unique @db.VarChar(100)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  orders Order[]
+
+  @@index([email])
+  @@index([stripe_customer_id])
+}
+
+// Order status enum
+enum OrderStatus {
+  pending
+  paid
+  failed
+  refunded
+  disputed
+}
+
+// eSIM delivery status enum
+enum EsimStatus {
+  pending       // Payment received, not yet ordered from eSIM-Go
+  ordering      // API call in progress
+  ordered       // Successfully ordered from eSIM-Go
+  delivered     // Email with QR code sent
+  activated     // Customer activated the eSIM
+  failed        // Order failed
+}
+
+// Order/Purchase tracking
+model Order {
+  id                       Int         @id @default(autoincrement())
+  order_number             String      @unique @db.VarChar(20) // e.g., TRV-20231217-001
+  customer_id              Int
+  customer                 Customer    @relation(fields: [customer_id], references: [id])
+
+  // Product details
+  destination_slug         String      @db.VarChar(50)
+  destination_name         String      @db.VarChar(100) // Denormalized for easy lookup
+  duration                 Int         // 5, 7, or 15 days
+  plan_name                String      @db.VarChar(50) // "Quick Trip", "Week Explorer", etc.
+  bundle_name              String?     @db.VarChar(100) // eSIM-Go bundle identifier
+
+  // Payment details
+  amount_cents             Int         // Amount in cents (avoids decimal issues)
+  currency                 String      @db.Char(3)
+  status                   OrderStatus @default(pending)
+
+  // Stripe references
+  stripe_session_id        String?     @unique @db.VarChar(100)
+  stripe_payment_intent_id String?     @db.VarChar(100)
+
+  // eSIM fulfillment
+  esim_status              EsimStatus  @default(pending)
+  esim_iccid               String?     @db.VarChar(50) // ICCID from eSIM-Go
+  esim_qr_code             String?     @db.Text // QR code data/URL
+  esim_order_ref           String?     @db.VarChar(100) // eSIM-Go order reference
+
+  // Communication
+  confirmation_email_sent  Boolean     @default(false)
+  esim_email_sent          Boolean     @default(false)
+
+  // Support
+  locale                   String      @db.VarChar(10)
+  notes                    String?     @db.Text // Internal notes for support
+
+  // Timestamps
+  createdAt                DateTime    @default(now())
+  updatedAt                DateTime    @updatedAt
+  paidAt                   DateTime?
+
+  @@index([order_number])
+  @@index([customer_id])
+  @@index([status])
+  @@index([esim_status])
+  @@index([stripe_session_id])
+  @@index([stripe_payment_intent_id])
+  @@index([destination_slug])
+  @@index([createdAt])
 }
 
