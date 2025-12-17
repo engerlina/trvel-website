@@ -7,6 +7,7 @@ const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://trvel.co';
 // Carrier mapping for comparison pages
 const LOCALE_CARRIERS: Record<string, string> = {
   'en-au': 'telstra',
+  'en-us': 'att',
   'en-sg': 'singtel',
   'en-gb': 'ee',
   'ms-my': 'maxis',

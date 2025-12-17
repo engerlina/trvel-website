@@ -40,6 +40,7 @@ function formatPrice(price: unknown, currency: string): string {
 // Carrier display names
 const CARRIER_NAMES: Record<string, string> = {
   telstra: 'Telstra',
+  att: 'AT&T',
   singtel: 'Singtel',
   ee: 'EE',
   maxis: 'Maxis',
@@ -49,6 +50,7 @@ const CARRIER_NAMES: Record<string, string> = {
 // Locale to carrier mapping
 const LOCALE_CARRIERS: Record<string, string> = {
   'en-au': 'telstra',
+  'en-us': 'att',
   'en-sg': 'singtel',
   'en-gb': 'ee',
   'ms-my': 'maxis',

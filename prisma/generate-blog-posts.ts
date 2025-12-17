@@ -44,6 +44,7 @@ You are writing for Trvel, a premium eSIM provider. Follow these guidelines:
 // Locale-specific context
 const LOCALE_CONTEXT: Record<string, { currency: string; competitor: string; demonym: string; spelling: string }> = {
   'en-au': { currency: 'AUD', competitor: 'Telstra', demonym: 'Australian', spelling: 'British' },
+  'en-us': { currency: 'USD', competitor: 'AT&T', demonym: 'American', spelling: 'American' },
   'en-sg': { currency: 'SGD', competitor: 'Singtel', demonym: 'Singaporean', spelling: 'British' },
   'en-gb': { currency: 'GBP', competitor: 'EE', demonym: 'British', spelling: 'British' },
   'ms-my': { currency: 'MYR', competitor: 'Maxis', demonym: 'Malaysian', spelling: 'British' },
@@ -65,6 +66,7 @@ const DESTINATION_IMAGE_PROMPTS: Record<string, string> = {
   spain: 'Beautiful travel photography of Barcelona Spain, Sagrada Familia, Mediterranean vibes, warm golden light, professional DSLR quality, no text',
   greece: 'Stunning travel photography of Santorini Greece, white buildings, blue domes, Mediterranean sea, sunset colors, professional DSLR quality, no text',
   china: 'Beautiful travel photography of China, Great Wall or Shanghai skyline, misty mountains, warm golden light, professional DSLR quality, no text',
+  'united-kingdom': 'Beautiful travel photography of London England, Big Ben, Tower Bridge, red phone booth, warm golden light, professional DSLR quality, no text',
   general: 'Beautiful travel photography, airplane window view of clouds at sunset, wanderlust vibes, warm golden tones, professional DSLR quality, no text',
 };
 
@@ -262,6 +264,7 @@ async function getCategoryId(contentType: string, locale: string): Promise<numbe
 async function getAuthorId(locale: string): Promise<number | null> {
   const authorMap: Record<string, string> = {
     'en-au': 'emma-thompson',
+    'en-us': 'james-wilson',
     'en-sg': 'sarah-chen',
     'en-gb': 'james-wilson',
     'ms-my': 'ahmad-rizal',
