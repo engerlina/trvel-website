@@ -21,7 +21,7 @@ npm run db:studio        # Open Prisma Studio GUI
 
 ### Internationalization (next-intl)
 - All routes are prefixed with locale: `/[locale]/...`
-- Supported locales: `en-au` (default), `en-sg`, `en-gb`, `ms-my`, `id-id`
+- Supported locales: `en-au` (default), `en-sg`, `en-gb`, `ms-my`, `id-id`, `en-us`
 - Translation files: `messages/{locale}.json`
 - Locale routing defined in `i18n/routing.ts` - exports `Link`, `redirect`, `usePathname`, `useRouter`
 - Use `getTranslations()` in server components, `useTranslations()` in client components
@@ -91,3 +91,48 @@ Blog images are stored in AWS S3 for fast global delivery.
 - Upload blog images to `blog/` folder in the bucket
 - Reference in blog posts: `https://trvel-s3.s3.ap-southeast-2.amazonaws.com/blog/image-name.jpg`
 - Supported formats: JPG, PNG, WebP (prefer WebP for performance)
+
+## Stripe Payments
+
+### Architecture: Dynamic Pricing
+
+The checkout uses **dynamic pricing** with `price_data` instead of pre-created Stripe Products/Prices. This approach is chosen because:
+
+1. **Scale**: 190 destinations × 6 locales × 3 durations = 3,420 unique prices would be unmanageable
+2. **Multi-currency**: Each locale has different currency (AUD, SGD, GBP, MYR, IDR, USD)
+3. **Price updates**: Prices calculated from exchange rates can change frequently
+
+### How It Works
+
+1. User clicks "Buy" button with destination + duration + locale
+2. `/api/checkout` fetches price from `Plan` table in database
+3. Stripe Checkout Session created with `price_data` (no pre-created Price ID needed)
+4. Product appears in Stripe as "Japan eSIM - Week Explorer" etc.
+5. Webhook receives payment → creates Order → provisions eSIM
+
+### Stripe Files
+
+- `app/api/checkout/route.ts` - Creates Stripe Checkout session with dynamic pricing
+- `app/api/webhooks/stripe/route.ts` - Handles payment success/failure webhooks
+- `lib/stripe.ts` - Stripe client configuration (supports TEST_MODE)
+
+### Stripe Environment Variables
+
+```bash
+# Production
+STRIPE_SECRET_KEY=sk_live_...
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+
+# Test mode (set TEST_MODE=true to use these)
+TEST_MODE=true
+TEST_STRIPE_SECRET_KEY=sk_test_...
+TEST_NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
+TEST_STRIPE_WEBHOOK_SECRET=whsec_...
+```
+
+### Promotion Codes
+
+- Coupons/Promotion codes are managed in Stripe Dashboard
+- Checkout automatically allows customers to enter promo codes
+- Can also pass `promoCode` param to pre-apply a code

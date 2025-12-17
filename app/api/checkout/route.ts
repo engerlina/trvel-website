@@ -3,6 +3,13 @@ import Stripe from 'stripe';
 import { stripe, isTestMode } from '@/lib/stripe';
 import { prisma } from '@/lib/db';
 
+// Plan names for display
+const PLAN_NAMES: Record<number, string> = {
+  5: 'Quick Trip',
+  7: 'Week Explorer',
+  15: 'Extended Stay',
+};
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -24,15 +31,25 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get the plan from database
-    const plan = await prisma.plan.findUnique({
-      where: {
-        destination_slug_locale: {
-          destination_slug: destination,
-          locale: locale,
+    // Get the plan and destination from database
+    const [plan, destinationData] = await Promise.all([
+      prisma.plan.findUnique({
+        where: {
+          destination_slug_locale: {
+            destination_slug: destination,
+            locale: locale,
+          },
         },
-      },
-    });
+      }),
+      prisma.destination.findUnique({
+        where: {
+          slug_locale: {
+            slug: destination,
+            locale: locale,
+          },
+        },
+      }),
+    ]);
 
     if (!plan) {
       return NextResponse.json(
@@ -41,66 +58,79 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get the appropriate Stripe price ID based on duration and test mode
-    let stripePriceId: string | null = null;
+    // Get the price based on duration
+    let price: number | null = null;
+    let bundleName: string | null = null;
 
-    if (isTestMode) {
-      // Use test price IDs
-      switch (duration) {
-        case 5:
-          stripePriceId = plan.stripe_test_price_5day;
-          break;
-        case 7:
-          stripePriceId = plan.stripe_test_price_7day;
-          break;
-        case 15:
-          stripePriceId = plan.stripe_test_price_15day;
-          break;
-      }
-    } else {
-      // Use production price IDs
-      switch (duration) {
-        case 5:
-          stripePriceId = plan.stripe_price_5day;
-          break;
-        case 7:
-          stripePriceId = plan.stripe_price_7day;
-          break;
-        case 15:
-          stripePriceId = plan.stripe_price_15day;
-          break;
-      }
+    switch (duration) {
+      case 5:
+        price = plan.price_5day ? Number(plan.price_5day) : null;
+        bundleName = plan.bundle_5day;
+        break;
+      case 7:
+        price = plan.price_7day ? Number(plan.price_7day) : null;
+        bundleName = plan.bundle_7day;
+        break;
+      case 15:
+        price = plan.price_15day ? Number(plan.price_15day) : null;
+        bundleName = plan.bundle_15day;
+        break;
     }
 
-    if (!stripePriceId) {
-      console.error(`Stripe price not configured for ${isTestMode ? 'test' : 'production'} mode`, {
+    if (!price || price <= 0) {
+      console.error('Price not configured for plan', {
         destination,
         duration,
         locale,
-        isTestMode,
+        plan,
       });
       return NextResponse.json(
-        { error: `Stripe price not configured for this plan (${isTestMode ? 'test' : 'production'} mode)` },
+        { error: 'Price not configured for this plan' },
         { status: 400 }
       );
     }
 
+    // Convert price to cents (Stripe uses smallest currency unit)
+    const priceInCents = Math.round(price * 100);
+
+    // Build product name for Stripe
+    const destinationName = destinationData?.name || destination.replace(/-/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase());
+    const planName = PLAN_NAMES[duration] || `${duration}-Day Plan`;
+    const productName = `${destinationName} eSIM - ${planName}`;
+    const productDescription = `${duration}-day unlimited data eSIM for ${destinationName}`;
+
     console.log(`Creating checkout session (${isTestMode ? 'TEST' : 'LIVE'} mode):`, {
       destination,
+      destinationName,
       duration,
-      stripePriceId,
+      price,
+      priceInCents,
+      currency: plan.currency,
     });
 
     // Get the origin for redirect URLs
     const origin = request.headers.get('origin') || 'http://localhost:3000';
 
-    // Build checkout session options
+    // Build checkout session options with dynamic pricing (price_data)
+    // This approach doesn't require pre-created Stripe Products/Prices
     const sessionOptions: Stripe.Checkout.SessionCreateParams = {
       mode: 'payment',
       payment_method_types: ['card'],
       line_items: [
         {
-          price: stripePriceId,
+          price_data: {
+            currency: plan.currency.toLowerCase(),
+            product_data: {
+              name: productName,
+              description: productDescription,
+              metadata: {
+                destination_slug: destination,
+                duration: duration.toString(),
+                locale: locale,
+              },
+            },
+            unit_amount: priceInCents,
+          },
           quantity: 1,
         },
       ],
@@ -108,11 +138,12 @@ export async function POST(request: NextRequest) {
       cancel_url: `${origin}/${locale}/checkout/cancel`,
       metadata: {
         destination_slug: destination,
+        destination_name: destinationName,
         duration: duration.toString(),
         locale: locale,
-        bundle_name: duration === 5 ? plan.bundle_5day || '' :
-                     duration === 7 ? plan.bundle_7day || '' :
-                     plan.bundle_15day || '',
+        bundle_name: bundleName || '',
+        price_paid: price.toString(),
+        currency: plan.currency,
       },
     };
 
