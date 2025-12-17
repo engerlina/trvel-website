@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import {
   Smartphone,
   CheckCircle,
@@ -226,12 +226,30 @@ export function EsimChecker() {
   const [modelDropdownOpen, setModelDropdownOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
+  const brandDropdownRef = useRef<HTMLDivElement>(null);
+  const modelDropdownRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     const result = detectDevice();
     setDetection(result);
     if (result.brand) {
       setSelectedBrand(result.brand);
     }
+  }, []);
+
+  // Click outside handler
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (brandDropdownRef.current && !brandDropdownRef.current.contains(event.target as Node)) {
+        setBrandDropdownOpen(false);
+      }
+      if (modelDropdownRef.current && !modelDropdownRef.current.contains(event.target as Node)) {
+        setModelDropdownOpen(false);
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   const brands = Object.keys(deviceDatabase) as Brand[];
@@ -257,9 +275,9 @@ export function EsimChecker() {
   }, [selectedBrand, selectedModel]);
 
   return (
-    <div className="bg-white rounded-2xl border border-cream-200 overflow-hidden shadow-soft">
+    <div className="bg-white rounded-2xl border border-cream-200 shadow-soft">
       {/* Header */}
-      <div className="bg-gradient-to-r from-brand-500 to-brand-600 p-6 text-white">
+      <div className="bg-gradient-to-r from-brand-500 to-brand-600 p-6 text-white rounded-t-2xl">
         <div className="flex items-center gap-3 mb-2">
           <Smartphone className="w-6 h-6" />
           <h3 className="text-xl font-bold">eSIM Compatibility Checker</h3>
@@ -377,14 +395,17 @@ export function EsimChecker() {
         {activeTab === 'manual' && (
           <div className="space-y-4">
             {/* Brand Dropdown */}
-            <div>
+            <div ref={brandDropdownRef}>
               <label className="block text-sm font-medium text-navy-500 mb-2">
                 Phone Brand
               </label>
               <div className="relative">
                 <button
                   type="button"
-                  onClick={() => setBrandDropdownOpen(!brandDropdownOpen)}
+                  onClick={() => {
+                    setBrandDropdownOpen(!brandDropdownOpen);
+                    setModelDropdownOpen(false);
+                  }}
                   className="w-full flex items-center justify-between gap-3 p-4 bg-cream-50 border border-cream-200 rounded-xl hover:border-brand-300 transition-colors text-left"
                 >
                   <span className={selectedBrand ? 'text-navy-600 font-medium' : 'text-navy-400'}>
@@ -394,17 +415,18 @@ export function EsimChecker() {
                 </button>
 
                 {brandDropdownOpen && (
-                  <div className="absolute z-20 top-full left-0 right-0 mt-2 bg-white border border-cream-200 rounded-xl shadow-lg max-h-60 overflow-y-auto">
+                  <div className="absolute z-50 top-full left-0 right-0 mt-2 bg-white border border-cream-200 rounded-xl shadow-lg max-h-60 overflow-y-auto">
                     {brands.map((brand) => (
                       <button
                         key={brand}
                         type="button"
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.stopPropagation();
                           setSelectedBrand(brand);
                           setSelectedModel('');
                           setBrandDropdownOpen(false);
                         }}
-                        className="w-full flex items-center justify-between p-4 hover:bg-cream-50 transition-colors text-left"
+                        className="w-full flex items-center justify-between p-4 hover:bg-cream-50 transition-colors text-left border-b border-cream-100 last:border-b-0"
                       >
                         <span className="font-medium text-navy-600">{brand}</span>
                         {selectedBrand === brand && (
@@ -419,14 +441,17 @@ export function EsimChecker() {
 
             {/* Model Dropdown */}
             {selectedBrand && (
-              <div>
+              <div ref={modelDropdownRef}>
                 <label className="block text-sm font-medium text-navy-500 mb-2">
                   Phone Model
                 </label>
                 <div className="relative">
                   <button
                     type="button"
-                    onClick={() => setModelDropdownOpen(!modelDropdownOpen)}
+                    onClick={() => {
+                      setModelDropdownOpen(!modelDropdownOpen);
+                      setBrandDropdownOpen(false);
+                    }}
                     className="w-full flex items-center justify-between gap-3 p-4 bg-cream-50 border border-cream-200 rounded-xl hover:border-brand-300 transition-colors text-left"
                   >
                     <span className={selectedModel ? 'text-navy-600 font-medium' : 'text-navy-400'}>
@@ -436,7 +461,7 @@ export function EsimChecker() {
                   </button>
 
                   {modelDropdownOpen && (
-                    <div className="absolute z-20 top-full left-0 right-0 mt-2 bg-white border border-cream-200 rounded-xl shadow-lg">
+                    <div className="absolute z-50 top-full left-0 right-0 mt-2 bg-white border border-cream-200 rounded-xl shadow-lg">
                       {/* Search input */}
                       <div className="p-3 border-b border-cream-200">
                         <div className="relative">
@@ -446,6 +471,7 @@ export function EsimChecker() {
                             placeholder="Search models..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
+                            onClick={(e) => e.stopPropagation()}
                             className="w-full pl-10 pr-4 py-2 bg-cream-50 border border-cream-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
                           />
                         </div>
@@ -457,12 +483,13 @@ export function EsimChecker() {
                             <button
                               key={model}
                               type="button"
-                              onClick={() => {
+                              onClick={(e) => {
+                                e.stopPropagation();
                                 setSelectedModel(model);
                                 setModelDropdownOpen(false);
                                 setSearchQuery('');
                               }}
-                              className="w-full flex items-center justify-between p-4 hover:bg-cream-50 transition-colors text-left"
+                              className="w-full flex items-center justify-between p-4 hover:bg-cream-50 transition-colors text-left border-b border-cream-100 last:border-b-0"
                             >
                               <span className="text-navy-600">{model}</span>
                               <span className={`text-xs px-2 py-1 rounded-full ${
@@ -604,7 +631,7 @@ export function EsimChecker() {
       </div>
 
       {/* Footer note */}
-      <div className="px-6 py-4 bg-cream-50 border-t border-cream-200">
+      <div className="px-6 py-4 bg-cream-50 border-t border-cream-200 rounded-b-2xl">
         <p className="text-xs text-navy-400 text-center">
           Your phone must be carrier-unlocked to use eSIM. Contact your carrier if you&apos;re unsure.
         </p>

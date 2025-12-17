@@ -45,8 +45,8 @@ export function Header() {
         {/* Desktop Navigation */}
         <div className="navbar-center hidden md:flex">
           <ul className="menu menu-horizontal px-1 gap-2">
-            <li><Link href="/" className="text-body">{t('home')}</Link></li>
             <li><Link href="/destinations" className="text-body">{t('destinations')}</Link></li>
+            <li><Link href="/compatibility" className="text-body">Check Device</Link></li>
             <li><Link href="/how-it-works" className="text-body">How It Works</Link></li>
             <li><Link href="/help" className="text-body">Help</Link></li>
           </ul>
@@ -95,8 +95,8 @@ export function Header() {
       {mobileMenuOpen && (
         <div className="md:hidden border-t border-base-200 bg-base-100">
           <ul className="menu p-4">
-            <li><Link href="/" onClick={() => setMobileMenuOpen(false)}>{t('home')}</Link></li>
             <li><Link href="/destinations" onClick={() => setMobileMenuOpen(false)}>{t('destinations')}</Link></li>
+            <li><Link href="/compatibility" onClick={() => setMobileMenuOpen(false)}>Check Device</Link></li>
             <li><Link href="/how-it-works" onClick={() => setMobileMenuOpen(false)}>How It Works</Link></li>
             <li><Link href="/help" onClick={() => setMobileMenuOpen(false)}>Help</Link></li>
             <li className="mt-4">
@@ -107,6 +107,35 @@ export function Header() {
               </Link>
             </li>
           </ul>
+
+          {/* Mobile Locale Switcher */}
+          <div className="border-t border-base-200 p-4">
+            <div className="flex items-center gap-2 text-sm text-navy-400 mb-3">
+              <Globe className="w-4 h-4" />
+              <span>Region & Currency</span>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              {locales.map((loc) => (
+                <Link
+                  key={loc.code}
+                  href="/"
+                  locale={loc.code}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`flex items-center gap-2 p-3 rounded-lg border transition-colors ${
+                    locale === loc.code
+                      ? 'border-brand-500 bg-brand-50'
+                      : 'border-cream-200 hover:border-brand-300'
+                  }`}
+                >
+                  <loc.Flag className="w-5 h-auto rounded-sm flex-shrink-0" />
+                  <div className="min-w-0">
+                    <span className="text-sm font-medium text-navy-600 block truncate">{loc.label}</span>
+                    <span className="text-xs text-navy-400">{loc.currency}</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
         </div>
       )}
     </header>

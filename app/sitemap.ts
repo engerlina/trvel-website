@@ -13,6 +13,7 @@ const staticPages = [
   '',
   '/destinations',
   '/how-it-works',
+  '/compatibility',
   '/help',
   '/blog',
   '/get-started',
