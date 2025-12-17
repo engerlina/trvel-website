@@ -129,8 +129,8 @@ export default function OrderStatus({ sessionId, translations }: OrderStatusProp
 
         {/* QR Code Skeleton */}
         <div className="bg-white rounded-2xl p-6 border-2 border-brand-200 shadow-soft">
-          <div className="text-center">
-            <div className="inline-flex items-center gap-2 mb-4">
+          <div className="flex flex-col items-center text-center">
+            <div className="flex items-center justify-center gap-2 mb-4">
               <svg className="w-5 h-5 text-brand-400 animate-spin" fill="none" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -139,7 +139,7 @@ export default function OrderStatus({ sessionId, translations }: OrderStatusProp
                 {LOADING_MESSAGES[messageIndex]}
               </span>
             </div>
-            <div className="bg-cream-100 rounded-xl p-4 inline-block mb-4 animate-pulse">
+            <div className="bg-cream-100 rounded-xl p-4 mb-4 animate-pulse">
               <div className="w-[200px] h-[200px] bg-cream-200 rounded"></div>
             </div>
             <p className="text-sm text-navy-300">This usually takes just a few seconds</p>
@@ -177,8 +177,8 @@ export default function OrderStatus({ sessionId, translations }: OrderStatusProp
 
         {/* Processing QR Code */}
         <div className="bg-white rounded-2xl p-6 border-2 border-brand-200 shadow-soft">
-          <div className="text-center">
-            <div className="inline-flex items-center gap-2 mb-4">
+          <div className="flex flex-col items-center text-center">
+            <div className="flex items-center justify-center gap-2 mb-4">
               <svg className="w-5 h-5 text-brand-400 animate-spin" fill="none" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -187,7 +187,7 @@ export default function OrderStatus({ sessionId, translations }: OrderStatusProp
                 {LOADING_MESSAGES[messageIndex]}
               </span>
             </div>
-            <div className="bg-cream-100 rounded-xl p-4 inline-block mb-4 animate-pulse">
+            <div className="bg-cream-100 rounded-xl p-4 mb-4 animate-pulse">
               <div className="w-[200px] h-[200px] bg-cream-200 rounded flex items-center justify-center">
                 <svg className="w-16 h-16 text-cream-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
