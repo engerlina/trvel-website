@@ -46,10 +46,10 @@ export async function createEsimOrder(
   bundleName: string,
   orderReference: string
 ): Promise<EsimGoOrderResponse> {
-  const apiKey = process.env.ESIMGO_API_KEY;
+  const apiKey = process.env.ESIMGO_API_KEY || process.env.ESIMGO_API_TOKEN;
 
   if (!apiKey) {
-    throw new Error('ESIMGO_API_KEY not configured');
+    throw new Error('ESIMGO_API_KEY or ESIMGO_API_TOKEN not configured');
   }
 
   // In test mode, use "validate" to test without charging
@@ -89,10 +89,10 @@ export async function createEsimOrder(
 
 // Get eSIM assignment details by order reference
 export async function getEsimAssignment(orderReference: string): Promise<EsimGoAssignmentResponse | null> {
-  const apiKey = process.env.ESIMGO_API_KEY;
+  const apiKey = process.env.ESIMGO_API_KEY || process.env.ESIMGO_API_TOKEN;
 
   if (!apiKey) {
-    throw new Error('ESIMGO_API_KEY not configured');
+    throw new Error('ESIMGO_API_KEY or ESIMGO_API_TOKEN not configured');
   }
 
   const response = await fetch(
@@ -118,10 +118,10 @@ export async function getEsimAssignment(orderReference: string): Promise<EsimGoA
 
 // Get bundle status for an eSIM
 export async function getBundleStatus(iccid: string, bundleName: string) {
-  const apiKey = process.env.ESIMGO_API_KEY;
+  const apiKey = process.env.ESIMGO_API_KEY || process.env.ESIMGO_API_TOKEN;
 
   if (!apiKey) {
-    throw new Error('ESIMGO_API_KEY not configured');
+    throw new Error('ESIMGO_API_KEY or ESIMGO_API_TOKEN not configured');
   }
 
   const response = await fetch(
@@ -143,10 +143,10 @@ export async function getBundleStatus(iccid: string, bundleName: string) {
 
 // Revoke a bundle (for testing/refunds - only works if not started)
 export async function revokeBundle(iccid: string, bundleName: string) {
-  const apiKey = process.env.ESIMGO_API_KEY;
+  const apiKey = process.env.ESIMGO_API_KEY || process.env.ESIMGO_API_TOKEN;
 
   if (!apiKey) {
-    throw new Error('ESIMGO_API_KEY not configured');
+    throw new Error('ESIMGO_API_KEY or ESIMGO_API_TOKEN not configured');
   }
 
   const response = await fetch(
@@ -169,10 +169,10 @@ export async function revokeBundle(iccid: string, bundleName: string) {
 
 // Refund from inventory (for testing - within 60 days, if not started)
 export async function refundFromInventory(bundleName: string, quantity: number = 1) {
-  const apiKey = process.env.ESIMGO_API_KEY;
+  const apiKey = process.env.ESIMGO_API_KEY || process.env.ESIMGO_API_TOKEN;
 
   if (!apiKey) {
-    throw new Error('ESIMGO_API_KEY not configured');
+    throw new Error('ESIMGO_API_KEY or ESIMGO_API_TOKEN not configured');
   }
 
   const response = await fetch(`${ESIMGO_API_BASE}/inventory/refund`, {

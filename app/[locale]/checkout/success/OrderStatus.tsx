@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 interface Order {
   order_number: string;
@@ -51,8 +51,8 @@ const LOADING_MESSAGES = [
 export default function OrderStatus({ sessionId, translations }: OrderStatusProps) {
   const [order, setOrder] = useState<Order | null>(null);
   const [status, setStatus] = useState<'pending' | 'processing' | 'ready'>('pending');
-  const [pollCount, setPollCount] = useState(0);
   const [messageIndex, setMessageIndex] = useState(0);
+  const pollCountRef = useRef(0);
 
   // Cycle through loading messages
   useEffect(() => {
@@ -67,6 +67,8 @@ export default function OrderStatus({ sessionId, translations }: OrderStatusProp
 
   useEffect(() => {
     if (!sessionId) return;
+
+    pollCountRef.current = 0; // Reset poll count when sessionId changes
 
     const pollOrder = async () => {
       try {
@@ -83,10 +85,11 @@ export default function OrderStatus({ sessionId, translations }: OrderStatusProp
           }
         }
 
-        setPollCount((prev) => prev + 1);
+        pollCountRef.current += 1;
         return false; // Continue polling
       } catch (error) {
         console.error('Error fetching order:', error);
+        pollCountRef.current += 1;
         return false;
       }
     };
@@ -97,13 +100,13 @@ export default function OrderStatus({ sessionId, translations }: OrderStatusProp
     // Poll every 2 seconds for up to 60 seconds (30 attempts)
     const intervalId = setInterval(async () => {
       const shouldStop = await pollOrder();
-      if (shouldStop || pollCount >= 30) {
+      if (shouldStop || pollCountRef.current >= 30) {
         clearInterval(intervalId);
       }
     }, 2000);
 
     return () => clearInterval(intervalId);
-  }, [sessionId, pollCount]);
+  }, [sessionId]);
 
   // Loading skeleton
   if (status === 'pending') {
