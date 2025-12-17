@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import { Header, Footer } from '@/components/layout';
 import { Link } from '@/i18n/routing';
+import { EsimChecker } from '@/components/compatibility/EsimChecker';
 import {
   Smartphone,
   QrCode,
@@ -215,48 +216,17 @@ export default async function HowItWorksPage({ params }: HowItWorksPageProps) {
         {/* Compatibility Section */}
         <section className="py-16 bg-cream-50">
           <div className="container-wide">
-            <div className="max-w-4xl mx-auto">
-              <div className="text-center mb-12">
+            <div className="max-w-2xl mx-auto">
+              <div className="text-center mb-8">
                 <h2 className="text-heading-xl md:text-display font-bold text-navy-500 mb-4">
-                  Compatible Devices
+                  Check Your Device
                 </h2>
                 <p className="text-body-lg text-navy-400 max-w-2xl mx-auto">
-                  Most modern smartphones support eSIM. Here are some popular compatible devices.
+                  Find out if your phone supports eSIM in seconds.
                 </p>
               </div>
 
-              <div className="grid md:grid-cols-3 gap-8">
-                <div className="bg-white rounded-2xl p-6 border border-cream-200">
-                  <h3 className="text-lg font-bold text-navy-500 mb-4">Apple iPhone</h3>
-                  <ul className="space-y-2 text-navy-400">
-                    <li>iPhone XS, XS Max, XR</li>
-                    <li>iPhone 11, 12, 13, 14, 15, 16 series</li>
-                    <li>iPhone SE (2nd gen onwards)</li>
-                  </ul>
-                </div>
-
-                <div className="bg-white rounded-2xl p-6 border border-cream-200">
-                  <h3 className="text-lg font-bold text-navy-500 mb-4">Samsung Galaxy</h3>
-                  <ul className="space-y-2 text-navy-400">
-                    <li>Galaxy S20, S21, S22, S23, S24 series</li>
-                    <li>Galaxy Z Fold / Flip series</li>
-                    <li>Galaxy Note 20 series</li>
-                  </ul>
-                </div>
-
-                <div className="bg-white rounded-2xl p-6 border border-cream-200">
-                  <h3 className="text-lg font-bold text-navy-500 mb-4">Google Pixel</h3>
-                  <ul className="space-y-2 text-navy-400">
-                    <li>Pixel 3, 3a, 4, 4a series</li>
-                    <li>Pixel 5, 5a, 6, 6a, 7, 7a series</li>
-                    <li>Pixel 8, 9 series</li>
-                  </ul>
-                </div>
-              </div>
-
-              <p className="text-center text-navy-300 mt-8 text-sm">
-                Your phone must be carrier-unlocked to use an eSIM. Contact your carrier if you&apos;re unsure.
-              </p>
+              <EsimChecker />
             </div>
           </div>
         </section>
