@@ -236,14 +236,19 @@ export async function POST(request: NextRequest) {
               orderNumber
             );
 
+            console.log('eSIM Go full response:', JSON.stringify(esimResponse, null, 2));
+
             // Extract eSIM details from the response
-            const esimItem = esimResponse.order?.items?.[0];
-            if (esimItem?.iccid && esimItem?.smdpAddress && esimItem?.matchingId) {
+            // Response format: { order: [{ type, item, quantity, esims: [{ iccid, smdpAddress, matchingId }] }], orderReference }
+            const orderItem = esimResponse.order?.[0];
+            const esimDetails = orderItem?.esims?.[0];
+
+            if (esimDetails?.iccid && esimDetails?.smdpAddress && esimDetails?.matchingId) {
               esimData = {
-                iccid: esimItem.iccid,
-                smdpAddress: esimItem.smdpAddress,
-                matchingId: esimItem.matchingId,
-                qrCodeString: generateQrCodeString(esimItem.smdpAddress, esimItem.matchingId),
+                iccid: esimDetails.iccid,
+                smdpAddress: esimDetails.smdpAddress,
+                matchingId: esimDetails.matchingId,
+                qrCodeString: generateQrCodeString(esimDetails.smdpAddress, esimDetails.matchingId),
               };
 
               // Update order with eSIM details
@@ -261,10 +266,16 @@ export async function POST(request: NextRequest) {
 
               console.log('eSIM provisioned successfully:', {
                 iccid: esimData.iccid,
-                orderReference: esimResponse.order?.orderReference,
+                orderReference: esimResponse.orderReference,
               });
             } else {
-              console.warn('eSIM order created but missing assignment details:', esimResponse);
+              console.warn('eSIM order created but missing assignment details:', {
+                hasOrder: !!esimResponse.order,
+                orderLength: esimResponse.order?.length,
+                hasEsims: !!orderItem?.esims,
+                esimsLength: orderItem?.esims?.length,
+                response: esimResponse,
+              });
             }
           }
         } catch (esimError) {

@@ -3,19 +3,24 @@ import { isTestMode } from './stripe';
 const ESIMGO_API_BASE = 'https://api.esim-go.com/v2.5';
 
 // eSIM Go API response types
+export interface EsimGoOrderItem {
+  type: string;
+  item: string;
+  quantity: number;
+  esims?: Array<{
+    iccid: string;
+    smdpAddress: string;
+    matchingId: string;
+  }>;
+  iccids?: string[];
+}
+
 export interface EsimGoOrderResponse {
-  order: {
-    orderReference: string;
-    status: string;
-    items: Array<{
-      type: string;
-      item: string;
-      quantity: number;
-      iccid?: string;
-      smdpAddress?: string;
-      matchingId?: string;
-    }>;
-  };
+  order: EsimGoOrderItem[];
+  total?: number;
+  currency?: string;
+  status?: string;
+  orderReference: string;
 }
 
 export interface EsimGoAssignmentResponse {
