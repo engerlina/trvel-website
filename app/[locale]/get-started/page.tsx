@@ -14,27 +14,18 @@ import {
   Shield,
   ArrowRight,
   Info,
+  Search,
 } from 'lucide-react';
-import {
-  JP, TH, KR, SG, ID, MY, VN, PH, GB, FR, IT, US,
-  type FlagComponent,
-} from 'country-flag-icons/react/3x2';
+import * as Flags from 'country-flag-icons/react/3x2';
 import { isDestinationExcluded } from '@/lib/utils';
 
-const destinations: { name: string; slug: string; Flag: FlagComponent }[] = [
-  { name: 'Japan', slug: 'japan', Flag: JP },
-  { name: 'Thailand', slug: 'thailand', Flag: TH },
-  { name: 'South Korea', slug: 'south-korea', Flag: KR },
-  { name: 'Singapore', slug: 'singapore', Flag: SG },
-  { name: 'Indonesia', slug: 'indonesia', Flag: ID },
-  { name: 'Malaysia', slug: 'malaysia', Flag: MY },
-  { name: 'Vietnam', slug: 'vietnam', Flag: VN },
-  { name: 'Philippines', slug: 'philippines', Flag: PH },
-  { name: 'United Kingdom', slug: 'united-kingdom', Flag: GB },
-  { name: 'France', slug: 'france', Flag: FR },
-  { name: 'Italy', slug: 'italy', Flag: IT },
-  { name: 'United States', slug: 'united-states', Flag: US },
-];
+interface Destination {
+  id: string;
+  name: string;
+  slug: string;
+  country_iso: string | null;
+  region: string | null;
+}
 
 interface Plan {
   currency: string;
@@ -48,6 +39,14 @@ const planOptions = [
   { id: 'week', days: 7, priceKey: 'price_7day' as const, icon: Star, label: '7 Days', popular: true },
   { id: 'extended', days: 15, priceKey: 'price_15day' as const, icon: TrendingUp, label: '15 Days' },
 ];
+
+// Get flag component dynamically from country ISO code
+function getFlagComponent(countryIso: string | null): React.ComponentType<React.SVGProps<SVGSVGElement>> {
+  if (!countryIso) return Globe as unknown as React.ComponentType<React.SVGProps<SVGSVGElement>>;
+  const code = countryIso.toUpperCase();
+  const FlagComponent = (Flags as Record<string, React.ComponentType<React.SVGProps<SVGSVGElement>>>)[code];
+  return FlagComponent || (Globe as unknown as React.ComponentType<React.SVGProps<SVGSVGElement>>);
+}
 
 function getCurrencySymbol(currency: string): string {
   if (currency === 'IDR') return 'Rp';
@@ -71,12 +70,63 @@ export default function GetStartedPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [plansMap, setPlansMap] = useState<Record<string, Plan>>({});
   const [plansLoading, setPlansLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // Dynamic destinations from API
+  const [destinations, setDestinations] = useState<Destination[]>([]);
+  const [destinationsLoading, setDestinationsLoading] = useState(true);
+
+  // Fetch destinations on mount
+  useEffect(() => {
+    async function fetchDestinations() {
+      try {
+        const response = await fetch(`/api/destinations?locale=${locale}`);
+        if (response.ok) {
+          const data = await response.json();
+          setDestinations(data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch destinations:', error);
+      } finally {
+        setDestinationsLoading(false);
+      }
+    }
+    fetchDestinations();
+  }, [locale]);
 
   // Filter out home country
   const availableDestinations = useMemo(
     () => destinations.filter(d => !isDestinationExcluded(d.slug, locale)),
-    [locale]
+    [destinations, locale]
   );
+
+  // Filter by search query
+  const filteredDestinations = useMemo(() => {
+    if (!searchQuery.trim()) return availableDestinations;
+    const query = searchQuery.toLowerCase();
+    return availableDestinations.filter(d =>
+      d.name.toLowerCase().includes(query) ||
+      d.region?.toLowerCase().includes(query)
+    );
+  }, [availableDestinations, searchQuery]);
+
+  // Group destinations by region
+  const groupedDestinations = useMemo(() => {
+    const groups: Record<string, Destination[]> = {};
+    filteredDestinations.forEach(dest => {
+      const region = dest.region || 'Other';
+      if (!groups[region]) groups[region] = [];
+      groups[region].push(dest);
+    });
+
+    // Sort regions by popularity
+    const regionOrder = ['Asia', 'Europe', 'North America', 'Oceania', 'Middle East', 'South America', 'Central America', 'Caribbean', 'Africa', 'Central Asia', 'Other'];
+    const sortedGroups: Record<string, Destination[]> = {};
+    regionOrder.forEach(region => {
+      if (groups[region]) sortedGroups[region] = groups[region];
+    });
+    return sortedGroups;
+  }, [filteredDestinations]);
 
   // Fetch plans on mount
   useEffect(() => {
@@ -100,6 +150,7 @@ export default function GetStartedPage() {
   const currentPlan = selectedDestination ? plansMap[selectedDestination] : null;
   const currency = currentPlan?.currency || 'AUD';
   const currencySymbol = getCurrencySymbol(currency);
+  const SelectedFlag = selectedDest ? getFlagComponent(selectedDest.country_iso) : null;
 
   const handleCheckout = async () => {
     if (!selectedDestination) return;
@@ -162,12 +213,15 @@ export default function GetStartedPage() {
                 <div className="relative">
                   <button
                     type="button"
-                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                    onClick={() => {
+                      setIsDropdownOpen(!isDropdownOpen);
+                      if (!isDropdownOpen) setSearchQuery('');
+                    }}
                     className="w-full flex items-center justify-between gap-3 p-4 bg-cream-50 border border-cream-200 rounded-xl hover:border-brand-300 transition-colors text-left"
                   >
-                    {selectedDest ? (
+                    {selectedDest && SelectedFlag ? (
                       <div className="flex items-center gap-3">
-                        <selectedDest.Flag className="w-8 h-auto rounded shadow-sm" />
+                        <SelectedFlag className="w-8 h-auto rounded shadow-sm" />
                         <span className="font-medium text-navy-500">{selectedDest.name}</span>
                       </div>
                     ) : (
@@ -177,24 +231,74 @@ export default function GetStartedPage() {
                   </button>
 
                   {isDropdownOpen && (
-                    <div className="absolute z-20 top-full left-0 right-0 mt-2 bg-white border border-cream-200 rounded-xl shadow-lg max-h-80 overflow-y-auto">
-                      {availableDestinations.map((dest) => (
-                        <button
-                          key={dest.slug}
-                          type="button"
-                          onClick={() => {
-                            setSelectedDestination(dest.slug);
-                            setIsDropdownOpen(false);
-                          }}
-                          className="w-full flex items-center gap-3 p-4 hover:bg-cream-50 transition-colors text-left first:rounded-t-xl last:rounded-b-xl"
-                        >
-                          <dest.Flag className="w-8 h-auto rounded shadow-sm" />
-                          <span className="font-medium text-navy-500">{dest.name}</span>
-                          {selectedDestination === dest.slug && (
-                            <Check className="w-5 h-5 text-brand-600 ml-auto" />
-                          )}
-                        </button>
-                      ))}
+                    <div className="absolute z-20 top-full left-0 right-0 mt-2 bg-white border border-cream-200 rounded-xl shadow-lg overflow-hidden">
+                      {/* Search Input */}
+                      <div className="p-3 border-b border-cream-200">
+                        <div className="relative">
+                          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-navy-300" />
+                          <input
+                            type="text"
+                            placeholder="Search destinations..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="w-full pl-10 pr-4 py-2 bg-cream-50 border border-cream-200 rounded-lg text-sm text-navy-500 placeholder:text-navy-300 focus:outline-none focus:border-brand-400"
+                            autoFocus
+                          />
+                        </div>
+                      </div>
+
+                      {/* Destinations List */}
+                      <div className="max-h-80 overflow-y-auto">
+                        {destinationsLoading ? (
+                          <div className="p-6 text-center text-navy-300">
+                            <div className="animate-spin w-5 h-5 border-2 border-brand-400 border-t-transparent rounded-full mx-auto mb-2" />
+                            Loading...
+                          </div>
+                        ) : filteredDestinations.length === 0 ? (
+                          <div className="p-6 text-center text-navy-300 text-sm">
+                            No destinations found
+                          </div>
+                        ) : (
+                          Object.entries(groupedDestinations).map(([region, dests]) => (
+                            <div key={region}>
+                              {/* Region Header */}
+                              <div className="sticky top-0 bg-cream-100 px-4 py-2 border-b border-cream-200">
+                                <span className="text-xs font-semibold text-navy-400 uppercase tracking-wide">{region}</span>
+                              </div>
+                              {/* Destinations */}
+                              {dests.map((dest) => {
+                                const FlagComponent = getFlagComponent(dest.country_iso);
+                                return (
+                                  <button
+                                    key={dest.slug}
+                                    type="button"
+                                    onClick={() => {
+                                      setSelectedDestination(dest.slug);
+                                      setIsDropdownOpen(false);
+                                    }}
+                                    className="w-full flex items-center gap-3 p-3 hover:bg-cream-50 transition-colors text-left"
+                                  >
+                                    <FlagComponent className="w-7 h-auto rounded shadow-sm" />
+                                    <span className="font-medium text-navy-500 text-sm">{dest.name}</span>
+                                    {selectedDestination === dest.slug && (
+                                      <Check className="w-5 h-5 text-brand-600 ml-auto" />
+                                    )}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          ))
+                        )}
+                      </div>
+
+                      {/* Footer */}
+                      {!destinationsLoading && filteredDestinations.length > 0 && (
+                        <div className="px-4 py-2 border-t border-cream-200 bg-cream-50 text-center">
+                          <span className="text-xs text-navy-400">
+                            {filteredDestinations.length} destinations available
+                          </span>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>

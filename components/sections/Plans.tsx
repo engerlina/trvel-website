@@ -2,12 +2,12 @@
 
 import { useEffect } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
-import { Check, Zap, Star, TrendingUp, AlertTriangle } from 'lucide-react';
+import { Check, Zap, Star, TrendingUp, AlertTriangle, Globe } from 'lucide-react';
 import { Badge } from '@/components/ui';
 import { Card } from '@/components/ui';
 import { useDestination, type PlansMap } from '@/contexts/DestinationContext';
-import { destinations } from './Hero';
 import { DirectCheckoutButton } from './DirectCheckoutButton';
+import * as Flags from 'country-flag-icons/react/3x2';
 
 const planConfigs = [
   {
@@ -56,6 +56,14 @@ function getCurrencySymbol(currency: string): string {
   return '$';
 }
 
+// Get flag component dynamically from country ISO code
+function getFlagComponent(countryIso: string | null): React.ComponentType<React.SVGProps<SVGSVGElement>> {
+  if (!countryIso) return Globe as unknown as React.ComponentType<React.SVGProps<SVGSVGElement>>;
+  const code = countryIso.toUpperCase();
+  const FlagComponent = (Flags as Record<string, React.ComponentType<React.SVGProps<SVGSVGElement>>>)[code];
+  return FlagComponent || (Globe as unknown as React.ComponentType<React.SVGProps<SVGSVGElement>>);
+}
+
 export function Plans() {
   const t = useTranslations('home.plans');
   const locale = useLocale();
@@ -67,6 +75,7 @@ export function Plans() {
     setPlansMap,
     plansLoading,
     setPlansLoading,
+    destinations,
   } = useDestination();
 
   // Fetch all plans for this locale on mount
@@ -97,9 +106,9 @@ export function Plans() {
   const currency = currentPlan?.currency || 'AUD';
   const currencySymbol = getCurrencySymbol(currency);
 
-  // Find the flag component for the current destination
+  // Find the country ISO for the current destination
   const currentDest = destinations.find(d => d.slug === currentDestSlug);
-  const FlagIcon = currentDest?.Flag;
+  const FlagIcon = currentDest ? getFlagComponent(currentDest.country_iso) : null;
 
   return (
     <section id="plans" aria-labelledby="plans-heading" className="section bg-base-100 scroll-mt-20">

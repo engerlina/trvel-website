@@ -1,43 +1,105 @@
 'use client';
 
-import { useRef, useMemo, useEffect } from 'react';
+import { useRef, useMemo, useEffect, useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
-import { ChevronDown, Shield, Check, Info } from 'lucide-react';
+import { ChevronDown, Shield, Check, Info, Globe, Search } from 'lucide-react';
 import { Badge } from '@/components/ui';
-import { JP, TH, KR, SG, ID, MY, VN, PH, GB, FR, IT, US, type FlagComponent } from 'country-flag-icons/react/3x2';
+import * as Flags from 'country-flag-icons/react/3x2';
 import { useDestination } from '@/contexts/DestinationContext';
 import { useTypewriter } from '@/hooks/useTypewriter';
 import { cn, isDestinationExcluded } from '@/lib/utils';
 
-export const destinations: { name: string; slug: string; Flag: FlagComponent }[] = [
-  { name: 'Japan', slug: 'japan', Flag: JP },
-  { name: 'Thailand', slug: 'thailand', Flag: TH },
-  { name: 'South Korea', slug: 'south-korea', Flag: KR },
-  { name: 'Singapore', slug: 'singapore', Flag: SG },
-  { name: 'Indonesia', slug: 'indonesia', Flag: ID },
-  { name: 'Malaysia', slug: 'malaysia', Flag: MY },
-  { name: 'Vietnam', slug: 'vietnam', Flag: VN },
-  { name: 'Philippines', slug: 'philippines', Flag: PH },
-  { name: 'United Kingdom', slug: 'united-kingdom', Flag: GB },
-  { name: 'France', slug: 'france', Flag: FR },
-  { name: 'Italy', slug: 'italy', Flag: IT },
-  { name: 'United States', slug: 'united-states', Flag: US },
-];
+interface Destination {
+  id: string;
+  name: string;
+  slug: string;
+  country_iso: string | null;
+  region: string | null;
+}
+
+// Get flag component dynamically from country ISO code
+function getFlagComponent(countryIso: string | null): React.ComponentType<React.SVGProps<SVGSVGElement>> {
+  if (!countryIso) return Globe as unknown as React.ComponentType<React.SVGProps<SVGSVGElement>>;
+  const code = countryIso.toUpperCase();
+  const FlagComponent = (Flags as Record<string, React.ComponentType<React.SVGProps<SVGSVGElement>>>)[code];
+  return FlagComponent || (Globe as unknown as React.ComponentType<React.SVGProps<SVGSVGElement>>);
+}
+
+// Popular destinations for typewriter effect (shown while loading full list)
+const POPULAR_DESTINATIONS = ['Japan', 'Thailand', 'South Korea', 'Singapore', 'Indonesia', 'France', 'Italy'];
 
 export function Hero() {
   const t = useTranslations('home.hero');
   const locale = useLocale();
   const { selectedDestination, setSelectedDestination, setDestinationName, setCyclingIndex, highlightPlansDropdown } = useDestination();
   const modalRef = useRef<HTMLDialogElement>(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
-  // Filter out the user's home country destination for the typewriter
+  // Dynamic destinations from API
+  const [destinations, setDestinations] = useState<Destination[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Fetch destinations on mount
+  useEffect(() => {
+    async function fetchDestinations() {
+      try {
+        const response = await fetch(`/api/destinations?locale=${locale}`);
+        if (response.ok) {
+          const data = await response.json();
+          setDestinations(data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch destinations:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    fetchDestinations();
+  }, [locale]);
+
+  // Filter out the user's home country destination
   const availableDestinations = useMemo(
     () => destinations.filter(d => !isDestinationExcluded(d.slug, locale)),
-    [locale]
+    [destinations, locale]
   );
 
-  // Get destination names for typewriter effect (excluding home country)
-  const destinationNames = useMemo(() => availableDestinations.map(d => d.name), [availableDestinations]);
+  // Filter by search query
+  const filteredDestinations = useMemo(() => {
+    if (!searchQuery.trim()) return availableDestinations;
+    const query = searchQuery.toLowerCase();
+    return availableDestinations.filter(d =>
+      d.name.toLowerCase().includes(query) ||
+      d.region?.toLowerCase().includes(query)
+    );
+  }, [availableDestinations, searchQuery]);
+
+  // Group destinations by region for modal display
+  const groupedDestinations = useMemo(() => {
+    const groups: Record<string, Destination[]> = {};
+    filteredDestinations.forEach(dest => {
+      const region = dest.region || 'Other';
+      if (!groups[region]) groups[region] = [];
+      groups[region].push(dest);
+    });
+
+    // Sort regions by popularity
+    const regionOrder = ['Asia', 'Europe', 'North America', 'Oceania', 'Middle East', 'South America', 'Central America', 'Caribbean', 'Africa', 'Central Asia', 'Other'];
+    const sortedGroups: Record<string, Destination[]> = {};
+    regionOrder.forEach(region => {
+      if (groups[region]) sortedGroups[region] = groups[region];
+    });
+    return sortedGroups;
+  }, [filteredDestinations]);
+
+  // Get destination names for typewriter effect
+  const destinationNames = useMemo(() => {
+    if (availableDestinations.length > 0) {
+      // Use top popular destinations that exist in our list
+      return availableDestinations.slice(0, 7).map(d => d.name);
+    }
+    return POPULAR_DESTINATIONS;
+  }, [availableDestinations]);
+
   const { text: typedDestination, wordIndex } = useTypewriter({
     words: destinationNames,
     typeSpeed: 80,
@@ -46,20 +108,19 @@ export function Hero() {
     delayBetweenWords: 300,
   });
 
-  // Share the cycling index with context so Plans section can sync
-  // Map to the full destinations array index for consistency
+  // Share the cycling index with context
   useEffect(() => {
-    const currentDest = availableDestinations[wordIndex];
-    if (currentDest) {
-      const fullIndex = destinations.findIndex(d => d.slug === currentDest.slug);
-      setCyclingIndex(fullIndex >= 0 ? fullIndex : wordIndex);
-    }
-  }, [wordIndex, availableDestinations, setCyclingIndex]);
+    setCyclingIndex(wordIndex);
+  }, [wordIndex, setCyclingIndex]);
 
-  // Get current flag component from available destinations
-  const CurrentFlag = availableDestinations[wordIndex]?.Flag;
+  // Get current flag component
+  const currentDest = availableDestinations[wordIndex];
+  const CurrentFlag = currentDest ? getFlagComponent(currentDest.country_iso) : null;
 
-  const openModal = () => modalRef.current?.showModal();
+  const openModal = () => {
+    setSearchQuery('');
+    modalRef.current?.showModal();
+  };
   const closeModal = () => modalRef.current?.close();
 
   const handleDestinationSelect = (slug: string, name: string) => {
@@ -77,6 +138,7 @@ export function Hero() {
   };
 
   const selected = destinations.find(d => d.slug === selectedDestination);
+  const SelectedFlag = selected ? getFlagComponent(selected.country_iso) : null;
 
   return (
     <section aria-labelledby="hero-heading" className="relative min-h-[90vh] flex items-center overflow-hidden">
@@ -130,9 +192,9 @@ export function Hero() {
               )}
             >
               <span className="flex items-center gap-3">
-                {selected ? (
+                {selected && SelectedFlag ? (
                   <>
-                    <selected.Flag className="w-7 h-auto rounded-sm" />
+                    <SelectedFlag className="w-7 h-auto rounded-sm" />
                     <span className="text-body-lg font-medium text-navy-500">{selected.name}</span>
                   </>
                 ) : (
@@ -164,67 +226,110 @@ export function Hero() {
 
       {/* Modal */}
       <dialog ref={modalRef} className="modal modal-bottom sm:modal-middle">
-        <div className="modal-box max-w-sm p-0 rounded-2xl overflow-hidden">
-          {/* Modal Header */}
-          <div className="flex items-center justify-between px-5 py-4 border-b border-cream-300">
-            <h3 className="text-lg font-semibold text-navy-500">Select destination</h3>
-            <form method="dialog">
-              <button className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-cream-200 transition-colors text-navy-200 hover:text-navy-400">
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </form>
+        <div className="modal-box max-w-md p-0 rounded-2xl overflow-hidden">
+          {/* Modal Header with Search */}
+          <div className="px-5 py-4 border-b border-cream-300">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-lg font-semibold text-navy-500">Select destination</h3>
+              <form method="dialog">
+                <button className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-cream-200 transition-colors text-navy-200 hover:text-navy-400">
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </form>
+            </div>
+            {/* Search Input */}
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-navy-300" />
+              <input
+                type="text"
+                placeholder="Search destinations..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-2.5 bg-cream-50 border border-cream-200 rounded-lg text-sm text-navy-500 placeholder:text-navy-300 focus:outline-none focus:border-brand-400"
+              />
+            </div>
           </div>
 
           {/* Destination List */}
           <div className="max-h-[60vh] overflow-y-auto">
-            {destinations.map((destination) => {
-              const isExcluded = isDestinationExcluded(destination.slug, locale);
+            {isLoading ? (
+              <div className="p-8 text-center text-navy-300">
+                <div className="animate-spin w-6 h-6 border-2 border-brand-400 border-t-transparent rounded-full mx-auto mb-2" />
+                Loading destinations...
+              </div>
+            ) : filteredDestinations.length === 0 ? (
+              <div className="p-8 text-center text-navy-300">
+                No destinations found matching &quot;{searchQuery}&quot;
+              </div>
+            ) : (
+              Object.entries(groupedDestinations).map(([region, dests]) => (
+                <div key={region}>
+                  {/* Region Header */}
+                  <div className="sticky top-0 bg-cream-100 px-5 py-2 border-b border-cream-200">
+                    <span className="text-xs font-semibold text-navy-400 uppercase tracking-wide">{region}</span>
+                  </div>
+                  {/* Destinations in Region */}
+                  {dests.map((destination) => {
+                    const isExcluded = isDestinationExcluded(destination.slug, locale);
+                    const FlagComponent = getFlagComponent(destination.country_iso);
 
-              return (
-                <div key={destination.slug} className="relative group">
-                  <button
-                    onClick={() => !isExcluded && handleDestinationSelect(destination.slug, destination.name)}
-                    disabled={isExcluded}
-                    className={cn(
-                      'w-full flex items-center gap-4 px-5 py-3.5 transition-colors text-left',
-                      isExcluded
-                        ? 'bg-gray-50 cursor-not-allowed opacity-50'
-                        : 'hover:bg-cream-100',
-                      !isExcluded && selectedDestination === destination.slug
-                        ? 'bg-cream-200'
-                        : !isExcluded && 'bg-white'
-                    )}
-                  >
-                    <destination.Flag className={cn(
-                      'w-8 h-auto rounded shadow-sm flex-shrink-0',
-                      isExcluded && 'grayscale'
-                    )} />
-                    <span className={cn(
-                      'text-base font-medium flex-1',
-                      isExcluded ? 'text-gray-400' : 'text-navy-500'
-                    )}>
-                      {destination.name}
-                    </span>
-                    {isExcluded ? (
-                      <Info className="w-4 h-4 text-gray-400 flex-shrink-0" />
-                    ) : selectedDestination === destination.slug ? (
-                      <Check className="w-5 h-5 text-brand-400 flex-shrink-0" />
-                    ) : null}
-                  </button>
-                  {/* Tooltip for excluded destinations */}
-                  {isExcluded && (
-                    <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
-                      <div className="bg-navy-500 text-white text-xs px-3 py-2 rounded-lg shadow-lg whitespace-nowrap -translate-x-8">
-                        You&apos;re already here!
+                    return (
+                      <div key={destination.slug} className="relative group">
+                        <button
+                          onClick={() => !isExcluded && handleDestinationSelect(destination.slug, destination.name)}
+                          disabled={isExcluded}
+                          className={cn(
+                            'w-full flex items-center gap-4 px-5 py-3 transition-colors text-left',
+                            isExcluded
+                              ? 'bg-gray-50 cursor-not-allowed opacity-50'
+                              : 'hover:bg-cream-100',
+                            !isExcluded && selectedDestination === destination.slug
+                              ? 'bg-cream-200'
+                              : !isExcluded && 'bg-white'
+                          )}
+                        >
+                          <FlagComponent className={cn(
+                            'w-7 h-auto rounded shadow-sm flex-shrink-0',
+                            isExcluded && 'grayscale'
+                          )} />
+                          <span className={cn(
+                            'text-sm font-medium flex-1',
+                            isExcluded ? 'text-gray-400' : 'text-navy-500'
+                          )}>
+                            {destination.name}
+                          </span>
+                          {isExcluded ? (
+                            <Info className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                          ) : selectedDestination === destination.slug ? (
+                            <Check className="w-5 h-5 text-brand-400 flex-shrink-0" />
+                          ) : null}
+                        </button>
+                        {/* Tooltip for excluded destinations */}
+                        {isExcluded && (
+                          <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+                            <div className="bg-navy-500 text-white text-xs px-3 py-2 rounded-lg shadow-lg whitespace-nowrap -translate-x-8">
+                              You&apos;re already here!
+                            </div>
+                          </div>
+                        )}
                       </div>
-                    </div>
-                  )}
+                    );
+                  })}
                 </div>
-              );
-            })}
+              ))
+            )}
           </div>
+
+          {/* Footer with count */}
+          {!isLoading && filteredDestinations.length > 0 && (
+            <div className="px-5 py-3 border-t border-cream-200 bg-cream-50 text-center">
+              <span className="text-xs text-navy-400">
+                {filteredDestinations.length} destinations available
+              </span>
+            </div>
+          )}
         </div>
         <form method="dialog" className="modal-backdrop">
           <button>close</button>

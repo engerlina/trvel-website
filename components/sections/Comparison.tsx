@@ -6,7 +6,6 @@ import { Card } from '@/components/ui';
 import Image from 'next/image';
 import { Link } from '@/i18n/routing';
 import { useDestination } from '@/contexts/DestinationContext';
-import { destinations } from './Hero';
 
 interface ComparisonRow {
   feature: string;
@@ -31,12 +30,12 @@ function formatPrice(price: number, currency: string): string {
 
 export function Comparison() {
   const t = useTranslations('home.comparison');
-  const { selectedDestination, cyclingIndex, plansMap, plansLoading } = useDestination();
+  const { selectedDestination, destinationName, cyclingIndex, plansMap, plansLoading, destinations } = useDestination();
 
   // Determine which destination to show
   const currentDestSlug = selectedDestination || destinations[cyclingIndex]?.slug || 'japan';
   const currentPlan = plansMap[currentDestSlug];
-  const currentDestName = destinations.find(d => d.slug === currentDestSlug)?.name || 'your trip';
+  const currentDestName = selectedDestination ? destinationName : (destinations[cyclingIndex]?.name || 'your trip');
 
   // Get competitor info from the current plan
   const competitorName = currentPlan?.competitor_name || 'Carrier';
