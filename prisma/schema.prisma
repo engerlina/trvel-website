@@ -71,10 +71,14 @@ model Plan {
   bundle_5day           String?  @db.VarChar(100) // EsimBundle.name
   bundle_7day           String?  @db.VarChar(100)
   bundle_15day          String?  @db.VarChar(100)
-  // Stripe price IDs for checkout
+  // Stripe price IDs for checkout (Production)
   stripe_price_5day     String?  @db.VarChar(100)
   stripe_price_7day     String?  @db.VarChar(100)
   stripe_price_15day    String?  @db.VarChar(100)
+  // Stripe price IDs for checkout (Test)
+  stripe_test_price_5day  String?  @db.VarChar(100)
+  stripe_test_price_7day  String?  @db.VarChar(100)
+  stripe_test_price_15day String?  @db.VarChar(100)
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
 
@@ -216,8 +220,11 @@ model Order {
   // eSIM fulfillment
   esim_status              EsimStatus  @default(pending)
   esim_iccid               String?     @db.VarChar(50) // ICCID from eSIM-Go
-  esim_qr_code             String?     @db.Text // QR code data/URL
+  esim_smdp_address        String?     @db.VarChar(200) // SM-DP+ server address
+  esim_matching_id         String?     @db.VarChar(200) // Matching ID for QR code
+  esim_qr_code             String?     @db.Text // LPA QR code string (LPA:1$smdpAddress$matchingId)
   esim_order_ref           String?     @db.VarChar(100) // eSIM-Go order reference
+  esim_provisioned_at      DateTime? // When eSIM was successfully provisioned
 
   // Communication
   confirmation_email_sent  Boolean     @default(false)

@@ -1,14 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { headers } from 'next/headers';
 import Stripe from 'stripe';
-import { stripe } from '@/lib/stripe';
+import { stripe, getWebhookSecret, isTestMode } from '@/lib/stripe';
 import { resend } from '@/lib/resend';
 import { prisma } from '@/lib/db';
+import {
+  createEsimOrder,
+  generateQrCodeString,
+  EsimGoOrderResponse,
+} from '@/lib/esimgo';
 
-const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+const webhookSecret = getWebhookSecret();
 
 // Email sender - using verified Resend domain
-const emailFrom = 'Trvel <noreply@e.trvel.co>';
+const emailFrom = 'Jonathan from Trvel <noreply@e.trvel.co>';
+const logoUrl = 'https://trvel.co/android-chrome-192x192.png';
 
 // Generate order number: TRV-YYYYMMDD-XXX
 async function generateOrderNumber(): Promise<string> {
@@ -172,107 +178,299 @@ export async function POST(request: NextRequest) {
 
       console.log('Created order:', order.order_number);
 
-      // 4. Format amount for email
+      // 4. Provision eSIM via eSIM Go API
+      let esimData: {
+        iccid: string | null;
+        smdpAddress: string | null;
+        matchingId: string | null;
+        qrCodeString: string | null;
+      } = {
+        iccid: null,
+        smdpAddress: null,
+        matchingId: null,
+        qrCodeString: null,
+      };
+
+      if (bundle_name) {
+        try {
+          console.log(`Provisioning eSIM via eSIM Go (${isTestMode ? 'TEST' : 'LIVE'} mode):`, {
+            bundle_name,
+            orderReference: orderNumber,
+          });
+
+          if (isTestMode) {
+            // In TEST mode, eSIM Go "validate" doesn't return real eSIM data
+            // Generate mock data for testing the email flow
+            const mockIccid = `TEST-${Date.now()}`;
+            const mockSmdpAddress = 'rsp.test.esim-go.io';
+            const mockMatchingId = `TEST-${orderNumber}-${Math.random().toString(36).substring(7)}`;
+
+            esimData = {
+              iccid: mockIccid,
+              smdpAddress: mockSmdpAddress,
+              matchingId: mockMatchingId,
+              qrCodeString: generateQrCodeString(mockSmdpAddress, mockMatchingId),
+            };
+
+            // Update order with test eSIM details
+            await prisma.order.update({
+              where: { id: order.id },
+              data: {
+                esim_iccid: esimData.iccid,
+                esim_smdp_address: esimData.smdpAddress,
+                esim_matching_id: esimData.matchingId,
+                esim_qr_code: esimData.qrCodeString,
+                esim_provisioned_at: new Date(),
+                esim_status: 'ordered',
+              },
+            });
+
+            console.log('TEST MODE: Generated mock eSIM data:', {
+              iccid: esimData.iccid,
+              qrCodeString: esimData.qrCodeString,
+            });
+          } else {
+            // PRODUCTION mode: Call eSIM Go API
+            const esimResponse: EsimGoOrderResponse = await createEsimOrder(
+              bundle_name,
+              orderNumber
+            );
+
+            // Extract eSIM details from the response
+            const esimItem = esimResponse.order?.items?.[0];
+            if (esimItem?.iccid && esimItem?.smdpAddress && esimItem?.matchingId) {
+              esimData = {
+                iccid: esimItem.iccid,
+                smdpAddress: esimItem.smdpAddress,
+                matchingId: esimItem.matchingId,
+                qrCodeString: generateQrCodeString(esimItem.smdpAddress, esimItem.matchingId),
+              };
+
+              // Update order with eSIM details
+              await prisma.order.update({
+                where: { id: order.id },
+                data: {
+                  esim_iccid: esimData.iccid,
+                  esim_smdp_address: esimData.smdpAddress,
+                  esim_matching_id: esimData.matchingId,
+                  esim_qr_code: esimData.qrCodeString,
+                  esim_provisioned_at: new Date(),
+                  esim_status: 'ordered',
+                },
+              });
+
+              console.log('eSIM provisioned successfully:', {
+                iccid: esimData.iccid,
+                orderReference: esimResponse.order?.orderReference,
+              });
+            } else {
+              console.warn('eSIM order created but missing assignment details:', esimResponse);
+            }
+          }
+        } catch (esimError) {
+          console.error('Failed to provision eSIM:', esimError);
+          // Update order status to indicate eSIM provisioning failed
+          await prisma.order.update({
+            where: { id: order.id },
+            data: {
+              esim_status: 'failed',
+            },
+          });
+          // Continue to send email without QR code - manual intervention needed
+        }
+      } else {
+        console.warn('No bundle_name in metadata, skipping eSIM provisioning');
+      }
+
+      // 5. Format amount for email
       const amountPaid = session.amount_total
         ? `${(session.amount_total / 100).toFixed(2)} ${session.currency?.toUpperCase()}`
         : 'Paid';
 
-      // 5. Send confirmation email
+      // 6. Send confirmation email
       console.log('Sending confirmation email to:', customerEmail);
+
+      // Get customer first name for personalization
+      const firstName = customerName?.split(' ')[0] || 'there';
 
       const { data: emailData, error: emailError } = await resend.emails.send({
         from: emailFrom,
         to: customerEmail,
-        subject: `Order ${orderNumber} - Your eSIM for ${destinationName} is Ready!`,
+        subject: `Your ${destinationName} eSIM is ready! ✈️`,
         html: `
 <!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
-<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #1e3a5f; margin: 0; padding: 0; background-color: #f8fafc;">
-  <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
-    <!-- Header -->
-    <div style="text-align: center; margin-bottom: 40px;">
-      <h1 style="color: #0284c7; font-size: 28px; margin: 0;">Trvel</h1>
-      <p style="color: #64748b; margin: 8px 0 0;">Your Travel eSIM Provider</p>
+<body style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #010326; margin: 0; padding: 0; background-color: #fdfbf8;">
+  <div style="max-width: 600px; margin: 0 auto; padding: 24px 20px;">
+
+    <!-- Header with Logo -->
+    <div style="text-align: center; margin-bottom: 20px;">
+      <img src="${logoUrl}" alt="Trvel" width="48" height="48" style="border-radius: 12px; margin-bottom: 8px;">
+      <h1 style="color: #63BFBF; font-size: 28px; margin: 0; font-weight: 700;">trvel</h1>
     </div>
 
     <!-- Main Card -->
-    <div style="background: white; border-radius: 16px; padding: 32px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);">
-      <!-- Success Icon -->
-      <div style="text-align: center; margin-bottom: 24px;">
-        <div style="display: inline-block; background: #dcfce7; border-radius: 50%; padding: 16px;">
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="20 6 9 17 4 12"></polyline>
-          </svg>
+    <div style="background: white; border-radius: 24px; padding: 40px 32px; box-shadow: 0 4px 24px rgba(99, 191, 191, 0.15);">
+
+      <!-- Greeting -->
+      <p style="font-size: 18px; color: #010326; margin: 0 0 24px;">Hey ${firstName}! 👋</p>
+
+      <!-- Success Message -->
+      <div style="background: linear-gradient(135deg, #63BFBF 0%, #75cfcf 100%); border-radius: 16px; padding: 24px; margin-bottom: 32px; text-align: center;">
+        <p style="color: white; font-size: 20px; font-weight: 600; margin: 0 0 8px;">${esimData.qrCodeString ? 'Your eSIM is ready!' : 'Payment confirmed!'}</p>
+        <p style="color: rgba(255,255,255,0.9); margin: 0; font-size: 15px;">${esimData.qrCodeString ? 'Scan the QR code below to install' : 'Your eSIM for ' + destinationName + ' is on its way'}</p>
+      </div>
+
+      <!-- Order Number Badge -->
+      <div style="text-align: center; margin-bottom: 32px;">
+        <span style="display: inline-block; background: #e8f7f7; border: 2px solid #63BFBF; color: #4fa9a9; padding: 8px 20px; border-radius: 100px; font-weight: 600; font-size: 14px; letter-spacing: 0.5px;">
+          Order ${orderNumber}
+        </span>
+      </div>
+
+      ${esimData.qrCodeString ? `
+      <!-- QR Code Section -->
+      <div style="background: #fdfbf8; border-radius: 16px; padding: 24px; margin-bottom: 32px; text-align: center;">
+        <h3 style="font-size: 16px; color: #010326; margin: 0 0 16px; font-weight: 600;">📱 Your eSIM QR Code</h3>
+        <div style="background: white; border-radius: 12px; padding: 16px; display: inline-block; border: 2px solid #F2E2CE;">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(esimData.qrCodeString)}" alt="eSIM QR Code" width="200" height="200" style="display: block;">
+        </div>
+        <p style="margin: 16px 0 8px; color: #585b76; font-size: 13px;">Scan this code from another device (laptop/tablet)</p>
+        <p style="margin: 0; color: #888a9d; font-size: 11px; word-break: break-all;">Code: ${esimData.qrCodeString}</p>
+      </div>
+
+      <!-- Detailed Installation Instructions -->
+      <div style="background: white; border: 2px solid #63BFBF; border-radius: 16px; padding: 24px; margin-bottom: 32px;">
+        <h3 style="font-size: 16px; color: #010326; margin: 0 0 20px; font-weight: 600;">📲 Step-by-step Installation</h3>
+
+        <!-- iPhone Instructions -->
+        <div style="margin-bottom: 20px;">
+          <p style="margin: 0 0 12px; color: #010326; font-weight: 600; font-size: 14px;"> iPhone (iOS 17.4+)</p>
+          <ol style="margin: 0; padding-left: 20px; color: #585b76; font-size: 14px; line-height: 1.8;">
+            <li>Open <strong>Settings</strong> → <strong>Mobile Data</strong> → <strong>Add eSIM</strong></li>
+            <li>Tap <strong>"Use QR Code"</strong></li>
+            <li>Point camera at the QR code above</li>
+            <li>Tap <strong>"Add eSIM"</strong> when prompted</li>
+            <li>Label it as "Travel" or "${destinationName}"</li>
+          </ol>
+        </div>
+
+        <!-- Android Instructions -->
+        <div style="margin-bottom: 20px;">
+          <p style="margin: 0 0 12px; color: #010326; font-weight: 600; font-size: 14px;">🤖 Android</p>
+          <ol style="margin: 0; padding-left: 20px; color: #585b76; font-size: 14px; line-height: 1.8;">
+            <li>Open <strong>Settings</strong> → <strong>Network & Internet</strong> → <strong>SIMs</strong></li>
+            <li>Tap <strong>"Add eSIM"</strong> or <strong>"+"</strong></li>
+            <li>Select <strong>"Scan QR code"</strong></li>
+            <li>Point camera at the QR code above</li>
+            <li>Follow prompts to complete setup</li>
+          </ol>
+        </div>
+
+        <!-- Pro Tips -->
+        <div style="background: #e8f7f7; border-radius: 12px; padding: 16px;">
+          <p style="margin: 0 0 8px; color: #4fa9a9; font-weight: 600; font-size: 14px;">💡 Pro Tips</p>
+          <ul style="margin: 0; padding-left: 18px; color: #585b76; font-size: 13px; line-height: 1.7;">
+            <li><strong>Install before you travel</strong> - Set it up on WiFi at home</li>
+            <li><strong>Don't delete it!</strong> - The QR code can only be used once</li>
+            <li><strong>When you land:</strong> Turn on <strong>Data Roaming</strong> for the eSIM</li>
+            <li>Your data plan starts when you first connect to a network in ${destinationName}</li>
+          </ul>
         </div>
       </div>
-
-      <h2 style="text-align: center; font-size: 24px; color: #1e3a5f; margin: 0 0 8px;">Payment Confirmed!</h2>
-      <p style="text-align: center; color: #64748b; margin: 0 0 32px;">Your eSIM is being prepared for your trip.</p>
-
-      <!-- Order Number -->
-      <div style="text-align: center; margin-bottom: 24px;">
-        <p style="color: #64748b; margin: 0 0 4px; font-size: 14px;">Order Number</p>
-        <p style="color: #0284c7; font-size: 20px; font-weight: 700; margin: 0; letter-spacing: 1px;">${orderNumber}</p>
-      </div>
+      ` : ''}
 
       <!-- Order Details -->
-      <div style="background: #f8fafc; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
-        <h3 style="font-size: 14px; text-transform: uppercase; color: #64748b; margin: 0 0 16px; letter-spacing: 0.5px;">Order Details</h3>
-
+      <div style="background: #fdfbf8; border-radius: 16px; padding: 24px; margin-bottom: 32px;">
         <table style="width: 100%; border-collapse: collapse;">
           <tr>
-            <td style="color: #64748b; padding: 8px 0;">Destination</td>
-            <td style="font-weight: 600; color: #1e3a5f; text-align: right; padding: 8px 0;">${destinationName}</td>
+            <td style="color: #585b76; padding: 12px 0; border-bottom: 1px solid #F2E2CE; font-size: 15px;">Destination</td>
+            <td style="font-weight: 600; color: #010326; text-align: right; padding: 12px 0; border-bottom: 1px solid #F2E2CE; font-size: 15px;">🌏 ${destinationName}</td>
           </tr>
           <tr>
-            <td style="color: #64748b; padding: 8px 0;">Plan</td>
-            <td style="font-weight: 600; color: #1e3a5f; text-align: right; padding: 8px 0;">${planName} (${duration} days)</td>
+            <td style="color: #585b76; padding: 12px 0; border-bottom: 1px solid #F2E2CE; font-size: 15px;">Plan</td>
+            <td style="font-weight: 600; color: #010326; text-align: right; padding: 12px 0; border-bottom: 1px solid #F2E2CE; font-size: 15px;">${planName} (${duration} days)</td>
           </tr>
           <tr>
-            <td style="color: #64748b; padding: 8px 0;">Data</td>
-            <td style="font-weight: 600; color: #22c55e; text-align: right; padding: 8px 0;">Unlimited</td>
+            <td style="color: #585b76; padding: 12px 0; border-bottom: 1px solid #F2E2CE; font-size: 15px;">Data</td>
+            <td style="font-weight: 600; color: #63BFBF; text-align: right; padding: 12px 0; border-bottom: 1px solid #F2E2CE; font-size: 15px;">Unlimited</td>
           </tr>
-        </table>
-
-        <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 16px 0;">
-
-        <table style="width: 100%; border-collapse: collapse;">
           <tr>
-            <td style="font-weight: 600; color: #1e3a5f; padding: 8px 0;">Total Paid</td>
-            <td style="font-weight: 700; color: #0284c7; font-size: 18px; text-align: right; padding: 8px 0;">${amountPaid}</td>
+            <td style="color: #010326; font-weight: 600; padding: 16px 0 0; font-size: 15px;">Total</td>
+            <td style="font-weight: 700; color: #63BFBF; font-size: 20px; text-align: right; padding: 16px 0 0;">${amountPaid}</td>
           </tr>
         </table>
       </div>
 
-      <!-- Next Steps -->
-      <div style="margin-bottom: 24px;">
-        <h3 style="font-size: 16px; color: #1e3a5f; margin: 0 0 16px;">What's Next?</h3>
-        <ol style="margin: 0; padding-left: 20px; color: #475569;">
-          <li style="margin-bottom: 8px;">You'll receive your eSIM QR code within 10 minutes</li>
-          <li style="margin-bottom: 8px;">Scan the QR code to install your eSIM</li>
-          <li style="margin-bottom: 8px;">Activate when you arrive in ${destinationName}</li>
-          <li>Enjoy unlimited data on your trip!</li>
-        </ol>
-      </div>
+      ${!esimData.qrCodeString ? `
+      <!-- What's Next (only show when QR code NOT available) -->
+      <div style="margin-bottom: 32px;">
+        <h3 style="font-size: 18px; color: #010326; margin: 0 0 20px; font-weight: 600;">What happens next?</h3>
 
-      <!-- Support -->
-      <div style="background: #eff6ff; border-radius: 12px; padding: 20px; text-align: center;">
-        <p style="margin: 0 0 8px; color: #1e3a5f; font-weight: 500;">Need help?</p>
-        <p style="margin: 0; color: #64748b; font-size: 14px;">
-          Our support team is available 24/7 on WhatsApp<br>
-          <span style="font-size: 12px;">Reference your order: <strong>${orderNumber}</strong></span>
+        <table style="width: 100%; border-collapse: collapse;">
+          <tr>
+            <td style="vertical-align: top; width: 44px; padding-bottom: 16px;">
+              <div style="width: 32px; height: 32px; background: #63BFBF; border-radius: 50%; color: white; font-weight: 600; font-size: 14px; line-height: 32px; text-align: center;">1</div>
+            </td>
+            <td style="vertical-align: top; padding-bottom: 16px; padding-left: 12px;">
+              <p style="margin: 0; color: #010326; font-weight: 500; font-size: 15px;">Check your inbox</p>
+              <p style="margin: 4px 0 0; color: #585b76; font-size: 14px;">Your eSIM QR code arrives within 10 minutes</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="vertical-align: top; width: 44px; padding-bottom: 16px;">
+              <div style="width: 32px; height: 32px; background: #63BFBF; border-radius: 50%; color: white; font-weight: 600; font-size: 14px; line-height: 32px; text-align: center;">2</div>
+            </td>
+            <td style="vertical-align: top; padding-bottom: 16px; padding-left: 12px;">
+              <p style="margin: 0; color: #010326; font-weight: 500; font-size: 15px;">Scan & install</p>
+              <p style="margin: 4px 0 0; color: #585b76; font-size: 14px;">Use your phone camera to scan the QR code</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="vertical-align: top; width: 44px;">
+              <div style="width: 32px; height: 32px; background: #63BFBF; border-radius: 50%; color: white; font-weight: 600; font-size: 14px; line-height: 32px; text-align: center;">3</div>
+            </td>
+            <td style="vertical-align: top; padding-left: 12px;">
+              <p style="margin: 0; color: #010326; font-weight: 500; font-size: 15px;">Land & connect</p>
+              <p style="margin: 4px 0 0; color: #585b76; font-size: 14px;">Enable data roaming when you arrive - that's it!</p>
+            </td>
+          </tr>
+        </table>
+      </div>
+      ` : ''}
+
+      <!-- Support Card -->
+      <div style="background: linear-gradient(135deg, #F2E2CE 0%, #f7efe4 100%); border-radius: 16px; padding: 20px; text-align: center;">
+        <p style="margin: 0 0 4px; color: #010326; font-weight: 600;">Questions? I'm here to help!</p>
+        <p style="margin: 0; color: #585b76; font-size: 14px;">
+          Reply to this email or message us on WhatsApp 24/7
         </p>
       </div>
     </div>
 
+    <!-- Personal Sign-off -->
+    <div style="margin-top: 32px; padding: 0 8px;">
+      <p style="color: #585b76; margin: 0 0 16px; font-size: 15px;">
+        Thanks for choosing Trvel for your ${destinationName} trip! If you have any questions at all, just reply to this email - I personally read and respond to every message.
+      </p>
+      <p style="color: #010326; margin: 0; font-weight: 500;">
+        Safe travels! ✈️<br>
+        <span style="color: #63BFBF; font-weight: 600;">Jonathan</span><br>
+        <span style="color: #585b76; font-size: 14px; font-weight: 400;">Founder of Trvel</span>
+      </p>
+    </div>
+
     <!-- Footer -->
-    <div style="text-align: center; margin-top: 32px; color: #94a3b8; font-size: 14px;">
-      <p style="margin: 0 0 8px;">Thank you for choosing Trvel!</p>
-      <p style="margin: 0;">Safe travels!</p>
+    <div style="text-align: center; margin-top: 40px; padding-top: 24px; border-top: 1px solid #F2E2CE;">
+      <p style="color: #888a9d; font-size: 12px; margin: 0;">
+        Trvel • Travel eSIMs made simple<br>
+        <a href="https://trvel.co" style="color: #63BFBF; text-decoration: none;">trvel.co</a>
+      </p>
     </div>
   </div>
 </body>
@@ -280,7 +478,7 @@ export async function POST(request: NextRequest) {
         `,
       });
 
-      // 6. Update order with email status
+      // 7. Update order with email status
       if (emailError) {
         console.error('Failed to send email:', emailError);
       } else {

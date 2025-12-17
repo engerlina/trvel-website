@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui';
+import { useDestination } from '@/contexts/DestinationContext';
 
 interface DirectCheckoutButtonProps {
   destination: string;
@@ -19,8 +20,15 @@ export function DirectCheckoutButton({
   children,
 }: DirectCheckoutButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const { selectedDestination, triggerPlansDropdownHighlight } = useDestination();
 
   const handleCheckout = async () => {
+    // If no destination is selected (cycling mode), highlight the dropdown
+    if (!selectedDestination) {
+      triggerPlansDropdownHighlight();
+      return;
+    }
+
     setIsLoading(true);
 
     try {

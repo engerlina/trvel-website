@@ -7,9 +7,10 @@ interface CheckoutButtonProps {
   destination: string;
   duration: number;
   locale: string;
+  promoCode?: string;
 }
 
-export default function CheckoutButton({ destination, duration, locale }: CheckoutButtonProps) {
+export default function CheckoutButton({ destination, duration, locale, promoCode }: CheckoutButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const t = useTranslations('common.buttons');
@@ -28,6 +29,7 @@ export default function CheckoutButton({ destination, duration, locale }: Checko
           destination,
           duration,
           locale,
+          promoCode,
         }),
       });
 
@@ -54,7 +56,7 @@ export default function CheckoutButton({ destination, duration, locale }: Checko
       <button
         onClick={handleCheckout}
         disabled={isLoading}
-        className="w-full bg-brand-600 text-white py-4 px-8 rounded-xl font-semibold text-lg hover:bg-brand-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        className="w-full bg-brand-400 text-white py-4 px-8 rounded-xl font-semibold text-lg hover:bg-brand-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-soft hover:shadow-glow"
       >
         {isLoading ? (
           <>
@@ -87,7 +89,7 @@ export default function CheckoutButton({ destination, duration, locale }: Checko
       </button>
 
       {error && (
-        <p className="mt-4 text-center text-sm text-red-600 bg-red-50 rounded-lg py-2 px-4">
+        <p className="mt-4 text-center text-sm text-accent-600 bg-accent-50 rounded-xl py-2 px-4">
           {error}
         </p>
       )}

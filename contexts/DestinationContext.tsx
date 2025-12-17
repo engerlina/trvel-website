@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, ReactNode } from 'react';
 
 // Plan prices for a destination
 export interface PlanPrices {
@@ -28,6 +28,9 @@ interface DestinationContextType {
   setPlansMap: (plans: PlansMap) => void;
   plansLoading: boolean;
   setPlansLoading: (loading: boolean) => void;
+  // Highlight the plans dropdown when user tries to checkout without selecting destination
+  highlightPlansDropdown: boolean;
+  triggerPlansDropdownHighlight: () => void;
 }
 
 const DestinationContext = createContext<DestinationContextType | undefined>(undefined);
@@ -38,6 +41,20 @@ export function DestinationProvider({ children }: { children: ReactNode }) {
   const [cyclingIndex, setCyclingIndex] = useState(0);
   const [plansMap, setPlansMap] = useState<PlansMap>({});
   const [plansLoading, setPlansLoading] = useState(true);
+  const [highlightPlansDropdown, setHighlightPlansDropdown] = useState(false);
+
+  const triggerPlansDropdownHighlight = useCallback(() => {
+    // Scroll to the Hero dropdown so user can see the highlight
+    const heroDropdown = document.getElementById('hero-destination-selector');
+    if (heroDropdown) {
+      heroDropdown.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    // Slight delay to let scroll happen before showing highlight
+    setTimeout(() => {
+      setHighlightPlansDropdown(true);
+      setTimeout(() => setHighlightPlansDropdown(false), 3000);
+    }, 300);
+  }, []);
 
   return (
     <DestinationContext.Provider value={{
@@ -51,6 +68,8 @@ export function DestinationProvider({ children }: { children: ReactNode }) {
       setPlansMap,
       plansLoading,
       setPlansLoading,
+      highlightPlansDropdown,
+      triggerPlansDropdownHighlight,
     }}>
       {children}
     </DestinationContext.Provider>

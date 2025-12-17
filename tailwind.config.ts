@@ -103,6 +103,7 @@ const config: Config = {
         'fade-up': 'fadeUp 0.6s ease-out',
         'scale-in': 'scaleIn 0.3s ease-out',
         'blink': 'blink 1s step-end infinite',
+        'shake': 'shake 0.5s ease-in-out',
       },
       keyframes: {
         fadeIn: {
@@ -120,6 +121,11 @@ const config: Config = {
         blink: {
           '0%, 100%': { opacity: '1' },
           '50%': { opacity: '0' },
+        },
+        shake: {
+          '0%, 100%': { transform: 'translateX(0)' },
+          '10%, 30%, 50%, 70%, 90%': { transform: 'translateX(-4px)' },
+          '20%, 40%, 60%, 80%': { transform: 'translateX(4px)' },
         },
       },
     },

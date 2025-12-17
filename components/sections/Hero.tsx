@@ -27,7 +27,7 @@ export const destinations: { name: string; slug: string; Flag: FlagComponent }[]
 export function Hero() {
   const t = useTranslations('home.hero');
   const locale = useLocale();
-  const { selectedDestination, setSelectedDestination, setDestinationName, setCyclingIndex } = useDestination();
+  const { selectedDestination, setSelectedDestination, setDestinationName, setCyclingIndex, highlightPlansDropdown } = useDestination();
   const modalRef = useRef<HTMLDialogElement>(null);
 
   // Filter out the user's home country destination for the typewriter
@@ -119,10 +119,15 @@ export function Hero() {
           </p>
 
           {/* Destination Selector */}
-          <div id="hero-destination-selector" className="animate-fade-up animate-delay-300 max-w-md mx-auto mb-8">
+          <div id="hero-destination-selector" className="animate-fade-up animate-delay-300 max-w-md mx-auto mb-8 relative">
             <button
               onClick={openModal}
-              className="btn btn-outline w-full justify-between gap-3 px-6 py-4 h-auto bg-white rounded-2xl border-2 border-cream-400 hover:border-brand-400 hover:bg-white transition-all duration-200 shadow-soft"
+              className={cn(
+                "btn btn-outline w-full justify-between gap-3 px-6 py-4 h-auto bg-white rounded-2xl border-2 transition-all duration-200 shadow-soft",
+                highlightPlansDropdown
+                  ? "border-accent-500 ring-4 ring-accent-200 animate-shake"
+                  : "border-cream-400 hover:border-brand-400 hover:bg-white"
+              )}
             >
               <span className="flex items-center gap-3">
                 {selected ? (
@@ -131,11 +136,23 @@ export function Hero() {
                     <span className="text-body-lg font-medium text-navy-500">{selected.name}</span>
                   </>
                 ) : (
-                  <span className="text-body-lg text-navy-200 font-normal">{t('destinationPlaceholder')}</span>
+                  <span className={cn(
+                    "text-body-lg font-normal",
+                    highlightPlansDropdown ? "text-accent-600 font-medium" : "text-navy-200"
+                  )}>{t('destinationPlaceholder')}</span>
                 )}
               </span>
-              <ChevronDown className="w-5 h-5 text-navy-200" />
+              <ChevronDown className={cn("w-5 h-5", highlightPlansDropdown ? "text-accent-500" : "text-navy-200")} />
             </button>
+            {/* Tooltip when highlighted */}
+            {highlightPlansDropdown && (
+              <div className="absolute -bottom-12 left-1/2 -translate-x-1/2 whitespace-nowrap animate-fade-up z-20">
+                <div className="bg-navy-500 text-white text-sm px-4 py-2 rounded-lg shadow-lg">
+                  Please select your travel destination first
+                  <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-navy-500 rotate-45" />
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Helper Text */}
