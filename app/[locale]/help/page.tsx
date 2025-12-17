@@ -126,7 +126,7 @@ const faqCategories = [
       },
       {
         question: 'How much data do I get?',
-        answer: 'All our plans include unlimited data. You get 1GB of high-speed data per day, then unlimited data at reduced speeds (typically 256-512kbps). This is enough for messaging, maps, social media, and general browsing even after the high-speed allowance.',
+        answer: 'All our plans include unlimited data. You get 1GB of high-speed data (5G where available) per day, then unlimited data at 1.25 Mbps. This is enough for messaging, maps, social media, music streaming, and general browsing even after the high-speed allowance.',
       },
       {
         question: 'Can I make calls and send SMS with the eSIM?',
@@ -157,7 +157,7 @@ const faqCategories = [
       },
       {
         question: 'My internet is slow. Is something wrong?',
-        answer: 'If you\'ve used your daily 1GB high-speed allowance, speeds are reduced for the remainder of the day (resets at midnight local time). This is still sufficient for messaging and basic browsing. If speeds seem unusually slow, try moving to an area with better coverage or contact support.',
+        answer: 'If you\'ve used your daily 1GB high-speed allowance, speeds are reduced to 1.25 Mbps for the remainder of the day (resets every 24 hours from first use). This is still sufficient for messaging, maps, and basic browsing. If speeds seem unusually slow, try moving to an area with better coverage or contact support.',
       },
     ],
   },

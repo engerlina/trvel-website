@@ -74,9 +74,11 @@ export function Header() {
             </ul>
           </div>
 
-          <Button variant="primary" size="sm" className="hidden md:flex">
-            Get Started
-          </Button>
+          <Link href="/get-started" className="hidden md:flex">
+            <Button variant="primary" size="sm">
+              Get Started
+            </Button>
+          </Link>
 
           {/* Mobile Menu Button */}
           <button
@@ -98,9 +100,11 @@ export function Header() {
             <li><Link href="/how-it-works" onClick={() => setMobileMenuOpen(false)}>How It Works</Link></li>
             <li><Link href="/help" onClick={() => setMobileMenuOpen(false)}>Help</Link></li>
             <li className="mt-4">
-              <Button variant="primary" size="md" className="w-full justify-center">
-                Get Started
-              </Button>
+              <Link href="/get-started" onClick={() => setMobileMenuOpen(false)} className="w-full">
+                <Button variant="primary" size="md" className="w-full justify-center">
+                  Get Started
+                </Button>
+              </Link>
             </li>
           </ul>
         </div>

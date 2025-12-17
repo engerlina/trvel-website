@@ -10,7 +10,9 @@ import {
   Star,
   Zap,
   Shield,
+  Info,
 } from 'lucide-react';
+import { isDestinationExcluded } from '@/lib/utils';
 import {
   JP, TH, KR, SG, ID, MY, VN, PH, GB, FR, IT, US,
   type FlagComponent,
@@ -188,14 +190,47 @@ export default async function DestinationsPage({ params }: DestinationsPageProps
                   {regionDestinations.map((destination) => {
                     const plan = planMap.get(destination.slug);
                     const FlagIcon = flagMap[destination.slug] || Globe;
+                    const isExcluded = isDestinationExcluded(destination.slug, locale);
+
+                    if (isExcluded) {
+                      return (
+                        <div key={destination.slug} className="relative group h-full">
+                          <div className="bg-cream-50 rounded-2xl p-6 border border-cream-200 opacity-50 cursor-not-allowed h-full flex flex-col">
+                            {/* Flag */}
+                            <div className="mb-4 relative">
+                              <FlagIcon className="w-16 h-auto rounded-lg shadow-soft grayscale" />
+                            </div>
+
+                            {/* Info */}
+                            <h3 className="text-lg font-semibold text-gray-400 mb-1">
+                              {destination.name}
+                            </h3>
+
+                            <p className="text-body-sm text-gray-400 flex items-center gap-1">
+                              <Info className="w-3.5 h-3.5" />
+                              You&apos;re here!
+                            </p>
+
+                            {/* Spacer to fill remaining height */}
+                            <div className="flex-grow" />
+                          </div>
+                          {/* Tooltip */}
+                          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+                            <div className="bg-navy-500 text-white text-xs px-3 py-2 rounded-lg shadow-lg">
+                              You don&apos;t need an eSIM for your home country
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    }
 
                     return (
                       <Link
                         key={destination.slug}
                         href={`/${destination.slug}`}
-                        className="group"
+                        className="group h-full"
                       >
-                        <div className="bg-cream-50 rounded-2xl p-6 border border-cream-200 hover:border-brand-300 hover:shadow-lg transition-all duration-300">
+                        <div className="bg-cream-50 rounded-2xl p-6 border border-cream-200 hover:border-brand-300 hover:shadow-lg transition-all duration-300 h-full flex flex-col">
                           {/* Flag */}
                           <div className="mb-4 relative">
                             <FlagIcon className="w-16 h-auto rounded-lg shadow-soft group-hover:scale-105 transition-transform duration-300" />
@@ -214,7 +249,7 @@ export default async function DestinationsPage({ params }: DestinationsPageProps
 
                           {/* Price - show lowest daily rate (15-day plan) */}
                           {plan?.price_15day && (
-                            <div className="flex items-baseline gap-2 mb-4">
+                            <div className="flex items-baseline gap-2">
                               <span className="text-navy-400 text-sm">{t('from')}</span>
                               <span className="text-xl font-bold text-brand-600">
                                 {currencySymbol}{formatPrice(Number(plan.price_15day) / 15, currency)}
@@ -223,8 +258,11 @@ export default async function DestinationsPage({ params }: DestinationsPageProps
                             </div>
                           )}
 
+                          {/* Spacer to push CTA to bottom */}
+                          <div className="flex-grow" />
+
                           {/* CTA */}
-                          <div className="flex items-center gap-2 text-brand-600 font-medium text-sm group-hover:gap-3 transition-all">
+                          <div className="flex items-center gap-2 text-brand-600 font-medium text-sm group-hover:gap-3 transition-all mt-4">
                             {t('viewPlans')}
                             <ArrowRight className="w-4 h-4" />
                           </div>

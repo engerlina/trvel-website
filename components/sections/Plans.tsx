@@ -182,7 +182,7 @@ export function Plans() {
                           <span className="text-body text-gray-500">{currency}</span>
                         </div>
                         <p className="text-body-sm text-gray-500 mt-1">
-                          {currencySymbol}{dailyRate}/day &middot; {t('unlimitedData')}
+                          from {currencySymbol}{dailyRate}/day
                         </p>
                       </>
                     )}

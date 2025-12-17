@@ -57,8 +57,8 @@ export function Destinations() {
             const plan = plansMap[destination.slug];
             const currency = plan?.currency || 'AUD';
             const currencySymbol = getCurrencySymbol(currency);
-            // Use 5-day price as "from" price (cheapest option)
-            const fromPrice = plan?.price_5day;
+            // Calculate daily rate from 15-day price (lowest per-day rate)
+            const dailyRate = plan?.price_15day ? plan.price_15day / 15 : null;
 
             if (isExcluded) {
               return (
@@ -78,6 +78,9 @@ export function Destinations() {
                         <Info className="w-3.5 h-3.5" />
                         You&apos;re here!
                       </p>
+
+                      {/* Spacer to match height of other cards */}
+                      <div className="mt-4 h-5" />
                     </div>
                   </Card>
                   {/* Tooltip */}
@@ -106,9 +109,9 @@ export function Destinations() {
                     <p className="text-body-sm text-gray-500">
                       {plansLoading ? (
                         <span className="inline-block w-16 h-4 bg-gray-200 rounded animate-pulse" />
-                      ) : fromPrice ? (
+                      ) : dailyRate ? (
                         <>
-                          {t('from')} <span className="font-semibold text-brand-600">{currencySymbol}{formatPrice(fromPrice, currency)}</span>
+                          {t('from')} <span className="font-semibold text-brand-600">{currencySymbol}{formatPrice(dailyRate, currency)}/day</span>
                         </>
                       ) : (
                         <span className="text-gray-400">Price unavailable</span>

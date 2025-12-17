@@ -40,7 +40,7 @@
       "unlimitedData": "Unlimited data",
       "selectPlan": "Select Plan",
       "savingsCallout": "Save {amount} vs carrier roaming",
-      "dataDisclaimer": "1GB high-speed daily, then unlimited at standard speed. No throttling, no caps.",
+      "dataDisclaimer": "1GB harian pada kelajuan 5G, kemudian tanpa had pada 1.25 Mbps. Reset setiap 24 jam.",
       "short": {
         "name": "Short Trip"
       },

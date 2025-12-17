@@ -79,15 +79,15 @@ export default async function FairUsePage({ params }: FairUsePageProps) {
 
               <h3>1.1 High-Speed Data</h3>
               <p>
-                Each Trvel eSIM plan includes a daily high-speed data allowance, typically 1GB per day.
-                The specific allowance is displayed at the time of purchase. High-speed data provides
-                full 4G/LTE speeds where available, suitable for all typical travel activities.
+                Each Trvel eSIM plan includes a daily high-speed data allowance of 1GB per day.
+                High-speed data provides full 5G/4G speeds where available, suitable for all
+                typical travel activities including video calls, streaming, and navigation.
               </p>
 
               <h3>1.2 Unlimited Data After High-Speed Allowance</h3>
               <p>
-                After you have used your daily high-speed allowance, you will continue to have
-                unlimited data access at reduced speeds (typically 256-512 Kbps) for the remainder
+                After you have used your daily 1GB high-speed allowance, you will continue to have
+                unlimited data access at reduced speeds (1.25 Mbps) for the remainder
                 of the day. This speed is sufficient for:
               </p>
               <ul>
@@ -99,8 +99,8 @@ export default async function FairUsePage({ params }: FairUsePageProps) {
 
               <h3>1.3 Daily Reset</h3>
               <p>
-                Your high-speed data allowance resets at midnight local time in your destination
-                country. Unused high-speed data does not roll over to the next day.
+                Your high-speed data allowance resets every 24 hours from your first data use.
+                Unused high-speed data does not roll over to the next day.
               </p>
 
               <h2>2. What Is Fair Use?</h2>

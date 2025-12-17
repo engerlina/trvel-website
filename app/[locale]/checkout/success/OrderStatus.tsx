@@ -247,16 +247,31 @@ export default function OrderStatus({ sessionId, translations }: OrderStatusProp
           </div>
 
           <p className="text-sm text-navy-300 mb-4">
-            Scan this code from another device to install your eSIM
+            Scan this code with your phone camera or from another device
           </p>
 
-          <div className="bg-brand-50 rounded-xl p-4 text-left">
-            <p className="text-sm font-medium text-brand-600 mb-2">Quick Install Steps:</p>
+          <div className="bg-brand-50 rounded-xl p-4 text-left mb-4">
+            <p className="text-sm font-medium text-brand-600 mb-2">How to Install:</p>
             <ol className="text-xs text-navy-400 space-y-1">
               <li><strong>iPhone:</strong> Settings → Mobile Data → Add eSIM → Use QR Code</li>
               <li><strong>Android:</strong> Settings → Network → SIMs → Add eSIM</li>
-              <li>Enable <strong>Data Roaming</strong> when you land!</li>
             </ol>
+          </div>
+
+          <div className="bg-cream-100 rounded-xl p-4 text-left mb-4">
+            <p className="text-sm font-medium text-navy-600 mb-2">Your Plan Includes:</p>
+            <ul className="text-xs text-navy-400 space-y-1">
+              <li>1GB of high-speed data per day (5G where available)</li>
+              <li>Unlimited data after at reduced speeds (1.25 Mbps)</li>
+              <li>Data resets every 24 hours from first use</li>
+            </ul>
+          </div>
+
+          <div className="bg-amber-50 rounded-xl p-4 text-left">
+            <p className="text-sm font-medium text-amber-700 mb-1">Important:</p>
+            <p className="text-xs text-amber-600">
+              Enable <strong>Data Roaming</strong> in your phone settings when you arrive at your destination.
+            </p>
           </div>
         </div>
       </div>

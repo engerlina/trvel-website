@@ -40,7 +40,7 @@
       "unlimitedData": "Unlimited data",
       "selectPlan": "Select Plan",
       "savingsCallout": "Save {amount} vs Singtel roaming",
-      "dataDisclaimer": "1GB high-speed daily, then unlimited at reduced speed. No throttling tricks.",
+      "dataDisclaimer": "1GB daily at 5G speeds, then unlimited at 1.25 Mbps. Resets every 24 hours.",
       "short": {
         "name": "Short Trip"
       },
