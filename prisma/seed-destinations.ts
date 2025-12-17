@@ -7,6 +7,7 @@ const localeCurrencies: Record<string, string> = {
   'en-au': 'AUD',
   'en-sg': 'SGD',
   'en-gb': 'GBP',
+  'en-us': 'USD',
   'ms-my': 'MYR',
   'id-id': 'IDR',
 };
@@ -26,6 +27,7 @@ const COMPETITORS: Record<string, { name: string; dailyRate: number }> = {
   'AUD': { name: 'Telstra', dailyRate: 10 },
   'SGD': { name: 'Singtel', dailyRate: 15 },
   'GBP': { name: 'EE', dailyRate: 3.54 },
+  'USD': { name: 'AT&T', dailyRate: 12 },
   'MYR': { name: 'Maxis', dailyRate: 35 },
   'IDR': { name: 'Telkomsel', dailyRate: 100000 },
 };
@@ -136,7 +138,7 @@ const destinationsData = [
   },
 ];
 
-const locales = ['en-au', 'en-sg', 'en-gb', 'ms-my', 'id-id'];
+const locales = ['en-au', 'en-sg', 'en-gb', 'en-us', 'ms-my', 'id-id'];
 
 // Localized destination names
 const localizedNames: Record<string, Record<string, { name: string; tagline: string }>> = {

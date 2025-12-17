@@ -283,7 +283,7 @@ export async function generateStaticParams() {
       select: { slug: true },
     });
 
-    const locales = ['en-au', 'en-sg', 'en-gb', 'ms-my', 'id-id'];
+    const locales = ['en-au', 'en-sg', 'en-gb', 'en-us', 'ms-my', 'id-id'];
     const params: { locale: string; brand: string }[] = [];
 
     for (const brand of brands) {

@@ -2,7 +2,7 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-const LOCALES = ['en-au', 'en-sg', 'en-gb', 'ms-my', 'id-id'];
+const LOCALES = ['en-au', 'en-sg', 'en-gb', 'en-us', 'ms-my', 'id-id'];
 
 // City data with unique connectivity information
 const CITIES_DATA: Record<string, Array<{

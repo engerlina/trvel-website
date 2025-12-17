@@ -209,7 +209,7 @@ async function ensureCategories() {
     { slug: 'comparisons', name: 'Comparisons', nameMs: 'Perbandingan', nameId: 'Perbandingan' },
   ];
 
-  const locales = ['en-au', 'en-sg', 'en-gb', 'ms-my', 'id-id'];
+  const locales = ['en-au', 'en-sg', 'en-gb', 'en-us', 'ms-my', 'id-id'];
 
   for (const locale of locales) {
     for (const cat of categoryTemplates) {

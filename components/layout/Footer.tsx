@@ -1,7 +1,7 @@
 import { Link } from '@/i18n/routing';
 import Image from 'next/image';
 import { Shield, Lock, MessageCircle, Mail, ChevronRight, Phone } from 'lucide-react';
-import { AU, SG, GB, MY, ID, type FlagComponent } from 'country-flag-icons/react/3x2';
+import { AU, SG, GB, US, MY, ID, type FlagComponent } from 'country-flag-icons/react/3x2';
 
 const destinations = [
   { name: 'Japan', slug: 'japan' },
@@ -35,6 +35,7 @@ const legal = [
 
 const locales: { code: string; label: string; Flag: FlagComponent; currency: string }[] = [
   { code: 'en-au', label: 'Australia', Flag: AU, currency: 'AUD' },
+  { code: 'en-us', label: 'United States', Flag: US, currency: 'USD' },
   { code: 'en-sg', label: 'Singapore', Flag: SG, currency: 'SGD' },
   { code: 'en-gb', label: 'United Kingdom', Flag: GB, currency: 'GBP' },
   { code: 'ms-my', label: 'Malaysia', Flag: MY, currency: 'MYR' },

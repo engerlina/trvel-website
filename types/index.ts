@@ -1,6 +1,6 @@
 import { Plan, Destination, Post } from '@prisma/client';
 
-export type Locale = 'en-au' | 'en-sg' | 'en-gb' | 'ms-my' | 'id-id';
+export type Locale = 'en-au' | 'en-sg' | 'en-gb' | 'en-us' | 'ms-my' | 'id-id';
 
 export type PlanWithRelations = Plan;
 

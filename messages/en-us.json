@@ -1,0 +1,283 @@
+{
+  "common": {
+    "nav": {
+      "home": "Home",
+      "destinations": "Destinations",
+      "blog": "Blog",
+      "pricing": "Pricing",
+      "howItWorks": "How It Works",
+      "help": "Help"
+    },
+    "buttons": {
+      "buy": "Buy Now",
+      "learnMore": "Learn More",
+      "checkout": "Checkout",
+      "continue": "Continue",
+      "back": "Back",
+      "getStarted": "Get Started"
+    },
+    "forms": {
+      "email": "Email",
+      "password": "Password",
+      "name": "Name",
+      "submit": "Submit"
+    }
+  },
+  "home": {
+    "hero": {
+      "headline": "Travel light. Stay connected.",
+      "subheadline": "Premium data abroad without the AT&T roaming bill. Pay in USD. Connected in minutes.",
+      "trustBadge": "10-min connection guarantee or full refund",
+      "destinationPlaceholder": "Where are you going?",
+      "cta": "See Plans",
+      "ctaSubtext": "Instant delivery. Setup in 2 minutes."
+    },
+    "plans": {
+      "title": "Choose your trip",
+      "subtitle": "Transparent pricing in USD. Unlimited data. Delivered instantly to your email.",
+      "mostPopular": "Most Popular",
+      "days": "days",
+      "unlimitedData": "Unlimited data",
+      "selectPlan": "Select Plan",
+      "savingsCallout": "Save {amount} vs AT&T roaming",
+      "dataDisclaimer": "1GB daily at 5G speeds, then unlimited at 1.25 Mbps. Resets every 24 hours.",
+      "short": {
+        "name": "Short Trip"
+      },
+      "week": {
+        "name": "Week Away"
+      },
+      "extended": {
+        "name": "Extended Stay"
+      },
+      "features": {
+        "unlimitedData": "Unlimited data included",
+        "instantActivation": "Instant QR code delivery",
+        "liveSupport": "Live chat & phone support",
+        "moneyBackGuarantee": "10-min guarantee or refund"
+      }
+    },
+    "whyTrvel": {
+      "title": "Why 50,000+ travelers switched",
+      "subtitle": "Premium connectivity without the premium hassle. Here's why Americans trust Trvel.",
+      "guarantee": {
+        "title": "10-Min Guarantee",
+        "description": "Online within 10 minutes of landing or full refund. No forms, no questions."
+      },
+      "support": {
+        "title": "24/7 Support",
+        "description": "Live chat and calls available. Average response: 3 minutes. Even at 2am."
+      },
+      "network": {
+        "title": "Tier-1 Networks Only",
+        "description": "Same towers as Docomo, AIS, and local carriers. Premium speeds, no exceptions."
+      },
+      "rollover": {
+        "title": "Unused Data Rolls Over",
+        "description": "Didn't use all your data? It carries to your next trip. Nothing wasted."
+      }
+    },
+    "comparison": {
+      "title": "Why pay AT&T $12/day?",
+      "subtitle": "See exactly how much you save compared to AT&T International Day Pass.",
+      "feature": "Feature",
+      "savingsLabel": "Your savings on a 7-day trip",
+      "features": {
+        "dailyCost": "Daily cost",
+        "data": "Unlimited data",
+        "support": "Live chat & phone support",
+        "setup": "Setup time",
+        "guarantee": "Money-back guarantee"
+      }
+    },
+    "howItWorks": {
+      "title": "Connected in 3 steps",
+      "subtitle": "No SIM swapping. No airport queues. No waiting. Buy now, connect when you land.",
+      "cta": "See detailed guide",
+      "buy": {
+        "title": "1. Buy before you fly",
+        "description": "Choose your destination. Pay in USD. Get your QR code instantly via email."
+      },
+      "land": {
+        "title": "2. Scan when you land",
+        "description": "Open your email, scan the QR code. Your eSIM activates automatically."
+      },
+      "connect": {
+        "title": "3. You're online",
+        "description": "That's it. Unlimited data for your entire trip. Message us if you need anything."
+      }
+    },
+    "testimonials": {
+      "title": "Trusted by 50,000+ travelers",
+      "subtitle": "Here's what American travelers say about switching from carrier roaming.",
+      "sarah": {
+        "name": "Sarah M.",
+        "quote": "Landed in Tokyo, connected before I got off the plane. This is how it should be."
+      },
+      "james": {
+        "name": "James K.",
+        "quote": "Called support at 2am Tokyo time. Got through in 3 minutes. Actual humans."
+      },
+      "emma": {
+        "name": "Emma L.",
+        "quote": "Saved $60 compared to what AT&T would have charged. Setup took maybe 2 minutes."
+      },
+      "michael": {
+        "name": "Michael R.",
+        "quote": "Five trips with Trvel now. Japan, Thailand, Korea. Reliable every single time."
+      },
+      "stats": {
+        "travelers": "Happy travelers",
+        "rating": "Average rating",
+        "countries": "Countries covered",
+        "response": "Support response"
+      }
+    },
+    "destinations": {
+      "title": "Popular destinations",
+      "subtitle": "Premium eSIMs for where Americans travel most. All priced in USD.",
+      "viewAll": "See all destinations",
+      "from": "From",
+      "viewPlans": "View plans"
+    }
+  },
+  "destination": {
+    "title": "Destination",
+    "pricing": "Pricing",
+    "selectPlan": "Select a Plan",
+    "hero": {
+      "rating": "4.9/5 rating",
+      "setupTime": "2 min setup",
+      "guarantee": "Money-back guarantee",
+      "startingFrom": "Starting from"
+    },
+    "plans": {
+      "title": "Choose Your Plan",
+      "subtitle": "All plans include unlimited data, premium network access, and 24/7 support",
+      "mostPopular": "Most Popular",
+      "5day": "5 Day",
+      "7day": "7 Day",
+      "15day": "15 Day",
+      "perDay": "/day",
+      "unlimitedData": "Unlimited data",
+      "premiumNetwork": "Premium network",
+      "liveSupport": "24/7 live chat & phone support",
+      "getStarted": "Get Started",
+      "compareTo": "Compare to {competitor} roaming at"
+    },
+    "features": {
+      "title": "Why Choose Trvel",
+      "subtitle": "Everything you need for seamless connectivity in {destination}",
+      "instantActivation": {
+        "title": "Instant Activation",
+        "description": "Scan QR code and connect in under 2 minutes"
+      },
+      "unlimitedData": {
+        "title": "Unlimited Data",
+        "description": "No throttling, no data caps, no surprises"
+      },
+      "premiumNetwork": {
+        "title": "Premium Network",
+        "description": "Connected to tier-1 local carriers"
+      },
+      "guarantee": {
+        "title": "10-Min Guarantee",
+        "description": "Connect in 10 minutes or full refund"
+      },
+      "humanSupport": {
+        "title": "24/7 Support",
+        "description": "Live chat & phone anytime"
+      },
+      "keepNumber": {
+        "title": "Keep Your Number",
+        "description": "Works alongside your existing SIM"
+      }
+    },
+    "howItWorks": {
+      "title": "Get Connected in 3 Steps",
+      "step1": {
+        "title": "Purchase",
+        "description": "Choose your plan and complete checkout in under 60 seconds"
+      },
+      "step2": {
+        "title": "Scan",
+        "description": "Receive your QR code instantly via email and scan it"
+      },
+      "step3": {
+        "title": "Connect",
+        "description": "Enable data roaming when you land and you're online!"
+      }
+    },
+    "cta": {
+      "title": "Ready for {destination}?",
+      "subtitle": "Get your eSIM now and be connected the moment you land. Instant delivery, premium network, 24/7 support.",
+      "button": "Get Your eSIM"
+    }
+  },
+  "destinations": {
+    "pageTitle": "All eSIM Destinations | Trvel",
+    "pageDescription": "Browse all travel eSIM destinations. Premium unlimited data plans for Asia, Europe, Americas and more. Instant delivery, 24/7 support.",
+    "badge": "12+ Destinations",
+    "title": "Choose Your Destination",
+    "subtitle": "Premium eSIMs with unlimited data for the world's most popular travel destinations. All plans include instant delivery and 24/7 support.",
+    "stats": {
+      "rating": "4.9/5 rating",
+      "instant": "Instant delivery",
+      "guarantee": "Money-back guarantee"
+    },
+    "from": "From",
+    "viewPlans": "View Plans",
+    "country": "destination",
+    "countries": "destinations",
+    "cta": {
+      "title": "Can't find your destination?",
+      "subtitle": "We're constantly adding new destinations. Contact us and we'll let you know when your destination is available.",
+      "button": "Contact Us"
+    }
+  },
+  "blog": {
+    "title": "Blog",
+    "readMore": "Read More",
+    "pageTitle": "Travel Tips & eSIM Guides | Trvel Blog",
+    "pageDescription": "Expert travel tips, destination guides, and eSIM advice for American travelers. Stay connected abroad with Trvel.",
+    "heroTitle": "Travel Stories & Tips",
+    "heroSubtitle": "Expert advice, destination guides, and travel insights to help you stay connected on your next adventure.",
+    "allPosts": "All Posts",
+    "emptyTitle": "Coming Soon",
+    "emptyDescription": "We're working on creating helpful travel content for you. Check back soon for tips, guides, and travel stories.",
+    "exploreDestinations": "Explore Destinations",
+    "newsletterTitle": "Get Travel Tips in Your Inbox",
+    "newsletterDescription": "Join 10,000+ travelers who get our best tips, deals, and destination guides delivered weekly.",
+    "emailPlaceholder": "Enter your email",
+    "subscribe": "Subscribe",
+    "noSpam": "No spam, unsubscribe anytime.",
+    "backToBlog": "Back to Blog",
+    "minRead": "min read",
+    "share": "Share",
+    "writtenBy": "Written by",
+    "authorBio": "Travel enthusiast and connectivity expert at Trvel, helping Americans stay connected abroad.",
+    "relatedPosts": "You Might Also Like",
+    "ctaTitle": "Ready to Travel Connected?",
+    "ctaDescription": "Get your eSIM before you fly. Instant delivery, premium networks, 24/7 support.",
+    "ctaButton": "Get Your eSIM"
+  },
+  "checkout": {
+    "title": "Checkout",
+    "completePurchase": "Complete Purchase",
+    "success": {
+      "title": "Payment Successful!",
+      "message": "Thank you for your purchase. Your eSIM details have been sent to your email.",
+      "nextSteps": "What happens next?",
+      "step1": "Check your email for the eSIM QR code (arrives within 2 minutes)",
+      "step2": "When you land, scan the QR code to install the eSIM",
+      "step3": "Enable data roaming and you're connected!",
+      "backHome": "Back to Home"
+    },
+    "cancel": {
+      "title": "Payment Canceled",
+      "message": "Your payment was not completed. No charges have been made to your account.",
+      "tryAgain": "Try Again",
+      "getHelp": "Get Help"
+    }
+  }
+}
