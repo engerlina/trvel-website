@@ -217,7 +217,7 @@
   "destinations": {
     "pageTitle": "Semua Destinasi eSIM | Trvel",
     "pageDescription": "Jelajahi semua destinasi eSIM perjalanan. Paket data tak terbatas premium untuk Asia, Eropa, Amerika dan lainnya. Pengiriman instan, dukungan manusia.",
-    "badge": "12+ Destinasi",
+    "badge": "190+ Destinasi",
     "title": "Pilih Destinasi Anda",
     "subtitle": "eSIM premium dengan data tak terbatas untuk destinasi perjalanan paling populer di dunia. Semua paket termasuk pengiriman instan dan dukungan manusia 24/7.",
     "stats": {
@@ -229,6 +229,7 @@
     "viewPlans": "Lihat Paket",
     "country": "destinasi",
     "countries": "destinasi",
+    "countriesAvailable": "destinasi tersedia",
     "cta": {
       "title": "Tidak menemukan destinasi Anda?",
       "subtitle": "Kami terus menambahkan destinasi baru. Hubungi kami dan kami akan memberitahu Anda ketika destinasi Anda tersedia.",

@@ -217,7 +217,7 @@
   "destinations": {
     "pageTitle": "All eSIM Destinations | Trvel",
     "pageDescription": "Browse all travel eSIM destinations. Premium unlimited data plans for Asia, Europe, Americas and more. Instant delivery, 24/7 support.",
-    "badge": "12+ Destinations",
+    "badge": "190+ Destinations",
     "title": "Choose Your Destination",
     "subtitle": "Premium eSIMs with unlimited data for the world's most popular travel destinations. All plans include instant delivery and 24/7 support.",
     "stats": {
@@ -229,6 +229,7 @@
     "viewPlans": "View Plans",
     "country": "destination",
     "countries": "destinations",
+    "countriesAvailable": "destinations available",
     "cta": {
       "title": "Can't find your destination?",
       "subtitle": "We're constantly adding new destinations. Contact us and we'll let you know when your destination is available.",

@@ -5,7 +5,6 @@ import { Header, Footer } from '@/components/layout';
 import { Link } from '@/i18n/routing';
 import {
   Globe,
-  Search,
   ArrowRight,
   Star,
   Zap,
@@ -13,10 +12,7 @@ import {
   Info,
 } from 'lucide-react';
 import { isDestinationExcluded } from '@/lib/utils';
-import {
-  JP, TH, KR, SG, ID, MY, VN, PH, GB, FR, IT, US,
-  type FlagComponent,
-} from 'country-flag-icons/react/3x2';
+import * as Flags from 'country-flag-icons/react/3x2';
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://trvel.co';
 
@@ -36,28 +32,28 @@ function formatPrice(price: unknown, currency: string): string {
   return num.toFixed(2);
 }
 
-// Map slugs to flag components
-const flagMap: Record<string, FlagComponent> = {
-  'japan': JP,
-  'thailand': TH,
-  'south-korea': KR,
-  'singapore': SG,
-  'indonesia': ID,
-  'malaysia': MY,
-  'vietnam': VN,
-  'philippines': PH,
-  'united-kingdom': GB,
-  'france': FR,
-  'italy': IT,
-  'united-states': US,
-};
+// Get flag component by country ISO code
+function getFlagComponent(countryIso: string | null): React.ComponentType<React.SVGProps<SVGSVGElement>> {
+  if (!countryIso) return Globe as unknown as React.ComponentType<React.SVGProps<SVGSVGElement>>;
+  const code = countryIso.toUpperCase();
+  const FlagComponent = (Flags as Record<string, React.ComponentType<React.SVGProps<SVGSVGElement>>>)[code];
+  return FlagComponent || (Globe as unknown as React.ComponentType<React.SVGProps<SVGSVGElement>>);
+}
 
-// Region groupings for filtering
-const regions: Record<string, string[]> = {
-  'Asia': ['japan', 'thailand', 'south-korea', 'singapore', 'indonesia', 'malaysia', 'vietnam', 'philippines'],
-  'Europe': ['united-kingdom', 'france', 'italy'],
-  'Americas': ['united-states'],
-};
+// Region display order (most popular first)
+const REGION_ORDER = [
+  'Asia',
+  'Europe',
+  'North America',
+  'Oceania',
+  'Middle East',
+  'South America',
+  'Central America',
+  'Caribbean',
+  'Africa',
+  'Central Asia',
+  'Other',
+];
 
 interface DestinationsPageProps {
   params: Promise<{
@@ -110,11 +106,26 @@ export default async function DestinationsPage({ params }: DestinationsPageProps
   const currency = firstPlan?.currency || 'AUD';
   const currencySymbol = currency === 'IDR' ? 'Rp' : currency === 'GBP' ? '£' : '$';
 
-  // Group destinations by region
+  // Group destinations by region from database
   const destinationsByRegion: Record<string, typeof destinations> = {};
-  for (const [region, slugs] of Object.entries(regions)) {
-    destinationsByRegion[region] = destinations.filter(d => slugs.includes(d.slug));
+  for (const dest of destinations) {
+    const region = dest.region || 'Other';
+    if (!destinationsByRegion[region]) {
+      destinationsByRegion[region] = [];
+    }
+    destinationsByRegion[region].push(dest);
   }
+
+  // Sort regions by preferred order
+  const sortedRegions = Object.keys(destinationsByRegion).sort((a, b) => {
+    const aIndex = REGION_ORDER.indexOf(a);
+    const bIndex = REGION_ORDER.indexOf(b);
+    // If not in order list, put at the end
+    if (aIndex === -1 && bIndex === -1) return a.localeCompare(b);
+    if (aIndex === -1) return 1;
+    if (bIndex === -1) return -1;
+    return aIndex - bIndex;
+  });
 
   return (
     <>
@@ -165,6 +176,11 @@ export default async function DestinationsPage({ params }: DestinationsPageProps
                   <span className="font-medium">{t('stats.guarantee')}</span>
                 </div>
               </div>
+
+              {/* Total destinations count */}
+              <p className="text-navy-400 mt-6">
+                {destinations.length} {t('countriesAvailable')}
+              </p>
             </div>
           </div>
 
@@ -173,9 +189,12 @@ export default async function DestinationsPage({ params }: DestinationsPageProps
         </section>
 
         {/* Destinations by Region */}
-        {Object.entries(destinationsByRegion).map(([region, regionDestinations]) => (
-          regionDestinations.length > 0 && (
-            <section key={region} className="py-12 bg-white">
+        {sortedRegions.map((region) => {
+          const regionDestinations = destinationsByRegion[region];
+          if (!regionDestinations || regionDestinations.length === 0) return null;
+
+          return (
+            <section key={region} className="py-12 bg-white even:bg-cream-50">
               <div className="container-wide">
                 <div className="flex items-center gap-3 mb-8">
                   <h2 className="text-heading-xl font-bold text-navy-500">
@@ -189,7 +208,7 @@ export default async function DestinationsPage({ params }: DestinationsPageProps
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                   {regionDestinations.map((destination) => {
                     const plan = planMap.get(destination.slug);
-                    const FlagIcon = flagMap[destination.slug] || Globe;
+                    const FlagIcon = getFlagComponent(destination.country_iso);
                     const isExcluded = isDestinationExcluded(destination.slug, locale);
 
                     if (isExcluded) {
@@ -230,7 +249,7 @@ export default async function DestinationsPage({ params }: DestinationsPageProps
                         href={`/${destination.slug}`}
                         className="group h-full"
                       >
-                        <div className="bg-cream-50 rounded-2xl p-6 border border-cream-200 hover:border-brand-300 hover:shadow-lg transition-all duration-300 h-full flex flex-col">
+                        <div className="bg-white rounded-2xl p-6 border border-cream-200 hover:border-brand-300 hover:shadow-lg transition-all duration-300 h-full flex flex-col">
                           {/* Flag */}
                           <div className="mb-4 relative">
                             <FlagIcon className="w-16 h-auto rounded-lg shadow-soft group-hover:scale-105 transition-transform duration-300" />
@@ -273,55 +292,8 @@ export default async function DestinationsPage({ params }: DestinationsPageProps
                 </div>
               </div>
             </section>
-          )
-        ))}
-
-        {/* All Destinations Grid (if no regions) */}
-        {destinations.length > 0 && Object.values(destinationsByRegion).every(d => d.length === 0) && (
-          <section className="py-12 bg-white">
-            <div className="container-wide">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {destinations.map((destination) => {
-                  const plan = planMap.get(destination.slug);
-                  const FlagIcon = flagMap[destination.slug] || Globe;
-
-                  return (
-                    <Link
-                      key={destination.slug}
-                      href={`/${destination.slug}`}
-                      className="group"
-                    >
-                      <div className="bg-cream-50 rounded-2xl p-6 border border-cream-200 hover:border-brand-300 hover:shadow-lg transition-all duration-300">
-                        <div className="mb-4">
-                          <FlagIcon className="w-16 h-auto rounded-lg shadow-soft group-hover:scale-105 transition-transform duration-300" />
-                        </div>
-
-                        <h3 className="text-lg font-semibold text-navy-500 mb-1 group-hover:text-brand-600 transition-colors">
-                          {destination.name}
-                        </h3>
-
-                        {plan?.price_15day && (
-                          <div className="flex items-baseline gap-2 mb-4">
-                            <span className="text-navy-400 text-sm">{t('from')}</span>
-                            <span className="text-xl font-bold text-brand-600">
-                              {currencySymbol}{formatPrice(Number(plan.price_15day) / 15, currency)}
-                            </span>
-                            <span className="text-navy-400 text-sm">/day</span>
-                          </div>
-                        )}
-
-                        <div className="flex items-center gap-2 text-brand-600 font-medium text-sm group-hover:gap-3 transition-all">
-                          {t('viewPlans')}
-                          <ArrowRight className="w-4 h-4" />
-                        </div>
-                      </div>
-                    </Link>
-                  );
-                })}
-              </div>
-            </div>
-          </section>
-        )}
+          );
+        })}
 
         {/* CTA Section */}
         <section className="py-16 bg-gradient-to-br from-navy-500 via-navy-500 to-navy-400 relative overflow-hidden">
