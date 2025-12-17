@@ -21,7 +21,9 @@
       "Bash(stripe:*)",
       "Bash(npm ls:*)",
       "Bash(node --env-file=.env --import tsx:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nFix TypeScript error in checkout route and add promo code support\n\n- Use Stripe.Checkout.SessionCreateParams type instead of Parameters utility\n- Add allow_promotion_codes to enable coupon codes in checkout\n- Support auto-applying promo codes via URL parameter\n- Remove temporary utility scripts\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git push:*)"
     ]
   }
 }
