@@ -78,7 +78,7 @@
 
 3. **Warm, Not Overly Casual**
    - Professional but human. Like a trusted travel advisor.
-   - ✅ "We're here if you need us—real humans on WhatsApp"
+   - ✅ "We're here if you need us—real humans via live chat and phone"
    - ❌ "Hit us up anytime fam! 🔥"
 
 4. **Direct, Not Pushy**
@@ -153,7 +153,7 @@
    - No throttling on "unlimited" plans
 
 4. **Human Support**
-   - Real people on WhatsApp (not chatbots)
+   - Real people via live chat and phone
    - Response in minutes, not days
    - We speak your language
 

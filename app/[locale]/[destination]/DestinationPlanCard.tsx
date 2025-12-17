@@ -101,7 +101,7 @@ export function DestinationPlanCard({
           </li>
           <li className="flex items-center gap-2">
             <Check className={`w-4 h-4 ${popular ? 'text-brand-200' : 'text-brand-500'}`} />
-            24/7 WhatsApp support
+            24/7 live chat & phone support
           </li>
         </ul>
 

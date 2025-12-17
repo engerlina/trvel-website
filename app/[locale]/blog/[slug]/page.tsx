@@ -290,7 +290,7 @@ export default async function BlogPostPage({ params }: PageProps) {
                 {t('ctaDescription')}
               </p>
               <Link
-                href="/"
+                href={`/${locale}/get-started`}
                 className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-accent-500 to-accent-600 text-white font-semibold rounded-xl shadow-md hover:shadow-lg hover:shadow-accent-500/25 transition-all"
               >
                 {t('ctaButton')}

@@ -43,11 +43,11 @@ export function WhyTrvel() {
   const t = useTranslations('home.whyTrvel');
 
   return (
-    <section className="section bg-gray-50">
+    <section aria-labelledby="why-trvel-heading" className="section bg-gray-50">
       <div className="container-wide">
         {/* Section Header */}
         <div className="text-center mb-16">
-          <h2 className="text-heading-xl md:text-display font-bold text-gray-900 mb-4">
+          <h2 id="why-trvel-heading" className="text-heading-xl md:text-display font-bold text-gray-900 mb-4">
             {t('title')}
           </h2>
           <p className="text-body-lg text-gray-600 max-w-2xl mx-auto">

@@ -1,0 +1,51 @@
+locale,primary_keyword,secondary_keywords,search_intent,monthly_volume_estimate,difficulty,content_type,target_destination
+en-au,japan esim australia,japan travel sim australia;esim for japan trip;japan data sim australian,transactional,2400,medium,destination-guide,japan
+en-au,thailand esim australia,thailand sim card australia;esim thailand travel;bangkok data sim,transactional,1800,medium,destination-guide,thailand
+en-au,korea esim australia,south korea esim;korean sim card australia;seoul data plan,transactional,1200,medium,destination-guide,south-korea
+en-au,telstra roaming alternative,telstra international day pass alternative;avoid telstra roaming;telstra overseas charges,commercial,1500,low,comparison,general
+en-au,esim vs sim card travel,travel sim vs esim;physical sim or esim travel;best sim for overseas,informational,900,low,guide,general
+en-au,singapore esim australia,singapore travel sim;singapore data plan australia;changi airport sim,transactional,800,medium,destination-guide,singapore
+en-au,bali esim australia,indonesia esim australia;bali sim card;bali data plan travellers,transactional,1400,medium,destination-guide,indonesia
+en-au,how to use esim overseas,esim setup guide;international esim guide;travel esim how to,informational,600,low,tutorial,general
+en-au,best esim for asia travel,asia travel esim;southeast asia sim card;asia data roaming,commercial,1100,medium,guide,general
+en-au,malaysia esim australia,kuala lumpur esim;malaysia travel sim australia;malaysia data plan,transactional,700,medium,destination-guide,malaysia
+en-sg,japan esim singapore,japan travel sim sg;esim for japan from singapore;japan data plan singapore,transactional,1800,medium,destination-guide,japan
+en-sg,korea esim singapore,south korea sim singapore;korean travel esim;seoul data sim sg,transactional,1400,medium,destination-guide,south-korea
+en-sg,thailand esim singapore,thailand sim card sg;bangkok esim singapore;thai data plan,transactional,1200,medium,destination-guide,thailand
+en-sg,singtel roaming alternative,singtel dataroam alternative;avoid singtel roaming;cheaper than singtel overseas,commercial,1000,low,comparison,general
+en-sg,best esim for travel singapore,travel esim singapore;international sim singapore;overseas data singapore,commercial,800,medium,guide,general
+en-sg,taiwan esim singapore,taipei esim;taiwan travel sim sg;taiwan data plan singapore,transactional,900,medium,destination-guide,taiwan
+en-sg,indonesia esim singapore,bali esim sg;indonesia sim singapore;jakarta data plan,transactional,1100,medium,destination-guide,indonesia
+en-sg,europe esim singapore,european travel sim;esim for europe from sg;uk france italy data,transactional,700,medium,destination-guide,europe
+en-sg,how does esim work,esim explained;what is esim travel;esim vs physical sim,informational,500,low,tutorial,general
+en-sg,australia esim singapore,sydney esim;australia travel sim sg;australian data plan,transactional,600,medium,destination-guide,australia
+en-gb,japan esim uk,japan travel sim uk;esim japan british;tokyo data sim uk,transactional,2200,medium,destination-guide,japan
+en-gb,thailand esim uk,thailand sim card uk;bangkok esim british;thai travel data uk,transactional,1600,medium,destination-guide,thailand
+en-gb,ee roaming alternative,ee roam abroad alternative;avoid ee roaming charges;cheaper than ee overseas,commercial,1200,low,comparison,general
+en-gb,usa esim uk,america travel sim uk;usa data plan british;new york esim,transactional,1800,medium,destination-guide,usa
+en-gb,spain esim uk,spain travel sim;barcelona esim uk;spanish data plan british,transactional,1400,medium,destination-guide,spain
+en-gb,best esim for europe travel,european esim uk;travel europe data;eu roaming after brexit,commercial,1000,medium,guide,general
+en-gb,bali esim uk,indonesia esim british;bali travel sim uk;bali data plan,transactional,1100,medium,destination-guide,indonesia
+en-gb,australia esim uk,sydney esim british;australia travel sim uk;aussie data plan,transactional,800,medium,destination-guide,australia
+en-gb,how to activate esim,esim activation guide;set up esim iphone;esim android setup,informational,600,low,tutorial,general
+en-gb,greece esim uk,greece travel sim;athens esim uk;greek islands data plan,transactional,900,medium,destination-guide,greece
+ms-my,japan esim malaysia,japan travel sim malaysia;esim jepun dari malaysia;data plan japan,transactional,1400,medium,destination-guide,japan
+ms-my,korea esim malaysia,south korea sim malaysia;korean esim;seoul data plan malaysia,transactional,1100,medium,destination-guide,south-korea
+ms-my,thailand esim malaysia,thailand sim card dari malaysia;bangkok esim;thai data plan,transactional,1000,medium,destination-guide,thailand
+ms-my,australia esim malaysia,sydney esim malaysia;australia travel sim;melbourne data plan,transactional,800,medium,destination-guide,australia
+ms-my,europe esim malaysia,european travel sim malaysia;uk esim dari malaysia;france italy data,transactional,600,medium,destination-guide,europe
+ms-my,best travel esim malaysia,esim perjalanan terbaik;international data malaysia;roaming alternatif,commercial,700,medium,guide,general
+ms-my,singapore esim malaysia,singapore data plan;changi esim;sg travel sim,transactional,500,medium,destination-guide,singapore
+ms-my,taiwan esim malaysia,taipei esim malaysia;taiwan travel sim;taiwan data plan,transactional,700,medium,destination-guide,taiwan
+ms-my,cara guna esim,panduan esim;setup esim iphone;esim untuk travel,informational,400,low,tutorial,general
+ms-my,china esim malaysia,china travel sim;beijing shanghai esim;chinese data plan,transactional,600,medium,destination-guide,china
+id-id,japan esim indonesia,japan travel sim indonesia;esim jepang dari indonesia;data plan jepang,transactional,1600,medium,destination-guide,japan
+id-id,korea esim indonesia,south korea sim indonesia;korean esim;seoul data plan indonesia,transactional,1300,medium,destination-guide,south-korea
+id-id,singapore esim indonesia,singapore data plan;changi esim indonesia;sg travel sim,transactional,900,medium,destination-guide,singapore
+id-id,thailand esim indonesia,thailand sim card dari indonesia;bangkok esim;thai data plan,transactional,800,medium,destination-guide,thailand
+id-id,australia esim indonesia,sydney esim indonesia;australia travel sim;melbourne data plan,transactional,700,medium,destination-guide,australia
+id-id,europe esim indonesia,european travel sim indonesia;uk esim;france italy data,transactional,500,medium,destination-guide,europe
+id-id,malaysia esim indonesia,kuala lumpur esim;malaysia travel sim indonesia;kl data plan,transactional,600,medium,destination-guide,malaysia
+id-id,best travel esim indonesia,esim perjalanan terbaik;international data indonesia;alternatif roaming,commercial,600,medium,guide,general
+id-id,cara pakai esim,panduan esim;setup esim iphone android;esim untuk traveling,informational,500,low,tutorial,general
+id-id,taiwan esim indonesia,taipei esim indonesia;taiwan travel sim;taiwan data plan,transactional,550,medium,destination-guide,taiwan

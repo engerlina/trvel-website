@@ -326,7 +326,7 @@ export default function GetStartedPage() {
                   '1GB high-speed data per day (5G where available)',
                   'Unlimited data after at 1.25 Mbps',
                   'Instant eSIM delivery via email',
-                  '24/7 WhatsApp support',
+                  '24/7 live chat & phone support',
                   '10-minute connection guarantee',
                 ].map((feature, i) => (
                   <li key={i} className="flex items-start gap-3 text-navy-400">

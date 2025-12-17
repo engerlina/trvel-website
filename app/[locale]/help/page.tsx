@@ -5,6 +5,7 @@ import {
   HelpCircle,
   MessageCircle,
   Mail,
+  Phone,
   ChevronDown,
   Smartphone,
   CreditCard,
@@ -145,7 +146,7 @@ const faqCategories = [
     faqs: [
       {
         question: 'My eSIM isn\'t connecting. What should I do?',
-        answer: 'First, make sure data is enabled for your travel eSIM line and data roaming is turned on (Settings > Cellular > your eSIM line > Data Roaming). Try toggling airplane mode on and off. If it still doesn\'t work, try restarting your phone. If problems persist, contact our support team via WhatsApp.',
+        answer: 'First, make sure data is enabled for your travel eSIM line and data roaming is turned on (Settings > Cellular > your eSIM line > Data Roaming). Try toggling airplane mode on and off. If it still doesn\'t work, try restarting your phone. If problems persist, contact our support team via live chat or phone.',
       },
       {
         question: 'The QR code won\'t scan. What should I do?',
@@ -199,13 +200,11 @@ export default async function HelpPage({ params }: HelpPageProps) {
               {/* Contact Options */}
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <a
-                  href="https://wa.me/message/your-whatsapp-link"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-3 px-6 py-4 bg-success-500 text-white font-semibold rounded-xl hover:bg-success-600 transition-colors"
+                  href="tel:+61340527555"
+                  className="inline-flex items-center justify-center gap-3 px-6 py-4 bg-brand-500 text-white font-semibold rounded-xl hover:bg-brand-600 transition-colors"
                 >
-                  <MessageCircle className="w-5 h-5" />
-                  Chat on WhatsApp
+                  <Phone className="w-5 h-5" />
+                  Call +61 3 4052 7555
                 </a>
                 <a
                   href="mailto:support@trvel.co"
@@ -296,13 +295,11 @@ export default async function HelpPage({ params }: HelpPageProps) {
                 <span>Typical response time: under 5 minutes</span>
               </div>
               <a
-                href="https://wa.me/message/your-whatsapp-link"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-8 py-4 bg-success-500 text-white font-semibold rounded-xl hover:bg-success-600 transition-colors"
+                href="tel:+61340527555"
+                className="inline-flex items-center gap-2 px-8 py-4 bg-brand-500 text-white font-semibold rounded-xl hover:bg-brand-600 transition-colors"
               >
-                <MessageCircle className="w-5 h-5" />
-                Chat with Support
+                <Phone className="w-5 h-5" />
+                Call +61 3 4052 7555
               </a>
             </div>
           </div>

@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     default: 'Trvel - Travel eSIM Plans | Stay Connected Worldwide',
     template: '%s | Trvel',
   },
-  description: 'Get unlimited travel eSIM plans for 30+ destinations. Instant activation, human WhatsApp support, and 10-minute connection guarantee. No roaming bills.',
+  description: 'Get unlimited travel eSIM plans for 30+ destinations. Instant activation, human support via live chat & phone, and 10-minute connection guarantee. No roaming bills.',
   keywords: ['travel eSIM', 'international data', 'roaming', 'Japan eSIM', 'Thailand eSIM', 'travel data plan', 'eSIM for travel', 'unlimited data abroad'],
   authors: [{ name: 'Trvel' }],
   creator: 'Trvel',
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
     url: BASE_URL,
     siteName: 'Trvel',
     title: 'Trvel - Travel eSIM Plans | Stay Connected Worldwide',
-    description: 'Get unlimited travel eSIM plans for 30+ destinations. Instant activation, human WhatsApp support, and 10-minute connection guarantee.',
+    description: 'Get unlimited travel eSIM plans for 30+ destinations. Instant activation, human support via live chat & phone, and 10-minute connection guarantee.',
     images: [
       {
         url: '/og-image.png',
@@ -102,6 +102,13 @@ export default function RootLayout({
           `}
         </Script>
         {children}
+        {/* ElevenLabs ConvAI Widget */}
+        {/* @ts-expect-error - Custom element not recognized by React */}
+        <elevenlabs-convai agent-id="agent_7501kcncsd2rftrtv8ap6n6q4czt"></elevenlabs-convai>
+        <Script
+          src="https://unpkg.com/@elevenlabs/convai-widget-embed"
+          strategy="afterInteractive"
+        />
       </body>
     </html>
   );

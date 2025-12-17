@@ -459,7 +459,7 @@ export async function POST(request: NextRequest) {
       <div style="background: linear-gradient(135deg, #F2E2CE 0%, #f7efe4 100%); border-radius: 16px; padding: 20px; text-align: center;">
         <p style="margin: 0 0 4px; color: #010326; font-weight: 600;">Questions? I'm here to help!</p>
         <p style="margin: 0; color: #585b76; font-size: 14px;">
-          Reply to this email or message us on WhatsApp 24/7
+          Reply to this email or call us on +61 3 4052 7555
         </p>
       </div>
     </div>

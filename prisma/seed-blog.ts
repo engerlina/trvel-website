@@ -168,11 +168,11 @@ Even with great connectivity, it's smart to have offline maps and important docu
 
 **The fix:** Download Google Maps offline areas and save key documents to your phone before departure.
 
-## 5. Ignoring WhatsApp Support
+## 5. Not Knowing Your Support Options
 
-Many eSIM providers offer WhatsApp support, but travellers often don't save the number or forget it exists. When something goes wrong at 2am in Tokyo, email won't cut it.
+Many eSIM providers offer support, but travellers often don't know how to reach them. When something goes wrong at 2am in Tokyo, email won't cut it.
 
-**The fix:** Save your provider's WhatsApp number before you travel. Trvel's team typically responds within 3 minutes, even at odd hours.
+**The fix:** Save your provider's support number before you travel. Trvel offers live chat and phone support—our team typically responds within 3 minutes, even at odd hours.
 
 ## Travel Smarter
 

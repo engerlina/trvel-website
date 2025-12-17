@@ -87,11 +87,11 @@ export function Comparison() {
   };
 
   return (
-    <section className="section bg-white">
+    <section aria-labelledby="comparison-heading" className="section bg-white">
       <div className="container-tight">
         {/* Section Header */}
         <div className="text-center mb-12">
-          <h2 className="text-heading-xl md:text-display font-bold text-gray-900 mb-4">
+          <h2 id="comparison-heading" className="text-heading-xl md:text-display font-bold text-gray-900 mb-4">
             {t('title', { competitor: competitorName })}
           </h2>
           <p className="text-body-lg text-gray-600 max-w-2xl mx-auto">

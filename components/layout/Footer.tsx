@@ -1,6 +1,6 @@
 import { Link } from '@/i18n/routing';
 import Image from 'next/image';
-import { Shield, Lock, MessageCircle, Mail, ChevronRight } from 'lucide-react';
+import { Shield, Lock, MessageCircle, Mail, ChevronRight, Phone } from 'lucide-react';
 import { AU, SG, GB, MY, ID, type FlagComponent } from 'country-flag-icons/react/3x2';
 
 const destinations = [
@@ -74,7 +74,7 @@ export function Footer() {
               </div>
               <div>
                 <p className="text-body-sm font-semibold text-cream-100">Human Support</p>
-                <p className="text-body-sm text-cream-400">Real people on WhatsApp</p>
+                <p className="text-body-sm text-cream-400">Live chat & phone support</p>
               </div>
             </div>
           </div>
@@ -102,11 +102,11 @@ export function Footer() {
             {/* Contact */}
             <div className="space-y-3">
               <a
-                href="https://wa.me/61400000000"
+                href="tel:+61340527555"
                 className="flex items-center gap-2 text-body-sm text-cream-400 hover:text-brand-400 transition-colors"
               >
-                <MessageCircle className="w-4 h-4" />
-                WhatsApp Support
+                <Phone className="w-4 h-4" />
+                +61 3 4052 7555
               </a>
               <a
                 href="mailto:support@trvel.co"

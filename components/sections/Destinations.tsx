@@ -30,12 +30,12 @@ export function Destinations() {
   const { plansMap, plansLoading } = useDestination();
 
   return (
-    <section className="section bg-gray-50">
+    <section aria-labelledby="destinations-heading" className="section bg-gray-50">
       <div className="container-wide">
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-12">
           <div>
-            <h2 className="text-heading-xl md:text-display font-bold text-gray-900 mb-2">
+            <h2 id="destinations-heading" className="text-heading-xl md:text-display font-bold text-gray-900 mb-2">
               {t('title')}
             </h2>
             <p className="text-body-lg text-gray-600">

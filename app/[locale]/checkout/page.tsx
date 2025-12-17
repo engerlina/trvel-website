@@ -154,7 +154,7 @@ export default async function CheckoutPage({ params, searchParams }: Props) {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                 </svg>
               </div>
-              24/7 WhatsApp support
+              24/7 live chat & phone support
             </li>
             <li className="flex items-center gap-3">
               <div className="w-5 h-5 rounded-full bg-brand-100 flex items-center justify-center flex-shrink-0">

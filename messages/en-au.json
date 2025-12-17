@@ -53,7 +53,7 @@
       "features": {
         "unlimitedData": "Unlimited data included",
         "instantActivation": "Instant QR code delivery",
-        "whatsappSupport": "Human support on WhatsApp",
+        "liveSupport": "Live chat & phone support",
         "moneyBackGuarantee": "10-min guarantee or refund"
       }
     },
@@ -66,7 +66,7 @@
       },
       "support": {
         "title": "Real Human Support",
-        "description": "Actual people on WhatsApp. Average response: 3 minutes. Even at 2am."
+        "description": "Live chat and calls available. Average response: 3 minutes. Even at 2am."
       },
       "network": {
         "title": "Tier-1 Networks Only",
@@ -85,7 +85,7 @@
       "features": {
         "dailyCost": "Daily cost",
         "data": "Unlimited data",
-        "support": "WhatsApp support",
+        "support": "Live chat & phone support",
         "setup": "Setup time",
         "guarantee": "Money-back guarantee"
       }
@@ -116,7 +116,7 @@
       },
       "james": {
         "name": "James K.",
-        "quote": "Messaged WhatsApp support at 2am Tokyo time. Got a reply in 3 minutes. Actual humans."
+        "quote": "Called support at 2am Tokyo time. Got through in 3 minutes. Actual humans."
       },
       "emma": {
         "name": "Emma L.",
@@ -161,7 +161,7 @@
       "perDay": "/day",
       "unlimitedData": "Unlimited data",
       "premiumNetwork": "Premium network",
-      "whatsappSupport": "24/7 WhatsApp support",
+      "liveSupport": "24/7 live chat & phone support",
       "getStarted": "Get Started",
       "compareTo": "Compare to {competitor} roaming at"
     },
@@ -186,7 +186,7 @@
       },
       "humanSupport": {
         "title": "Human Support",
-        "description": "Real people on WhatsApp 24/7"
+        "description": "Live chat & phone support 24/7"
       },
       "keepNumber": {
         "title": "Keep Your Number",

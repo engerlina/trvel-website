@@ -16,6 +16,7 @@ import {
   Signal,
   ArrowRight,
   Star,
+  MapPin,
 } from 'lucide-react';
 import { DestinationPlanCard } from './DestinationPlanCard';
 import {
@@ -114,6 +115,12 @@ export default async function DestinationPage({ params }: DestinationPageProps) 
     where: {
       slug_locale: { slug: destination, locale },
     },
+    include: {
+      cities: {
+        take: 6,
+        orderBy: { population: 'desc' },
+      },
+    },
   });
 
   const planData = await prisma.plan.findUnique({
@@ -140,7 +147,7 @@ export default async function DestinationPage({ params }: DestinationPageProps) 
     { icon: Wifi, title: 'Unlimited Data', description: 'No throttling, no data caps, no surprises' },
     { icon: Signal, title: 'Premium Network', description: 'Connected to tier-1 local carriers' },
     { icon: Shield, title: '10-Min Guarantee', description: 'Connect in 10 minutes or full refund' },
-    { icon: MessageCircle, title: 'Human Support', description: 'Real people on WhatsApp 24/7' },
+    { icon: MessageCircle, title: 'Human Support', description: 'Live chat & phone support 24/7' },
     { icon: Smartphone, title: 'Keep Your Number', description: 'Works alongside your existing SIM' },
   ];
 
@@ -276,22 +283,66 @@ export default async function DestinationPage({ params }: DestinationPageProps) 
               ))}
             </div>
 
-            {/* Competitor comparison */}
+            {/* Competitor comparison with link */}
             {competitorData && (
               <div className="mt-12 text-center">
-                <p className="text-navy-400">
+                <p className="text-navy-400 mb-3">
                   Compare to {competitorData.name} roaming at{' '}
                   <span className="font-semibold text-navy-500">
                     {currencySymbol}{formatPrice(competitorData.daily_rate, currency)}/day
                   </span>
                 </p>
+                <Link
+                  href={`/compare/${competitorData.name.toLowerCase()}-vs-esim-${destination}`}
+                  className="inline-flex items-center gap-2 text-brand-600 hover:text-brand-700 font-medium"
+                >
+                  See full comparison
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
               </div>
             )}
           </div>
         </section>
 
+        {/* Popular Cities Section */}
+        {destinationData.cities && destinationData.cities.length > 0 && (
+          <section className="py-16 bg-cream-50">
+            <div className="container-wide">
+              <div className="text-center mb-10">
+                <h2 className="text-heading-xl font-bold text-navy-500 mb-3 flex items-center justify-center gap-3">
+                  <MapPin className="w-7 h-7 text-accent-500" />
+                  Popular Cities in {destinationData.name}
+                </h2>
+                <p className="text-body-lg text-navy-300">
+                  City-specific guides with network coverage information
+                </p>
+              </div>
+
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 max-w-5xl mx-auto">
+                {destinationData.cities.map((city) => (
+                  <Link
+                    key={city.slug}
+                    href={`/${destination}/${city.slug}`}
+                    className="group p-4 bg-white rounded-xl border border-cream-200 hover:border-brand-300 hover:shadow-lg transition-all text-center"
+                  >
+                    <div className="text-lg font-semibold text-navy-500 group-hover:text-brand-600 transition-colors">
+                      {city.name}
+                    </div>
+                    {city.network_quality && (
+                      <div className="flex items-center justify-center gap-1 mt-2 text-sm text-navy-400">
+                        <Signal className="w-3 h-3 text-success-500" />
+                        {city.network_quality}/5
+                      </div>
+                    )}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+
         {/* Features Section */}
-        <section className="py-20 bg-cream-50">
+        <section className="py-20 bg-white">
           <div className="container-wide">
             <div className="text-center mb-12">
               <h2 className="text-heading-xl font-bold text-navy-500 mb-4">

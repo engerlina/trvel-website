@@ -104,7 +104,7 @@ const faqs = [
   },
   {
     question: 'What if I have trouble connecting?',
-    answer: 'Our support team is available via WhatsApp to help you get connected. If we can\'t get you online within 10 minutes, you\'ll receive a full refund.',
+    answer: 'Our support team is available via live chat and phone to help you get connected. If we can\'t get you online within 10 minutes, you\'ll receive a full refund.',
   },
   {
     question: 'Can I top up if I need more days?',

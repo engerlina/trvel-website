@@ -12,125 +12,19 @@ import {
   Sparkles,
   HelpCircle,
   ExternalLink,
+  Loader2,
 } from 'lucide-react';
 
-// Comprehensive eSIM compatible device database
-const deviceDatabase = {
-  Apple: {
-    compatible: [
-      'iPhone 17 Pro Max', 'iPhone 17 Pro', 'iPhone 17 Air', 'iPhone 17',
-      'iPhone 16 Pro Max', 'iPhone 16 Pro', 'iPhone 16 Plus', 'iPhone 16',
-      'iPhone 15 Pro Max', 'iPhone 15 Pro', 'iPhone 15 Plus', 'iPhone 15',
-      'iPhone 14 Pro Max', 'iPhone 14 Pro', 'iPhone 14 Plus', 'iPhone 14',
-      'iPhone 13 Pro Max', 'iPhone 13 Pro', 'iPhone 13 mini', 'iPhone 13',
-      'iPhone 12 Pro Max', 'iPhone 12 Pro', 'iPhone 12 mini', 'iPhone 12',
-      'iPhone 11 Pro Max', 'iPhone 11 Pro', 'iPhone 11',
-      'iPhone XS Max', 'iPhone XS', 'iPhone XR',
-      'iPhone SE (3rd generation)', 'iPhone SE (2nd generation)',
-      'iPad Pro (all models with cellular)',
-      'iPad Air (3rd generation and later)',
-      'iPad (7th generation and later)',
-      'iPad mini (5th generation and later)',
-    ],
-    notCompatible: [
-      'iPhone X', 'iPhone 8', 'iPhone 8 Plus', 'iPhone 7', 'iPhone 6s',
-      'iPhone SE (1st generation)',
-    ],
-    checkPath: 'Settings → Mobile Data → Add eSIM',
-  },
-  Samsung: {
-    compatible: [
-      'Galaxy S24 Ultra', 'Galaxy S24+', 'Galaxy S24',
-      'Galaxy S23 Ultra', 'Galaxy S23+', 'Galaxy S23', 'Galaxy S23 FE',
-      'Galaxy S22 Ultra', 'Galaxy S22+', 'Galaxy S22',
-      'Galaxy S21 Ultra', 'Galaxy S21+', 'Galaxy S21', 'Galaxy S21 FE',
-      'Galaxy S20 Ultra', 'Galaxy S20+', 'Galaxy S20', 'Galaxy S20 FE',
-      'Galaxy Z Fold 6', 'Galaxy Z Fold 5', 'Galaxy Z Fold 4', 'Galaxy Z Fold 3', 'Galaxy Z Fold 2',
-      'Galaxy Z Flip 6', 'Galaxy Z Flip 5', 'Galaxy Z Flip 4', 'Galaxy Z Flip 3', 'Galaxy Z Flip',
-      'Galaxy Note 20 Ultra', 'Galaxy Note 20',
-      'Galaxy A55', 'Galaxy A54', 'Galaxy A35', 'Galaxy A34',
-    ],
-    notCompatible: [
-      'Galaxy S10', 'Galaxy S9', 'Galaxy Note 10', 'Galaxy Note 9',
-      'Galaxy A53', 'Galaxy A52', 'Galaxy A51',
-    ],
-    checkPath: 'Settings → Connections → SIM Manager → Add eSIM',
-  },
-  Google: {
-    compatible: [
-      'Pixel 9 Pro XL', 'Pixel 9 Pro', 'Pixel 9', 'Pixel 9 Pro Fold',
-      'Pixel 8 Pro', 'Pixel 8', 'Pixel 8a',
-      'Pixel 7 Pro', 'Pixel 7', 'Pixel 7a',
-      'Pixel 6 Pro', 'Pixel 6', 'Pixel 6a',
-      'Pixel 5', 'Pixel 5a',
-      'Pixel 4 XL', 'Pixel 4', 'Pixel 4a',
-      'Pixel 3 XL', 'Pixel 3', 'Pixel 3a XL', 'Pixel 3a',
-      'Pixel Fold',
-    ],
-    notCompatible: [
-      'Pixel 2', 'Pixel 2 XL', 'Pixel', 'Pixel XL',
-    ],
-    checkPath: 'Settings → Network & Internet → SIMs → Add eSIM',
-  },
-  OnePlus: {
-    compatible: [
-      'OnePlus 12', 'OnePlus 12R',
-      'OnePlus 11', 'OnePlus 11R',
-      'OnePlus Open',
-    ],
-    notCompatible: [
-      'OnePlus 10 Pro', 'OnePlus 10T', 'OnePlus 9', 'OnePlus 8',
-    ],
-    checkPath: 'Settings → Mobile Network → SIM & Network → Add eSIM',
-  },
-  Xiaomi: {
-    compatible: [
-      'Xiaomi 14 Ultra', 'Xiaomi 14 Pro', 'Xiaomi 14',
-      'Xiaomi 13 Ultra', 'Xiaomi 13 Pro', 'Xiaomi 13',
-      'Xiaomi 12S Ultra', 'Xiaomi 12 Pro',
-    ],
-    notCompatible: [
-      'Xiaomi 12', 'Xiaomi 11', 'Redmi Note series',
-    ],
-    checkPath: 'Settings → SIM Cards & Mobile Networks → Add eSIM',
-  },
-  Oppo: {
-    compatible: [
-      'Find X7 Ultra', 'Find X7',
-      'Find X6 Pro', 'Find X6',
-      'Find X5 Pro', 'Find X5',
-      'Find N3', 'Find N2', 'Find N2 Flip',
-    ],
-    notCompatible: [
-      'Reno series (most models)', 'A series',
-    ],
-    checkPath: 'Settings → SIM Card & Mobile Data → Add eSIM',
-  },
-  Motorola: {
-    compatible: [
-      'Motorola Razr 40 Ultra', 'Motorola Razr 40',
-      'Motorola Razr (2023)', 'Motorola Razr (2022)',
-      'Motorola Edge 40 Pro', 'Motorola Edge 40',
-      'Motorola Edge+ (2023)',
-    ],
-    notCompatible: [
-      'Moto G series', 'Moto E series',
-    ],
-    checkPath: 'Settings → Network & Internet → SIMs → Add eSIM',
-  },
-  Huawei: {
-    compatible: [
-      'P40 Pro', 'P40',
-      'Mate 40 Pro',
-    ],
-    notCompatible: [
-      'Most newer Huawei models (due to US restrictions)',
-    ],
-    checkPath: 'Settings → Mobile Network → SIM Management',
-  },
-};
+// Type definitions for device data
+interface DeviceData {
+  compatible: string[];
+  notCompatible: string[];
+  checkPath: string;
+}
 
-type Brand = keyof typeof deviceDatabase;
+type DeviceDatabase = Record<string, DeviceData>;
+
+type Brand = string;
 
 interface DetectionResult {
   detected: boolean;
@@ -140,7 +34,7 @@ interface DetectionResult {
   isMobile: boolean;
 }
 
-function detectDevice(): DetectionResult {
+function detectDevice(brands: string[]): DetectionResult {
   if (typeof window === 'undefined') {
     return { detected: false, isMobile: false };
   }
@@ -150,28 +44,24 @@ function detectDevice(): DetectionResult {
 
   // iPhone detection
   if (/iPhone/.test(ua)) {
-    // Try to extract iPhone model
     const match = ua.match(/iPhone\s*(\d+),(\d+)/);
     if (match) {
       const major = parseInt(match[1]);
-      // iPhone 11,2 = iPhone XS (2018), first with eSIM
-      // Anything >= iPhone 11 hardware is compatible
       if (major >= 11) {
         return {
           detected: true,
-          brand: 'Apple',
+          brand: brands.includes('Apple') ? 'Apple' : undefined,
           model: 'iPhone',
           isCompatible: true,
           isMobile: true,
         };
       }
     }
-    // Can't determine specific model, but it's an iPhone
     return {
       detected: true,
-      brand: 'Apple',
+      brand: brands.includes('Apple') ? 'Apple' : undefined,
       model: 'iPhone',
-      isCompatible: undefined, // Unknown - needs manual check
+      isCompatible: undefined,
       isMobile: true,
     };
   }
@@ -180,7 +70,7 @@ function detectDevice(): DetectionResult {
   if (/iPad/.test(ua)) {
     return {
       detected: true,
-      brand: 'Apple',
+      brand: brands.includes('Apple') ? 'Apple' : undefined,
       model: 'iPad',
       isCompatible: undefined,
       isMobile: true,
@@ -189,26 +79,20 @@ function detectDevice(): DetectionResult {
 
   // Android detection - brand detection
   if (/Android/.test(ua)) {
-    if (/Samsung/i.test(ua)) {
-      return { detected: true, brand: 'Samsung', isMobile: true };
-    }
-    if (/Pixel/i.test(ua)) {
-      return { detected: true, brand: 'Google', isMobile: true };
-    }
-    if (/OnePlus/i.test(ua)) {
-      return { detected: true, brand: 'OnePlus', isMobile: true };
-    }
-    if (/Xiaomi|Mi\s|Redmi/i.test(ua)) {
-      return { detected: true, brand: 'Xiaomi', isMobile: true };
-    }
-    if (/OPPO/i.test(ua)) {
-      return { detected: true, brand: 'Oppo', isMobile: true };
-    }
-    if (/motorola/i.test(ua)) {
-      return { detected: true, brand: 'Motorola', isMobile: true };
-    }
-    if (/HUAWEI/i.test(ua)) {
-      return { detected: true, brand: 'Huawei', isMobile: true };
+    const brandMap: Record<string, RegExp> = {
+      Samsung: /Samsung/i,
+      Google: /Pixel/i,
+      OnePlus: /OnePlus/i,
+      Xiaomi: /Xiaomi|Mi\s|Redmi/i,
+      Oppo: /OPPO/i,
+      Motorola: /motorola/i,
+      Huawei: /HUAWEI/i,
+    };
+
+    for (const [brand, regex] of Object.entries(brandMap)) {
+      if (regex.test(ua) && brands.includes(brand)) {
+        return { detected: true, brand, isMobile: true };
+      }
     }
     return { detected: false, isMobile: true };
   }
@@ -226,17 +110,41 @@ export function EsimChecker() {
   const [brandDropdownOpen, setBrandDropdownOpen] = useState(false);
   const [modelDropdownOpen, setModelDropdownOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [deviceDatabase, setDeviceDatabase] = useState<DeviceDatabase>({});
+  const [loading, setLoading] = useState(true);
 
   const brandDropdownRef = useRef<HTMLDivElement>(null);
   const modelDropdownRef = useRef<HTMLDivElement>(null);
 
+  // Fetch device data from API
   useEffect(() => {
-    const result = detectDevice();
-    setDetection(result);
-    if (result.brand) {
-      setSelectedBrand(result.brand);
+    async function fetchDevices() {
+      try {
+        const response = await fetch('/api/devices');
+        if (response.ok) {
+          const data = await response.json();
+          setDeviceDatabase(data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch devices:', error);
+      } finally {
+        setLoading(false);
+      }
     }
+    fetchDevices();
   }, []);
+
+  // Run device detection after data is loaded
+  useEffect(() => {
+    if (!loading && Object.keys(deviceDatabase).length > 0) {
+      const brands = Object.keys(deviceDatabase);
+      const result = detectDevice(brands);
+      setDetection(result);
+      if (result.brand) {
+        setSelectedBrand(result.brand);
+      }
+    }
+  }, [loading, deviceDatabase]);
 
   // Click outside handler
   useEffect(() => {
@@ -253,19 +161,21 @@ export function EsimChecker() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const brands = Object.keys(deviceDatabase) as Brand[];
+  const brands = Object.keys(deviceDatabase);
 
   const filteredModels = useMemo(() => {
     if (!selectedBrand) return [];
     const brandData = deviceDatabase[selectedBrand];
+    if (!brandData) return [];
     const allModels = [...brandData.compatible, ...brandData.notCompatible];
     if (!searchQuery) return allModels;
     return allModels.filter(m => m.toLowerCase().includes(searchQuery.toLowerCase()));
-  }, [selectedBrand, searchQuery]);
+  }, [selectedBrand, searchQuery, deviceDatabase]);
 
   const checkResult = useMemo(() => {
     if (!selectedBrand || !selectedModel) return null;
     const brandData = deviceDatabase[selectedBrand];
+    if (!brandData) return null;
     if (brandData.compatible.includes(selectedModel)) {
       return { compatible: true, checkPath: brandData.checkPath };
     }
@@ -273,7 +183,7 @@ export function EsimChecker() {
       return { compatible: false, checkPath: brandData.checkPath };
     }
     return null;
-  }, [selectedBrand, selectedModel]);
+  }, [selectedBrand, selectedModel, deviceDatabase]);
 
   return (
     <div className="bg-white rounded-2xl border border-cream-200 shadow-soft">
@@ -327,8 +237,16 @@ export function EsimChecker() {
 
       {/* Content */}
       <div className="p-6">
+        {/* Loading state */}
+        {loading && (
+          <div className="flex flex-col items-center justify-center py-12">
+            <Loader2 className="w-8 h-8 text-brand-500 animate-spin mb-4" />
+            <p className="text-navy-400">Loading device data...</p>
+          </div>
+        )}
+
         {/* Auto-Detect Tab */}
-        {activeTab === 'auto' && (
+        {!loading && activeTab === 'auto' && (
           <div className="space-y-4">
             {detection.detected ? (
               <>
@@ -393,7 +311,7 @@ export function EsimChecker() {
         )}
 
         {/* Manual Tab */}
-        {activeTab === 'manual' && (
+        {!loading && activeTab === 'manual' && (
           <div className="space-y-4">
             {/* Brand Dropdown */}
             <div ref={brandDropdownRef}>
@@ -551,7 +469,7 @@ export function EsimChecker() {
         )}
 
         {/* Dial Tab */}
-        {activeTab === 'dial' && (
+        {!loading && activeTab === 'dial' && (
           <div className="space-y-6">
             <div className="text-center">
               <p className="text-navy-500 mb-4">

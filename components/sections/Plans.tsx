@@ -36,7 +36,7 @@ const planConfigs = [
 const features = [
   'unlimitedData',
   'instantActivation',
-  'whatsappSupport',
+  'liveSupport',
   'moneyBackGuarantee',
 ];
 

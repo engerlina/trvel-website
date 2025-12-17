@@ -89,17 +89,22 @@ model Plan {
 }
 
 model Destination {
-  id        Int      @id @default(autoincrement())
-  slug      String   @db.VarChar(50)
-  locale    String   @db.VarChar(10)
-  name      String   @db.VarChar(100)
-  tagline   String?  @db.VarChar(200)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          Int      @id @default(autoincrement())
+  slug        String   @db.VarChar(50)
+  locale      String   @db.VarChar(10)
+  name        String   @db.VarChar(100)
+  tagline     String?  @db.VarChar(200)
+  country_iso String?  @db.Char(2) // ISO country code for data matching
+  region      String?  @db.VarChar(50) // Asia, Europe, etc.
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  cities City[]
 
   @@unique([slug, locale])
   @@index([slug])
   @@index([locale])
+  @@index([country_iso])
 }
 
 model Author {
@@ -247,5 +252,101 @@ model Order {
   @@index([stripe_payment_intent_id])
   @@index([destination_slug])
   @@index([createdAt])
+}
+
+// Device brand for eSIM compatibility checker
+model DeviceBrand {
+  id           Int      @id @default(autoincrement())
+  name         String   @unique @db.VarChar(50) // e.g., "Apple", "Samsung"
+  slug         String   @unique @db.VarChar(50) // e.g., "apple", "samsung"
+  settings_path String? @db.VarChar(200) // How to add eSIM in settings
+  sort_order   Int      @default(0) // Display order
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  devices Device[]
+
+  @@index([slug])
+  @@index([sort_order])
+}
+
+// Device model for eSIM compatibility checker
+model Device {
+  id           Int          @id @default(autoincrement())
+  brand_id     Int
+  brand        DeviceBrand  @relation(fields: [brand_id], references: [id], onDelete: Cascade)
+  model_name   String       @db.VarChar(100) // e.g., "iPhone 17 Pro Max"
+  slug         String       @db.VarChar(100) // e.g., "iphone-17-pro-max"
+  is_compatible Boolean     @default(true)
+  release_year  Int?        // Year of release
+  notes        String?      @db.VarChar(300) // Regional restrictions etc.
+  sort_order   Int          @default(0) // Display order within brand
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  @@unique([brand_id, slug])
+  @@index([brand_id])
+  @@index([is_compatible])
+  @@index([sort_order])
+}
+
+// City model for programmatic SEO pages
+model City {
+  id                 Int          @id @default(autoincrement())
+  slug               String       @db.VarChar(100)
+  locale             String       @db.VarChar(10)
+  name               String       @db.VarChar(100)
+  country_iso        String       @db.Char(2)
+  destination_id     Int?
+  destination        Destination? @relation(fields: [destination_id], references: [id])
+
+  // Unique content for each city (differentiates from thin content)
+  airport_code       String?      @db.VarChar(10)
+  airport_name       String?      @db.VarChar(100)
+  connectivity_notes String?      @db.Text // City-specific network info
+  popular_areas      String[]     // Array of popular areas/landmarks
+  network_quality    Int?         // 1-5 rating
+  timezone           String?      @db.VarChar(50)
+  population         Int?         // For context
+
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+
+  @@unique([slug, locale])
+  @@index([country_iso])
+  @@index([destination_id])
+  @@index([locale])
+}
+
+// SEO metadata for programmatic pages (tracks indexing, stores generated content)
+model SeoPage {
+  id               Int       @id @default(autoincrement())
+  page_type        String    @db.VarChar(50) // destination, city, duration, comparison, device
+  slug             String    @db.VarChar(200)
+  locale           String    @db.VarChar(10)
+
+  // SEO fields
+  title            String    @db.VarChar(70)
+  meta_description String    @db.VarChar(160)
+  h1               String    @db.VarChar(100)
+
+  // Generated content blocks (JSON for flexibility)
+  intro_paragraph  String?   @db.Text // AI-generated unique intro
+  faq_content      Json?     // Array of Q&A pairs
+  content_blocks   Json?     // Additional dynamic content
+
+  // Tracking
+  indexed_at       DateTime?
+  last_crawled     DateTime?
+  search_volume    Int?      // Monthly search volume estimate
+  keyword_rank     Int?      // Current Google ranking
+
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@unique([page_type, slug, locale])
+  @@index([page_type])
+  @@index([locale])
+  @@index([indexed_at])
 }
 

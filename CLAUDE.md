@@ -52,3 +52,42 @@ app/[locale]/
 - `DATABASE_URL` - Supabase PostgreSQL connection string
 - `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` - Supabase auth
 - `STRIPE_SECRET_KEY`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` - Stripe payments
+
+## MCP Tools Available
+
+Use these tools when appropriate for research, SEO analysis, and web scraping:
+
+### Firecrawl (`firecrawl-mcp`)
+- **Use for**: Web scraping, site crawling, content extraction
+- **When to use**: Extracting content from competitor sites, scraping travel information, gathering pricing data from other eSIM providers
+
+### Perplexity (`perplexity`)
+- **Use for**: AI-powered web search with citations
+- **When to use**: Researching travel destinations, finding up-to-date information about eSIM compatibility, answering questions about travel regulations or requirements
+
+### DataForSEO (`dataforseo`)
+- **Use for**: SEO data and analysis
+- **Available APIs**:
+  - SERP data (Google, Bing, Yahoo rankings)
+  - Keyword research & search volume
+  - Backlink analysis
+  - On-page SEO metrics
+  - Domain analytics
+  - Content analysis
+- **When to use**: Analyzing keyword opportunities for destinations, checking SERP rankings, competitor backlink analysis, content optimization suggestions
+
+## AWS S3 - Blog Images
+
+Blog images are stored in AWS S3 for fast global delivery.
+
+### Configuration
+
+- **Bucket**: `trvel-s3`
+- **Region**: `ap-southeast-2` (Sydney)
+- **Public URL pattern**: `https://trvel-s3.s3.ap-southeast-2.amazonaws.com/{path}`
+
+### Usage
+
+- Upload blog images to `blog/` folder in the bucket
+- Reference in blog posts: `https://trvel-s3.s3.ap-southeast-2.amazonaws.com/blog/image-name.jpg`
+- Supported formats: JPG, PNG, WebP (prefer WebP for performance)

@@ -4,16 +4,16 @@ import { useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import Image from 'next/image';
-import { Menu, X, Globe } from 'lucide-react';
+import { Menu, X, Globe, Phone } from 'lucide-react';
 import { Button } from '@/components/ui';
 import { AU, SG, GB, MY, ID } from 'country-flag-icons/react/3x2';
 
 const locales = [
-  { code: 'en-au', label: 'Australia', Flag: AU, currency: 'AUD' },
-  { code: 'en-sg', label: 'Singapore', Flag: SG, currency: 'SGD' },
-  { code: 'en-gb', label: 'United Kingdom', Flag: GB, currency: 'GBP' },
-  { code: 'ms-my', label: 'Malaysia', Flag: MY, currency: 'MYR' },
-  { code: 'id-id', label: 'Indonesia', Flag: ID, currency: 'IDR' },
+  { code: 'en-au', label: 'Australia', Flag: AU, currency: 'AUD', phone: '+61 3 4052 7555' },
+  { code: 'en-sg', label: 'Singapore', Flag: SG, currency: 'SGD', phone: null },
+  { code: 'en-gb', label: 'United Kingdom', Flag: GB, currency: 'GBP', phone: null },
+  { code: 'ms-my', label: 'Malaysia', Flag: MY, currency: 'MYR', phone: null },
+  { code: 'id-id', label: 'Indonesia', Flag: ID, currency: 'IDR', phone: null },
 ];
 
 export function Header() {
@@ -54,6 +54,17 @@ export function Header() {
 
         {/* Desktop Actions */}
         <div className="navbar-end gap-2">
+          {/* Phone Number - Only shown if locale has one */}
+          {currentLocale.phone && (
+            <a
+              href={`tel:${currentLocale.phone.replace(/\s/g, '')}`}
+              className="hidden lg:flex items-center gap-2 text-sm text-navy-500 hover:text-brand-600 transition-colors"
+            >
+              <Phone className="w-4 h-4" />
+              <span>{currentLocale.phone}</span>
+            </a>
+          )}
+
           {/* Locale Switcher - DaisyUI Dropdown */}
           <div className="dropdown dropdown-end hidden md:block">
             <div tabIndex={0} role="button" className="btn btn-ghost btn-sm gap-2">
@@ -107,6 +118,20 @@ export function Header() {
               </Link>
             </li>
           </ul>
+
+          {/* Mobile Phone Number */}
+          {currentLocale.phone && (
+            <div className="border-t border-base-200 p-4">
+              <a
+                href={`tel:${currentLocale.phone.replace(/\s/g, '')}`}
+                className="flex items-center justify-center gap-3 p-3 bg-brand-50 rounded-xl text-brand-600 font-medium"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <Phone className="w-5 h-5" />
+                <span>Call {currentLocale.phone}</span>
+              </a>
+            </div>
+          )}
 
           {/* Mobile Locale Switcher */}
           <div className="border-t border-base-200 p-4">
