@@ -1,6 +1,5 @@
 import { useTranslations } from 'next-intl';
 import { Star, Quote } from 'lucide-react';
-import { Card } from '@/components/ui';
 
 const testimonials = [
   {
@@ -49,7 +48,7 @@ export function Testimonials() {
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           {testimonials.map((testimonial) => (
             <article key={testimonial.id}>
-              <Card hover padding="lg" className="relative h-full">
+              <div className="relative h-full bg-white rounded-2xl border border-gray-100 shadow-soft p-8 transition-all duration-300 hover:shadow-soft-lg hover:border-brand-200 hover:-translate-y-1">
                 {/* Quote Icon */}
                 <div className="absolute top-6 right-6" aria-hidden="true">
                   <Quote className="w-8 h-8 text-brand-100" />
@@ -68,15 +67,15 @@ export function Testimonials() {
                 </blockquote>
 
                 {/* Author */}
-                <footer className="pt-4 border-t border-gray-100">
-                  <p className="text-body font-semibold text-gray-900">
+                <div className="pt-4 border-t border-gray-100 mt-auto">
+                  <p className="text-body font-semibold text-navy-500">
                     {t(`${testimonial.id}.name`)}
                   </p>
                   <p className="text-body-sm text-gray-500">
                     {testimonial.location} → {testimonial.destination}
                   </p>
-                </footer>
-              </Card>
+                </div>
+              </div>
             </article>
           ))}
         </div>

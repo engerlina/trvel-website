@@ -26,6 +26,9 @@ const staticPages = [
   '/fair-use',
 ];
 
+// Duration options for Tier 3 pages
+const DURATIONS = [5, 7, 15] as const;
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const routes: MetadataRoute.Sitemap = [];
 
@@ -49,6 +52,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const posts = await prisma.post.findMany({
       where: { published_at: { not: null } },
       select: { slug: true, locale: true, updatedAt: true },
+    });
+
+    // Fetch devices for compatibility pages (Tier 5)
+    const devices = await prisma.device.findMany({
+      select: {
+        slug: true,
+        updatedAt: true,
+        brand: { select: { slug: true } },
+      },
+    });
+
+    // Fetch device brands for brand listing pages
+    const deviceBrands = await prisma.deviceBrand.findMany({
+      select: { slug: true, updatedAt: true },
     });
 
     // Generate URLs for each locale
@@ -83,6 +100,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             priority: 0.7,
           });
         }
+
+        // Duration pages (Tier 3) - 3 durations per destination per locale
+        for (const duration of DURATIONS) {
+          routes.push({
+            url: `${BASE_URL}/${locale}/esim/${dest.slug}/${duration}-day`,
+            lastModified: dest.updatedAt,
+            changeFrequency: 'monthly',
+            priority: 0.75,
+          });
+        }
       }
 
       // City pages (Tier 2)
@@ -102,6 +129,26 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         routes.push({
           url: `${BASE_URL}/${locale}/blog/${post.slug}`,
           lastModified: post.updatedAt,
+          changeFrequency: 'monthly',
+          priority: 0.6,
+        });
+      }
+
+      // Device brand pages (Tier 5)
+      for (const brand of deviceBrands) {
+        routes.push({
+          url: `${BASE_URL}/${locale}/compatibility/${brand.slug}`,
+          lastModified: brand.updatedAt,
+          changeFrequency: 'monthly',
+          priority: 0.65,
+        });
+      }
+
+      // Device compatibility pages (Tier 5)
+      for (const device of devices) {
+        routes.push({
+          url: `${BASE_URL}/${locale}/compatibility/${device.brand.slug}/${device.slug}`,
+          lastModified: device.updatedAt,
           changeFrequency: 'monthly',
           priority: 0.6,
         });

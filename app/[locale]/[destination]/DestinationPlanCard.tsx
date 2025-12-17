@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Check } from 'lucide-react';
+import { Check, ArrowRight } from 'lucide-react';
+import { Link } from '@/i18n/routing';
 
 interface DestinationPlanCardProps {
   name: string;
@@ -138,6 +139,19 @@ export function DestinationPlanCard({
             'Get Started'
           )}
         </button>
+
+        {/* Link to duration-specific page for SEO */}
+        <Link
+          href={`/esim/${destination}/${duration}-day`}
+          className={`mt-3 flex items-center justify-center gap-1 text-sm transition-colors ${
+            popular
+              ? 'text-brand-100 hover:text-white'
+              : 'text-navy-400 hover:text-brand-600'
+          }`}
+        >
+          Learn more
+          <ArrowRight className="w-3 h-3" />
+        </Link>
       </div>
     </div>
   );

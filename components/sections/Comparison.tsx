@@ -1,9 +1,10 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { Check, X, TrendingUp } from 'lucide-react';
+import { Check, X, TrendingUp, ArrowRight } from 'lucide-react';
 import { Card } from '@/components/ui';
 import Image from 'next/image';
+import { Link } from '@/i18n/routing';
 import { useDestination } from '@/contexts/DestinationContext';
 import { destinations } from './Hero';
 
@@ -171,6 +172,19 @@ export function Comparison() {
                   No data limits
                 </p>
               </div>
+            </div>
+          )}
+
+          {/* Link to full comparison page */}
+          {competitorName && currentDestSlug && (
+            <div className="mt-6">
+              <Link
+                href={`/compare/${competitorName.toLowerCase()}-vs-esim-${currentDestSlug}`}
+                className="inline-flex items-center gap-2 text-brand-600 hover:text-brand-700 font-medium transition-colors"
+              >
+                See full {competitorName} vs eSIM comparison
+                <ArrowRight className="w-4 h-4" />
+              </Link>
             </div>
           )}
         </div>

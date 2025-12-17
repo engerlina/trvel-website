@@ -13,12 +13,16 @@ import {
   HelpCircle,
   ExternalLink,
   Loader2,
+  ArrowRight,
 } from 'lucide-react';
+import { Link } from '@/i18n/routing';
 
 // Type definitions for device data
 interface DeviceData {
+  brandSlug: string;
   compatible: string[];
   notCompatible: string[];
+  deviceSlugs: Record<string, string>;
   checkPath: string;
 }
 
@@ -176,11 +180,13 @@ export function EsimChecker() {
     if (!selectedBrand || !selectedModel) return null;
     const brandData = deviceDatabase[selectedBrand];
     if (!brandData) return null;
+    const deviceSlug = brandData.deviceSlugs?.[selectedModel];
+    const devicePageUrl = deviceSlug ? `/compatibility/${brandData.brandSlug}/${deviceSlug}` : null;
     if (brandData.compatible.includes(selectedModel)) {
-      return { compatible: true, checkPath: brandData.checkPath };
+      return { compatible: true, checkPath: brandData.checkPath, devicePageUrl };
     }
     if (brandData.notCompatible.includes(selectedModel)) {
-      return { compatible: false, checkPath: brandData.checkPath };
+      return { compatible: false, checkPath: brandData.checkPath, devicePageUrl };
     }
     return null;
   }, [selectedBrand, selectedModel, deviceDatabase]);
@@ -441,7 +447,7 @@ export function EsimChecker() {
                   ) : (
                     <XCircle className="w-6 h-6 text-red-500 flex-shrink-0" />
                   )}
-                  <div>
+                  <div className="flex-1">
                     <p className={`font-semibold ${checkResult.compatible ? 'text-success-700' : 'text-red-700'}`}>
                       {checkResult.compatible
                         ? 'Your device supports eSIM!'
@@ -460,6 +466,16 @@ export function EsimChecker() {
                       <p className="text-sm text-red-600 mt-1">
                         You&apos;ll need a physical SIM card for this device, or consider upgrading to a newer model.
                       </p>
+                    )}
+                    {/* Link to device-specific page */}
+                    {checkResult.devicePageUrl && (
+                      <Link
+                        href={checkResult.devicePageUrl}
+                        className="mt-3 inline-flex items-center gap-1 text-sm text-brand-600 hover:text-brand-700 font-medium transition-colors"
+                      >
+                        View full {selectedModel} eSIM guide
+                        <ArrowRight className="w-3 h-3" />
+                      </Link>
                     )}
                   </div>
                 </div>

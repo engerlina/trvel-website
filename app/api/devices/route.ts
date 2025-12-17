@@ -13,18 +13,25 @@ export async function GET() {
     });
 
     // Transform to the format expected by EsimChecker
+    // Includes slugs for linking to device pages
     const deviceData = brands.reduce((acc, brand) => {
       acc[brand.name] = {
+        brandSlug: brand.slug,
         compatible: brand.devices
           .filter(d => d.is_compatible)
           .map(d => d.model_name),
         notCompatible: brand.devices
           .filter(d => !d.is_compatible)
           .map(d => d.model_name),
+        // Map model names to slugs for linking
+        deviceSlugs: brand.devices.reduce((slugMap, d) => {
+          slugMap[d.model_name] = d.slug;
+          return slugMap;
+        }, {} as Record<string, string>),
         checkPath: brand.settings_path || '',
       };
       return acc;
-    }, {} as Record<string, { compatible: string[]; notCompatible: string[]; checkPath: string }>);
+    }, {} as Record<string, { brandSlug: string; compatible: string[]; notCompatible: string[]; deviceSlugs: Record<string, string>; checkPath: string }>);
 
     return NextResponse.json(deviceData);
   } catch (error) {

@@ -19,6 +19,13 @@ const company = [
   { name: 'Help Center', href: '/help' },
 ];
 
+const resources = [
+  { name: 'Check Device Compatibility', href: '/compatibility' },
+  { name: 'iPhone eSIM Guide', href: '/compatibility/apple' },
+  { name: 'Samsung eSIM Guide', href: '/compatibility/samsung' },
+  { name: 'Google Pixel eSIM', href: '/compatibility/google' },
+];
+
 const legal = [
   { name: 'Terms of Service', href: '/terms' },
   { name: 'Privacy Policy', href: '/privacy' },
@@ -83,7 +90,7 @@ export function Footer() {
 
       {/* Main Footer */}
       <div className="container-wide py-16">
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-8 lg:gap-12">
+        <div className="grid grid-cols-2 md:grid-cols-6 gap-8 lg:gap-12">
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
             <Link href="/" className="flex items-center gap-2 mb-4">
@@ -148,6 +155,23 @@ export function Footer() {
             <h4 className="text-body font-semibold text-cream-100 mb-4">Company</h4>
             <ul className="space-y-3">
               {company.map((item) => (
+                <li key={item.href}>
+                  <Link
+                    href={item.href}
+                    className="text-body-sm text-cream-400 hover:text-brand-400 transition-colors"
+                  >
+                    {item.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Resources */}
+          <div>
+            <h4 className="text-body font-semibold text-cream-100 mb-4">Resources</h4>
+            <ul className="space-y-3">
+              {resources.map((item) => (
                 <li key={item.href}>
                   <Link
                     href={item.href}
