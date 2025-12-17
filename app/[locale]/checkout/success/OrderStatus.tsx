@@ -24,10 +24,46 @@ interface OrderStatusProps {
   };
 }
 
+// Fun loading messages that cycle every 2 seconds
+const LOADING_MESSAGES = [
+  'Preparing your eSIM...',
+  'Connecting to satellite network...',
+  'Warming up the data pipes...',
+  'Downloading vacation mode...',
+  'Activating travel superpowers...',
+  'Summoning digital nomad energy...',
+  'Configuring wanderlust protocol...',
+  'Spinning up your connection...',
+  'Crossing the digital border...',
+  'Packing your bits and bytes...',
+  'Charging the signal boosters...',
+  'Aligning the cellular stars...',
+  'Brewing fresh connectivity...',
+  'Teaching your phone new tricks...',
+  'Rolling out the digital welcome mat...',
+  'Syncing with adventure mode...',
+  'Turbo-charging your travels...',
+  'Assembling your digital passport...',
+  'Fueling up the data tanks...',
+  'Almost there, hang tight...',
+];
+
 export default function OrderStatus({ sessionId, translations }: OrderStatusProps) {
   const [order, setOrder] = useState<Order | null>(null);
   const [status, setStatus] = useState<'pending' | 'processing' | 'ready'>('pending');
   const [pollCount, setPollCount] = useState(0);
+  const [messageIndex, setMessageIndex] = useState(0);
+
+  // Cycle through loading messages
+  useEffect(() => {
+    if (status === 'ready') return;
+
+    const messageInterval = setInterval(() => {
+      setMessageIndex((prev) => (prev + 1) % LOADING_MESSAGES.length);
+    }, 2500);
+
+    return () => clearInterval(messageInterval);
+  }, [status]);
 
   useEffect(() => {
     if (!sessionId) return;
@@ -58,10 +94,10 @@ export default function OrderStatus({ sessionId, translations }: OrderStatusProp
     // Initial poll
     pollOrder();
 
-    // Poll every 2 seconds for up to 30 seconds (15 attempts)
+    // Poll every 2 seconds for up to 60 seconds (30 attempts)
     const intervalId = setInterval(async () => {
       const shouldStop = await pollOrder();
-      if (shouldStop || pollCount >= 15) {
+      if (shouldStop || pollCount >= 30) {
         clearInterval(intervalId);
       }
     }, 2000);
@@ -99,7 +135,9 @@ export default function OrderStatus({ sessionId, translations }: OrderStatusProp
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
-              <span className="font-semibold text-navy-500">Preparing your eSIM...</span>
+              <span className="font-semibold text-navy-500 transition-opacity duration-300">
+                {LOADING_MESSAGES[messageIndex]}
+              </span>
             </div>
             <div className="bg-cream-100 rounded-xl p-4 inline-block mb-4 animate-pulse">
               <div className="w-[200px] h-[200px] bg-cream-200 rounded"></div>
