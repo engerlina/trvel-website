@@ -90,7 +90,7 @@ export async function generateMetadata({ params }: DestinationPageProps): Promis
   const title = dailyRate
     ? `${destinationData.name} eSIM | From ${currencySymbol}${dailyRate}/day`
     : `${destinationData.name} eSIM | Unlimited Data`;
-  const description = destinationData.tagline || `Get unlimited data eSIM for ${destinationData.name}. Instant activation, premium networks, human support.`;
+  const description = destinationData.tagline || `Get unlimited data eSIM for ${destinationData.name}. Instant activation, premium networks, 24/7 support.`;
 
   return {
     title,
@@ -147,7 +147,7 @@ export default async function DestinationPage({ params }: DestinationPageProps) 
     { icon: Wifi, title: 'Unlimited Data', description: 'No throttling, no data caps, no surprises' },
     { icon: Signal, title: 'Premium Network', description: 'Connected to tier-1 local carriers' },
     { icon: Shield, title: '10-Min Guarantee', description: 'Connect in 10 minutes or full refund' },
-    { icon: MessageCircle, title: 'Human Support', description: 'Live chat & phone support 24/7' },
+    { icon: MessageCircle, title: '24/7 Support', description: 'Live chat & phone anytime' },
     { icon: Smartphone, title: 'Keep Your Number', description: 'Works alongside your existing SIM' },
   ];
 
@@ -408,7 +408,7 @@ export default async function DestinationPage({ params }: DestinationPageProps) 
                 Ready for {destinationData.name}?
               </h2>
               <p className="text-cream-300 text-lg mb-8">
-                Get your eSIM now and be connected the moment you land. Instant delivery, premium network, human support.
+                Get your eSIM now and be connected the moment you land. Instant delivery, premium network, 24/7 support.
               </p>
               <Link
                 href="#plans"

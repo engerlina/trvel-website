@@ -65,7 +65,7 @@
         "description": "Online within 10 minutes of landing or full refund. No forms, no questions."
       },
       "support": {
-        "title": "Real Human Support",
+        "title": "24/7 Support",
         "description": "Live chat and calls available. Average response: 3 minutes. Even at 2am."
       },
       "network": {
@@ -185,8 +185,8 @@
         "description": "Connect in 10 minutes or full refund"
       },
       "humanSupport": {
-        "title": "Human Support",
-        "description": "Live chat & call support 24/7"
+        "title": "24/7 Support",
+        "description": "Live chat & phone anytime"
       },
       "keepNumber": {
         "title": "Keep Your Number",
@@ -210,16 +210,16 @@
     },
     "cta": {
       "title": "Ready for {destination}?",
-      "subtitle": "Get your eSIM now and be connected the moment you land. Instant delivery, premium network, human support.",
+      "subtitle": "Get your eSIM now and be connected the moment you land. Instant delivery, premium network, 24/7 support.",
       "button": "Get Your eSIM"
     }
   },
   "destinations": {
     "pageTitle": "All eSIM Destinations | Trvel",
-    "pageDescription": "Browse all travel eSIM destinations. Premium unlimited data plans for Asia, Europe, Americas and more. Instant delivery, human support.",
+    "pageDescription": "Browse all travel eSIM destinations. Premium unlimited data plans for Asia, Europe, Americas and more. Instant delivery, 24/7 support.",
     "badge": "12+ Destinations",
     "title": "Choose Your Destination",
-    "subtitle": "Premium eSIMs with unlimited data for the world's most popular travel destinations. All plans include instant delivery and 24/7 human support.",
+    "subtitle": "Premium eSIMs with unlimited data for the world's most popular travel destinations. All plans include instant delivery and 24/7 support.",
     "stats": {
       "rating": "4.9/5 rating",
       "instant": "Instant delivery",
@@ -258,7 +258,7 @@
     "authorBio": "Travel enthusiast and connectivity expert at Trvel, helping UK travellers stay connected abroad.",
     "relatedPosts": "You Might Also Like",
     "ctaTitle": "Ready to Travel Connected?",
-    "ctaDescription": "Get your eSIM before you fly. Instant delivery, premium networks, human support.",
+    "ctaDescription": "Get your eSIM before you fly. Instant delivery, premium networks, 24/7 support.",
     "ctaButton": "Get Your eSIM"
   },
   "checkout": {

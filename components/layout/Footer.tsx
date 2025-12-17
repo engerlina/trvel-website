@@ -80,8 +80,8 @@ export function Footer() {
                 <MessageCircle className="w-5 h-5 text-accent-400" />
               </div>
               <div>
-                <p className="text-body-sm font-semibold text-cream-100">Human Support</p>
-                <p className="text-body-sm text-cream-400">Live chat & phone support</p>
+                <p className="text-body-sm font-semibold text-cream-100">24/7 Support</p>
+                <p className="text-body-sm text-cream-400">Live chat & phone anytime</p>
               </div>
             </div>
           </div>
