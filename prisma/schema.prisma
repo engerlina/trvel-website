@@ -67,18 +67,10 @@ model Plan {
   price_5day            Decimal? @db.Decimal(10, 2)
   price_7day            Decimal? @db.Decimal(10, 2)
   price_15day           Decimal? @db.Decimal(10, 2)
-  // Bundle references
-  bundle_5day           String?  @db.VarChar(100) // EsimBundle.name
+  // Bundle references (eSIM-Go bundle name for fulfillment)
+  bundle_5day           String?  @db.VarChar(100)
   bundle_7day           String?  @db.VarChar(100)
   bundle_15day          String?  @db.VarChar(100)
-  // Stripe price IDs for checkout (Production)
-  stripe_price_5day     String?  @db.VarChar(100)
-  stripe_price_7day     String?  @db.VarChar(100)
-  stripe_price_15day    String?  @db.VarChar(100)
-  // Stripe price IDs for checkout (Test)
-  stripe_test_price_5day  String?  @db.VarChar(100)
-  stripe_test_price_7day  String?  @db.VarChar(100)
-  stripe_test_price_15day String?  @db.VarChar(100)
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
 
