@@ -9,7 +9,17 @@ const destinations = [
   'united-kingdom', 'france', 'italy', 'united-states'
 ];
 
-const staticPages = ['', '/destinations', '/how-it-works', '/help', '/blog'];
+const staticPages = [
+  '',
+  '/destinations',
+  '/how-it-works',
+  '/help',
+  '/blog',
+  '/get-started',
+  '/terms',
+  '/privacy',
+  '/fair-use',
+];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const routes: MetadataRoute.Sitemap = [];
