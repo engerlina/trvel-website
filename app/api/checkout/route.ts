@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import Stripe from 'stripe';
 import { stripe, isTestMode } from '@/lib/stripe';
 import { prisma } from '@/lib/db';
 
@@ -94,7 +95,7 @@ export async function POST(request: NextRequest) {
     const origin = request.headers.get('origin') || 'http://localhost:3000';
 
     // Build checkout session options
-    const sessionOptions: Parameters<typeof stripe.checkout.sessions.create>[0] = {
+    const sessionOptions: Stripe.Checkout.SessionCreateParams = {
       mode: 'payment',
       payment_method_types: ['card'],
       line_items: [

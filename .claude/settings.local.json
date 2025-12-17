@@ -20,7 +20,8 @@
       "Bash(node -e:*)",
       "Bash(stripe:*)",
       "Bash(npm ls:*)",
-      "Bash(node --env-file=.env --import tsx:*)"
+      "Bash(node --env-file=.env --import tsx:*)",
+      "Bash(git add:*)"
     ]
   }
 }
