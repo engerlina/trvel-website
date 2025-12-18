@@ -24,6 +24,7 @@ import {
   JP, TH, KR, SG, ID, MY, VN, PH, GB, FR, IT, US, AU, ES, GR, CN, TW,
   type FlagComponent,
 } from 'country-flag-icons/react/3x2';
+import { DurationOption } from '@/types';
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://trvel.co';
 
@@ -69,7 +70,7 @@ export async function generateMetadata({ params }: CityPageProps): Promise<Metad
     where: { destination_slug_locale: { destination_slug: destination, locale } },
   });
 
-  const dailyRate = planData?.price_15day ? (Number(planData.price_15day) / 15).toFixed(2) : '';
+  const dailyRate = planData?.best_daily_rate ? formatPrice(planData.best_daily_rate, planData.currency) : '';
   const currencySymbol = planData?.currency === 'IDR' ? 'Rp' : planData?.currency === 'GBP' ? '£' : '$';
 
   const title = dailyRate
@@ -137,29 +138,22 @@ export default async function CityPage({ params }: CityPageProps) {
   const currency = planData?.currency || 'AUD';
   const currencySymbol = currency === 'IDR' ? 'Rp' : currency === 'GBP' ? '£' : '$';
 
-  const plans = [
-    {
-      name: '5 Day',
-      duration: 5,
-      price: formatPrice(planData?.price_5day, currency),
-      perDay: formatPrice(planData?.price_5day ? Number(planData.price_5day) / 5 : null, currency),
-      popular: false,
-    },
-    {
-      name: '7 Day',
-      duration: 7,
-      price: formatPrice(planData?.price_7day, currency),
-      perDay: formatPrice(planData?.price_7day ? Number(planData.price_7day) / 7 : null, currency),
-      popular: true,
-    },
-    {
-      name: '15 Day',
-      duration: 15,
-      price: formatPrice(planData?.price_15day, currency),
-      perDay: formatPrice(planData?.price_15day ? Number(planData.price_15day) / 15 : null, currency),
-      popular: false,
-    },
-  ];
+  // Get plans from durations array
+  const durations = (planData?.durations || []) as unknown as DurationOption[];
+  const defaultDurations = planData?.default_durations || [];
+
+  // Use default durations if available, otherwise show first 3
+  const plansToShow = defaultDurations.length > 0
+    ? durations.filter(d => defaultDurations.includes(d.duration))
+    : durations.slice(0, 3);
+
+  const plans = plansToShow.map(d => ({
+    name: `${d.duration} Day`,
+    duration: d.duration,
+    price: formatPrice(d.retail_price, currency),
+    perDay: formatPrice(d.daily_rate, currency),
+    popular: d.duration === 7,
+  }));
 
   return (
     <>
@@ -239,11 +233,11 @@ export default async function CityPage({ params }: CityPageProps) {
                 )}
               </div>
 
-              {planData?.price_15day && (
+              {planData?.best_daily_rate && (
                 <div className="inline-flex items-baseline gap-2 px-6 py-3 bg-white rounded-2xl shadow-soft-lg">
                   <span className="text-navy-400">From</span>
                   <span className="text-heading-xl font-bold text-navy-500">
-                    {currencySymbol}{formatPrice(Number(planData.price_15day) / 15, currency)}
+                    {currencySymbol}{formatPrice(planData.best_daily_rate, currency)}
                   </span>
                   <span className="text-navy-400">/day</span>
                 </div>

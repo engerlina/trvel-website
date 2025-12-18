@@ -23,6 +23,7 @@ import {
   JP, TH, KR, SG, ID, MY, VN, PH, GB, FR, IT, US,
   type FlagComponent,
 } from 'country-flag-icons/react/3x2';
+import { DurationOption } from '@/types';
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://trvel.co';
 
@@ -84,8 +85,8 @@ export async function generateMetadata({ params }: DestinationPageProps): Promis
     },
   });
 
-  // Calculate daily rate from 15-day plan for best value display
-  const dailyRate = planData?.price_15day ? (Number(planData.price_15day) / 15).toFixed(2) : '';
+  // Use best_daily_rate for display
+  const dailyRate = planData?.best_daily_rate ? Number(planData.best_daily_rate).toFixed(2) : '';
   const currencySymbol = planData?.currency === 'IDR' ? 'Rp' : planData?.currency === 'GBP' ? '£' : '$';
   const title = dailyRate
     ? `${destinationData.name} eSIM | From ${currencySymbol}${dailyRate}/day`
@@ -153,29 +154,30 @@ export default async function DestinationPage({ params }: DestinationPageProps) 
 
   const currency = planData?.currency || 'AUD';
 
-  const plans = [
-    {
-      name: '5 Day',
-      duration: 5,
-      price: formatPrice(planData?.price_5day, currency),
-      perDay: formatPrice(planData?.price_5day ? Number(planData.price_5day) / 5 : null, currency),
-      popular: false,
-    },
-    {
-      name: '7 Day',
-      duration: 7,
-      price: formatPrice(planData?.price_7day, currency),
-      perDay: formatPrice(planData?.price_7day ? Number(planData.price_7day) / 7 : null, currency),
-      popular: true,
-    },
-    {
-      name: '15 Day',
-      duration: 15,
-      price: formatPrice(planData?.price_15day, currency),
-      perDay: formatPrice(planData?.price_15day ? Number(planData.price_15day) / 15 : null, currency),
-      popular: false,
-    },
-  ];
+  // Get durations and default_durations from plan
+  const durations = (planData?.durations || []) as unknown as DurationOption[];
+  const defaultDurations = planData?.default_durations || [];
+
+  // Build plans from durations, using default_durations to determine which to show
+  const plansToShow = defaultDurations.length > 0
+    ? durations.filter(d => defaultDurations.includes(d.duration))
+    : durations.slice(0, 3); // Fallback to first 3 if no defaults
+
+  const plans = plansToShow.map((d, index) => ({
+    name: d.duration === 1 ? '1 Day' :
+          d.duration === 3 ? '3 Days' :
+          d.duration === 5 ? '5 Days' :
+          d.duration === 7 ? '1 Week' :
+          d.duration === 10 ? '10 Days' :
+          d.duration === 15 ? '2 Weeks' :
+          d.duration === 30 ? '1 Month' :
+          `${d.duration} Days`,
+    duration: d.duration,
+    price: formatPrice(d.retail_price, currency),
+    perDay: formatPrice(d.daily_rate, currency),
+    popular: index === 1 && plansToShow.length >= 3, // Middle option is popular
+  }));
+
   const currencySymbol = currency === 'IDR' ? 'Rp' : currency === 'GBP' ? '£' : '$';
 
   return (
@@ -237,12 +239,12 @@ export default async function DestinationPage({ params }: DestinationPageProps) 
                 </div>
               </div>
 
-              {/* Starting price - show lowest daily rate (15-day plan) */}
-              {planData?.price_15day && (
+              {/* Starting price - show best daily rate */}
+              {planData?.best_daily_rate && (
                 <div className="inline-flex items-baseline gap-2 px-6 py-3 bg-white rounded-2xl shadow-soft-lg">
                   <span className="text-navy-400">Starting from</span>
                   <span className="text-heading-xl font-bold text-navy-500">
-                    {currencySymbol}{formatPrice(Number(planData.price_15day) / 15, currency)}
+                    {currencySymbol}{formatPrice(Number(planData.best_daily_rate), currency)}
                   </span>
                   <span className="text-navy-400">/day</span>
                 </div>

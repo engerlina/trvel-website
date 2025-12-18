@@ -55,24 +55,19 @@ model Competitor {
 }
 
 model Plan {
-  id                    Int      @id @default(autoincrement())
-  destination_slug      String   @db.VarChar(50)
-  locale                String   @db.VarChar(10)
-  currency              String   @db.Char(3)
-  // Wholesale prices in USD cents (from eSIM-Go)
-  wholesale_5day_cents  Int?
-  wholesale_7day_cents  Int?
-  wholesale_15day_cents Int?
-  // Retail prices with markup (in local currency)
-  price_5day            Decimal? @db.Decimal(10, 2)
-  price_7day            Decimal? @db.Decimal(10, 2)
-  price_15day           Decimal? @db.Decimal(10, 2)
-  // Bundle references (eSIM-Go bundle name for fulfillment)
-  bundle_5day           String?  @db.VarChar(100)
-  bundle_7day           String?  @db.VarChar(100)
-  bundle_15day          String?  @db.VarChar(100)
-  createdAt             DateTime @default(now())
-  updatedAt             DateTime @updatedAt
+  id               Int      @id @default(autoincrement())
+  destination_slug String   @db.VarChar(50)
+  locale           String   @db.VarChar(10)
+  currency         String   @db.Char(3)
+  // All available durations as JSON array
+  // Each entry: { duration: number, wholesale_cents: number, retail_price: number, bundle_name: string }
+  durations        Json     @default("[]")
+  // Default durations to show (e.g., [5, 7, 15] or [3, 7, 10] for limited destinations)
+  default_durations Int[]   @default([])
+  // Best daily rate for "from X/day" display
+  best_daily_rate  Decimal? @db.Decimal(10, 2)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
   @@unique([destination_slug, locale])
   @@index([destination_slug])

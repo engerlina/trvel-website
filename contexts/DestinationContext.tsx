@@ -2,12 +2,13 @@
 
 import { createContext, useContext, useState, useCallback, useEffect, ReactNode } from 'react';
 import { useLocale } from 'next-intl';
+import { DurationOption } from '@/types';
 
-// Plan prices for a destination
+// Plan prices for a destination (flexible durations)
 export interface PlanPrices {
-  price_5day: number | null;
-  price_7day: number | null;
-  price_15day: number | null;
+  durations: DurationOption[];
+  default_durations: number[];
+  best_daily_rate: number | null;
   currency: string;
   competitor_name: string | null;
   competitor_daily_rate: number | null;

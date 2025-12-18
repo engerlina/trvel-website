@@ -23,20 +23,16 @@ import {
   JP, TH, KR, SG, ID, MY, VN, PH, GB, FR, IT, US, AU, ES, GR, CN, TW,
   type FlagComponent,
 } from 'country-flag-icons/react/3x2';
+import { DurationOption } from '@/types';
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://trvel.co';
 
-// Valid durations we support
-const VALID_DURATIONS = [5, 7, 15] as const;
-type ValidDuration = typeof VALID_DURATIONS[number];
-
 // Parse duration from slug (e.g., "7-day" -> 7)
-function parseDuration(slug: string): ValidDuration | null {
+function parseDuration(slug: string): number | null {
   const match = slug.match(/^(\d+)-day$/);
   if (!match) return null;
   const days = parseInt(match[1], 10);
-  if (!VALID_DURATIONS.includes(days as ValidDuration)) return null;
-  return days as ValidDuration;
+  return days > 0 ? days : null;
 }
 
 function formatPrice(price: unknown, currency: string): string {
@@ -59,31 +55,43 @@ const flagMap: Record<string, FlagComponent> = {
 };
 
 // Duration-specific icons and descriptions
-const durationInfo: Record<ValidDuration, {
+function getDurationInfo(days: number): {
   icon: typeof CalendarDays;
   tripType: string;
   description: string;
   useCases: string[];
-}> = {
-  5: {
-    icon: CalendarDays,
-    tripType: 'Short Trip',
-    description: 'Perfect for a quick getaway or weekend escape',
-    useCases: ['Weekend trips', 'Business meetings', 'City breaks', 'Quick stopovers'],
-  },
-  7: {
-    icon: CalendarRange,
-    tripType: 'Week Trip',
-    description: 'Ideal for a full week of exploration and adventure',
-    useCases: ['Holiday getaways', 'Cultural exploration', 'Relaxation trips', 'Family vacations'],
-  },
-  15: {
+} {
+  if (days <= 3) {
+    return {
+      icon: CalendarDays,
+      tripType: 'Quick Trip',
+      description: 'Perfect for a quick getaway or weekend escape',
+      useCases: ['Weekend trips', 'Business meetings', 'City breaks', 'Quick stopovers'],
+    };
+  }
+  if (days <= 7) {
+    return {
+      icon: CalendarRange,
+      tripType: 'Week Trip',
+      description: 'Ideal for a full week of exploration and adventure',
+      useCases: ['Holiday getaways', 'Cultural exploration', 'Relaxation trips', 'Family vacations'],
+    };
+  }
+  if (days <= 15) {
+    return {
+      icon: CalendarCheck,
+      tripType: 'Extended Stay',
+      description: 'Best value for longer stays and deep exploration',
+      useCases: ['Extended holidays', 'Remote work', 'Multi-city tours', 'Slow travel'],
+    };
+  }
+  return {
     icon: CalendarCheck,
-    tripType: 'Extended Stay',
-    description: 'Best value for longer stays and deep exploration',
-    useCases: ['Extended holidays', 'Remote work', 'Multi-city tours', 'Slow travel'],
-  },
-};
+    tripType: 'Long Stay',
+    description: 'Maximum value for extended stays',
+    useCases: ['Extended holidays', 'Remote work', 'Multi-city tours', 'Digital nomads'],
+  };
+}
 
 interface DurationPageProps {
   params: Promise<{
@@ -113,8 +121,10 @@ export async function generateMetadata({ params }: DurationPageProps): Promise<M
     where: { destination_slug_locale: { destination_slug: destination, locale } },
   });
 
-  const priceField = `price_${days}day` as 'price_5day' | 'price_7day' | 'price_15day';
-  const price = planData?.[priceField];
+  // Find price from durations array
+  const durations = (planData?.durations || []) as unknown as DurationOption[];
+  const selectedDuration = durations.find(d => d.duration === days);
+  const price = selectedDuration?.retail_price || null;
   const currencySymbol = planData?.currency === 'IDR' ? 'Rp' : planData?.currency === 'GBP' ? '£' : '$';
   const currency = planData?.currency || 'AUD';
 
@@ -169,15 +179,22 @@ export default async function DurationPage({ params }: DurationPageProps) {
   const currency = planData?.currency || 'AUD';
   const currencySymbol = currency === 'IDR' ? 'Rp' : currency === 'GBP' ? '£' : '$';
 
-  const priceField = `price_${days}day` as 'price_5day' | 'price_7day' | 'price_15day';
-  const price = planData?.[priceField];
-  const perDay = price ? Number(price) / days : null;
+  // Get price from durations array
+  const durations = (planData?.durations || []) as unknown as DurationOption[];
+  const selectedDuration = durations.find(d => d.duration === days);
+  const price = selectedDuration?.retail_price || null;
+  const perDay = price ? price / days : null;
 
-  const info = durationInfo[days];
+  // If the requested duration is not available for this destination, show 404
+  if (!selectedDuration && planData) {
+    notFound();
+  }
+
+  const info = getDurationInfo(days);
   const DurationIcon = info.icon;
 
-  // Other duration options for cross-linking
-  const otherDurations = VALID_DURATIONS.filter(d => d !== days);
+  // Other duration options for cross-linking (all available durations except current)
+  const otherDurations = durations.filter(d => d.duration !== days);
 
   // Calculate competitor comparison for this duration
   const competitorCost = competitorData?.daily_rate ? Number(competitorData.daily_rate) * days : null;
@@ -355,46 +372,45 @@ export default async function DurationPage({ params }: DurationPageProps) {
         </section>
 
         {/* Other Duration Options */}
-        <section className="py-12 bg-cream-50">
-          <div className="container-wide">
-            <h2 className="text-heading-lg font-bold text-navy-500 mb-6 text-center">
-              Other Duration Options
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl mx-auto">
-              {otherDurations.map((d) => {
-                const otherPrice = planData?.[`price_${d}day` as 'price_5day' | 'price_7day' | 'price_15day'];
-                const otherInfo = durationInfo[d];
-                const OtherIcon = otherInfo.icon;
-                return (
-                  <Link
-                    key={d}
-                    href={`/esim/${destination}/${d}-day`}
-                    className="flex items-center gap-4 p-5 bg-white rounded-xl border border-cream-200 hover:border-brand-300 hover:shadow-lg transition-all"
-                  >
-                    <div className="w-12 h-12 rounded-xl bg-brand-100 flex items-center justify-center flex-shrink-0">
-                      <OtherIcon className="w-6 h-6 text-brand-600" />
-                    </div>
-                    <div className="flex-1">
-                      <p className="font-semibold text-navy-500">{d}-Day Plan</p>
-                      <p className="text-sm text-navy-400">{otherInfo.tripType}</p>
-                    </div>
-                    {otherPrice && (
+        {otherDurations.length > 0 && (
+          <section className="py-12 bg-cream-50">
+            <div className="container-wide">
+              <h2 className="text-heading-lg font-bold text-navy-500 mb-6 text-center">
+                Other Duration Options
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl mx-auto">
+                {otherDurations.map((durationOption) => {
+                  const otherInfo = getDurationInfo(durationOption.duration);
+                  const OtherIcon = otherInfo.icon;
+                  return (
+                    <Link
+                      key={durationOption.duration}
+                      href={`/esim/${destination}/${durationOption.duration}-day`}
+                      className="flex items-center gap-4 p-5 bg-white rounded-xl border border-cream-200 hover:border-brand-300 hover:shadow-lg transition-all"
+                    >
+                      <div className="w-12 h-12 rounded-xl bg-brand-100 flex items-center justify-center flex-shrink-0">
+                        <OtherIcon className="w-6 h-6 text-brand-600" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-semibold text-navy-500">{durationOption.duration}-Day Plan</p>
+                        <p className="text-sm text-navy-400">{otherInfo.tripType}</p>
+                      </div>
                       <div className="text-right">
                         <p className="font-bold text-navy-500">
-                          {currencySymbol}{formatPrice(otherPrice, currency)}
+                          {currencySymbol}{formatPrice(durationOption.retail_price, currency)}
                         </p>
                         <p className="text-xs text-navy-400">
-                          {currencySymbol}{formatPrice(Number(otherPrice) / d, currency)}/day
+                          {currencySymbol}{formatPrice(durationOption.daily_rate, currency)}/day
                         </p>
                       </div>
-                    )}
-                    <ArrowRight className="w-5 h-5 text-navy-300" />
-                  </Link>
-                );
-              })}
+                      <ArrowRight className="w-5 h-5 text-navy-300" />
+                    </Link>
+                  );
+                })}
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
+        )}
 
         {/* Features */}
         <section className="py-16 bg-white">
@@ -458,18 +474,20 @@ export default async function DurationPage({ params }: DurationPageProps) {
 // Generate static params for all destination/duration combinations
 export async function generateStaticParams() {
   try {
-    const destinations = await prisma.destination.findMany({
-      select: { slug: true, locale: true },
+    // Get all plans with their available durations
+    const plans = await prisma.plan.findMany({
+      select: { destination_slug: true, locale: true, durations: true },
     });
 
     const params: { locale: string; destination: string; duration: string }[] = [];
 
-    for (const dest of destinations) {
-      for (const days of VALID_DURATIONS) {
+    for (const plan of plans) {
+      const durations = (plan.durations || []) as unknown as DurationOption[];
+      for (const durationOption of durations) {
         params.push({
-          locale: dest.locale,
-          destination: dest.slug,
-          duration: `${days}-day`,
+          locale: plan.locale,
+          destination: plan.destination_slug,
+          duration: `${durationOption.duration}-day`,
         });
       }
     }

@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
+import { DurationOption } from '@/types';
 
 // GET /api/plans?locale=en-au
 // Returns all plans for a locale, keyed by destination_slug
-// Also includes competitor info from the Competitor table (based on currency)
+// Now returns flexible durations array instead of fixed price columns
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const locale = searchParams.get('locale') || 'en-au';
@@ -15,9 +16,9 @@ export async function GET(request: NextRequest) {
       select: {
         destination_slug: true,
         currency: true,
-        price_5day: true,
-        price_7day: true,
-        price_15day: true,
+        durations: true,
+        default_durations: true,
+        best_daily_rate: true,
       },
     });
 
@@ -29,9 +30,9 @@ export async function GET(request: NextRequest) {
 
     // Convert to a map keyed by destination_slug
     const plansMap: Record<string, {
-      price_5day: number | null;
-      price_7day: number | null;
-      price_15day: number | null;
+      durations: DurationOption[];
+      default_durations: number[];
+      best_daily_rate: number | null;
       currency: string;
       competitor_name: string | null;
       competitor_daily_rate: number | null;
@@ -40,9 +41,9 @@ export async function GET(request: NextRequest) {
     for (const plan of plans) {
       const competitor = competitorMap.get(plan.currency);
       plansMap[plan.destination_slug] = {
-        price_5day: plan.price_5day ? Number(plan.price_5day) : null,
-        price_7day: plan.price_7day ? Number(plan.price_7day) : null,
-        price_15day: plan.price_15day ? Number(plan.price_15day) : null,
+        durations: plan.durations as unknown as DurationOption[],
+        default_durations: plan.default_durations,
+        best_daily_rate: plan.best_daily_rate ? Number(plan.best_daily_rate) : null,
         currency: plan.currency,
         competitor_name: competitor?.name || null,
         competitor_daily_rate: competitor?.daily_rate || null,

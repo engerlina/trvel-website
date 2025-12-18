@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import CheckoutButton from './CheckoutButton';
 import { getCurrencySymbol } from '@/lib/pricing';
+import { DurationOption } from '@/types';
 
 interface Props {
   params: Promise<{ locale: string }>;
@@ -17,6 +18,18 @@ function parsePlanDuration(plan: string | undefined): number | null {
   return match ? parseInt(match[1], 10) : null;
 }
 
+// Get plan name based on duration
+function getPlanName(days: number): string {
+  if (days === 1) return '1 Day';
+  if (days === 3) return '3 Days';
+  if (days === 5) return '5 Days';
+  if (days === 7) return '1 Week';
+  if (days === 10) return '10 Days';
+  if (days === 15) return '2 Weeks';
+  if (days === 30) return '1 Month';
+  return `${days} Days`;
+}
+
 export default async function CheckoutPage({ params, searchParams }: Props) {
   const { locale } = await params;
   const { destination, duration: durationStr, plan: planStr, promo } = await searchParams;
@@ -28,8 +41,8 @@ export default async function CheckoutPage({ params, searchParams }: Props) {
     ? parseInt(durationStr, 10)
     : parsePlanDuration(planStr);
 
-  // Validate parameters
-  if (!destination || !duration || ![5, 7, 15].includes(duration)) {
+  // Validate parameters - duration must be positive integer
+  if (!destination || !duration || duration <= 0) {
     notFound();
   }
 
@@ -57,22 +70,19 @@ export default async function CheckoutPage({ params, searchParams }: Props) {
     notFound();
   }
 
-  // Get price for selected duration
-  const price = duration === 5 ? plan.price_5day :
-                duration === 7 ? plan.price_7day :
-                plan.price_15day;
+  // Get price from durations array
+  const durations = plan.durations as unknown as DurationOption[];
+  const selectedDuration = durations.find(d => d.duration === duration);
 
-  if (!price) {
+  if (!selectedDuration) {
     notFound();
   }
 
-  const priceNumber = typeof price === 'object' ? Number(price) : price;
+  const priceNumber = selectedDuration.retail_price;
   const currencySymbol = getCurrencySymbol(plan.currency);
 
   // Get plan name
-  const planName = duration === 5 ? tPlans('short.name') :
-                   duration === 7 ? tPlans('week.name') :
-                   tPlans('extended.name');
+  const planName = getPlanName(duration);
 
   return (
     <main className="min-h-screen py-12 px-4 bg-cream-50">

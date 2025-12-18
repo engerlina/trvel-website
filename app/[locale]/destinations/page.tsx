@@ -266,12 +266,12 @@ export default async function DestinationsPage({ params }: DestinationsPageProps
                             </p>
                           )}
 
-                          {/* Price - show lowest daily rate (15-day plan) */}
-                          {plan?.price_15day && (
+                          {/* Price - show best daily rate from any duration */}
+                          {plan?.best_daily_rate && (
                             <div className="flex items-baseline gap-2">
                               <span className="text-navy-400 text-sm">{t('from')}</span>
                               <span className="text-xl font-bold text-brand-600">
-                                {currencySymbol}{formatPrice(Number(plan.price_15day) / 15, currency)}
+                                {currencySymbol}{formatPrice(plan.best_daily_rate, currency)}
                               </span>
                               <span className="text-navy-400 text-sm">/day</span>
                             </div>

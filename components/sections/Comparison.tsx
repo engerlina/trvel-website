@@ -43,12 +43,12 @@ export function Comparison() {
   const currency = currentPlan?.currency || 'AUD';
   const currencySymbol = getCurrencySymbol(currency);
 
-  // Calculate Trvel daily rate from 7-day plan (most popular)
-  const trvelDailyRate = currentPlan?.price_7day ? currentPlan.price_7day / 7 : 5.71;
+  // Use best daily rate from the plan
+  const trvelDailyRate = currentPlan?.best_daily_rate || 5.71;
 
-  // Calculate savings for a 7-day trip
+  // Calculate savings for a 7-day trip using best daily rate
   const competitorTotal = competitorDailyRate * 7;
-  const trvelTotal = currentPlan?.price_7day || 40;
+  const trvelTotal = trvelDailyRate * 7;
   const savings = competitorTotal - trvelTotal;
 
   const comparisonData: ComparisonRow[] = [

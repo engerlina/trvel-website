@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import * as Flags from 'country-flag-icons/react/3x2';
 import { isDestinationExcluded } from '@/lib/utils';
+import { DurationOption } from '@/types';
 
 interface Destination {
   id: string;
@@ -29,15 +30,15 @@ interface Destination {
 
 interface Plan {
   currency: string;
-  price_5day: number | null;
-  price_7day: number | null;
-  price_15day: number | null;
+  durations: DurationOption[];
+  default_durations: number[];
+  best_daily_rate: number | null;
 }
 
-const planOptions = [
-  { id: 'short', days: 5, priceKey: 'price_5day' as const, icon: Zap, label: '5 Days' },
-  { id: 'week', days: 7, priceKey: 'price_7day' as const, icon: Star, label: '7 Days', popular: true },
-  { id: 'extended', days: 15, priceKey: 'price_15day' as const, icon: TrendingUp, label: '15 Days' },
+const defaultPlanOptions = [
+  { id: 'short', days: 5, icon: Zap, label: '5 Days' },
+  { id: 'week', days: 7, icon: Star, label: '7 Days', popular: true },
+  { id: 'extended', days: 15, icon: TrendingUp, label: '15 Days' },
 ];
 
 // Get flag component dynamically from country ISO code
@@ -310,52 +311,99 @@ export default function GetStartedPage() {
                   2. How long is your trip?
                 </label>
                 <div className="grid grid-cols-3 gap-3">
-                  {planOptions.map((plan) => {
-                    const Icon = plan.icon;
-                    const price = currentPlan?.[plan.priceKey] ?? null;
-                    const isSelected = selectedDuration === plan.days;
+                  {(() => {
+                    // Get available durations for selected destination
+                    const availableDurations = currentPlan?.durations || [];
+                    const defaultDurations = currentPlan?.default_durations || [];
 
-                    return (
-                      <button
-                        key={plan.id}
-                        type="button"
-                        onClick={() => setSelectedDuration(plan.days)}
-                        className={`relative p-4 rounded-xl border-2 transition-all text-center ${
-                          isSelected
-                            ? 'border-brand-500 bg-brand-50'
-                            : 'border-cream-200 bg-cream-50 hover:border-brand-300'
-                        }`}
-                      >
-                        {plan.popular && (
-                          <div className="absolute -top-2 left-1/2 -translate-x-1/2">
-                            <span className="px-2 py-0.5 bg-brand-500 text-white text-xs font-medium rounded-full">
-                              Popular
-                            </span>
-                          </div>
-                        )}
-                        <Icon className={`w-5 h-5 mx-auto mb-2 ${isSelected ? 'text-brand-600' : 'text-navy-400'}`} />
-                        <p className={`font-semibold ${isSelected ? 'text-brand-600' : 'text-navy-500'}`}>
-                          {plan.label}
-                        </p>
-                        {plansLoading ? (
-                          <div className="h-4 w-12 mx-auto mt-1 bg-gray-200 rounded animate-pulse" />
-                        ) : price !== null ? (
-                          <p className="text-sm text-navy-400 mt-1">
-                            {currencySymbol}{formatPrice(price, currency)}
+                    // If destination is selected, show its default durations
+                    // Otherwise, show the default 5/7/15 options
+                    const durationsToShow = availableDurations.length > 0
+                      ? (defaultDurations.length > 0
+                          ? availableDurations.filter(d => defaultDurations.includes(d.duration))
+                          : availableDurations.slice(0, 3))
+                      : [];
+
+                    // If no destination selected, show placeholder options
+                    if (durationsToShow.length === 0) {
+                      return defaultPlanOptions.map((plan) => {
+                        const Icon = plan.icon;
+                        const isSelected = selectedDuration === plan.days;
+                        return (
+                          <button
+                            key={plan.id}
+                            type="button"
+                            onClick={() => setSelectedDuration(plan.days)}
+                            className={`relative p-4 rounded-xl border-2 transition-all text-center ${
+                              isSelected
+                                ? 'border-brand-500 bg-brand-50'
+                                : 'border-cream-200 bg-cream-50 hover:border-brand-300'
+                            }`}
+                          >
+                            {plan.popular && (
+                              <div className="absolute -top-2 left-1/2 -translate-x-1/2">
+                                <span className="px-2 py-0.5 bg-brand-500 text-white text-xs font-medium rounded-full">
+                                  Popular
+                                </span>
+                              </div>
+                            )}
+                            <Icon className={`w-5 h-5 mx-auto mb-2 ${isSelected ? 'text-brand-600' : 'text-navy-400'}`} />
+                            <p className={`font-semibold ${isSelected ? 'text-brand-600' : 'text-navy-500'}`}>
+                              {plan.label}
+                            </p>
+                            <p className="text-sm text-gray-400 mt-1">—</p>
+                          </button>
+                        );
+                      });
+                    }
+
+                    return durationsToShow.map((durationOption, index) => {
+                      const isSelected = selectedDuration === durationOption.duration;
+                      const isPopular = durationOption.duration === 7;
+                      // Choose icon based on duration
+                      const Icon = durationOption.duration <= 5 ? Zap : durationOption.duration <= 7 ? Star : TrendingUp;
+
+                      return (
+                        <button
+                          key={durationOption.duration}
+                          type="button"
+                          onClick={() => setSelectedDuration(durationOption.duration)}
+                          className={`relative p-4 rounded-xl border-2 transition-all text-center ${
+                            isSelected
+                              ? 'border-brand-500 bg-brand-50'
+                              : 'border-cream-200 bg-cream-50 hover:border-brand-300'
+                          }`}
+                        >
+                          {isPopular && (
+                            <div className="absolute -top-2 left-1/2 -translate-x-1/2">
+                              <span className="px-2 py-0.5 bg-brand-500 text-white text-xs font-medium rounded-full">
+                                Popular
+                              </span>
+                            </div>
+                          )}
+                          <Icon className={`w-5 h-5 mx-auto mb-2 ${isSelected ? 'text-brand-600' : 'text-navy-400'}`} />
+                          <p className={`font-semibold ${isSelected ? 'text-brand-600' : 'text-navy-500'}`}>
+                            {durationOption.duration} Days
                           </p>
-                        ) : (
-                          <p className="text-sm text-gray-400 mt-1">—</p>
-                        )}
-                      </button>
-                    );
-                  })}
+                          {plansLoading ? (
+                            <div className="h-4 w-12 mx-auto mt-1 bg-gray-200 rounded animate-pulse" />
+                          ) : (
+                            <p className="text-sm text-navy-400 mt-1">
+                              {currencySymbol}{formatPrice(durationOption.retail_price, currency)}
+                            </p>
+                          )}
+                        </button>
+                      );
+                    });
+                  })()}
                 </div>
               </div>
 
               {/* Plan Summary */}
               {selectedDestination && currentPlan && (() => {
-                const totalPrice = currentPlan[`price_${selectedDuration}day` as keyof Plan] as number | null;
-                const dailyRate = totalPrice ? totalPrice / selectedDuration : null;
+                const selectedDurationOption = currentPlan.durations?.find(d => d.duration === selectedDuration);
+                const totalPrice = selectedDurationOption?.retail_price || null;
+                const dailyRate = selectedDurationOption?.daily_rate || null;
                 return (
                   <div className="bg-cream-50 rounded-xl p-4 mb-6 border border-cream-200">
                     <div className="flex items-center justify-between mb-3">

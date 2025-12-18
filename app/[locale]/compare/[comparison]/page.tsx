@@ -15,6 +15,7 @@ import {
   Clock,
   Phone,
 } from 'lucide-react';
+import { DurationOption } from '@/types';
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://trvel.co';
 
@@ -144,13 +145,23 @@ export default async function ComparisonPage({ params }: ComparisonPageProps) {
   const tripDays = 7;
   const carrierDailyCost = competitorData?.daily_rate ? Number(competitorData.daily_rate) : 20;
   const carrierTotalCost = carrierDailyCost * tripDays;
-  const esimCost = planData?.price_7day ? Number(planData.price_7day) : 0;
+
+  // Get the 7-day plan price from durations array, or fallback to closest option
+  const durations = (planData?.durations || []) as unknown as DurationOption[];
+  const sevenDayPlan = durations.find(d => d.duration === 7);
+  const closestPlan = !sevenDayPlan && durations.length > 0
+    ? durations.reduce((prev, curr) => Math.abs(curr.duration - tripDays) < Math.abs(prev.duration - tripDays) ? curr : prev)
+    : null;
+  const comparisonPlan = sevenDayPlan || closestPlan;
+  const esimCost = comparisonPlan?.retail_price || 0;
+  const esimDailyRate = comparisonPlan?.daily_rate || (esimCost / tripDays);
+
   const savings = carrierTotalCost - esimCost;
   const savingsPercent = carrierTotalCost > 0 ? Math.round((savings / carrierTotalCost) * 100) : 0;
 
   // Feature comparison data
   const features = [
-    { feature: 'Daily cost', carrier: `${currencySymbol}${formatPrice(carrierDailyCost, currency)}`, esim: `${currencySymbol}${formatPrice(esimCost / tripDays, currency)}`, esimWins: true },
+    { feature: 'Daily cost', carrier: `${currencySymbol}${formatPrice(carrierDailyCost, currency)}`, esim: `${currencySymbol}${formatPrice(esimDailyRate, currency)}`, esimWins: true },
     { feature: `${tripDays}-day total`, carrier: `${currencySymbol}${formatPrice(carrierTotalCost, currency)}`, esim: `${currencySymbol}${formatPrice(esimCost, currency)}`, esimWins: true },
     { feature: 'Data limit', carrier: 'Usually capped', esim: 'Unlimited', esimWins: true },
     { feature: 'Setup time', carrier: 'Auto on arrival', esim: '2 minutes', esimWins: true },
@@ -268,7 +279,7 @@ export default async function ComparisonPage({ params }: ComparisonPageProps) {
                   <div className="space-y-4">
                     <div className="flex justify-between">
                       <span className="text-navy-400">Daily rate</span>
-                      <span className="font-semibold text-navy-500">{currencySymbol}{formatPrice(esimCost / tripDays, currency)}/day</span>
+                      <span className="font-semibold text-navy-500">{currencySymbol}{formatPrice(esimDailyRate, currency)}/day</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-navy-400">{tripDays} days total</span>

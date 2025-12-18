@@ -85,8 +85,8 @@ export function Destinations() {
               const plan = plansMap[destination.slug];
               const currency = plan?.currency || 'AUD';
               const currencySymbol = getCurrencySymbol(currency);
-              // Calculate daily rate from 15-day price (lowest per-day rate)
-              const dailyRate = plan?.price_15day ? plan.price_15day / 15 : null;
+              // Use best_daily_rate from the plan (calculated across all durations)
+              const dailyRate = plan?.best_daily_rate ?? null;
               const FlagComponent = getFlagComponent(destination.country_iso);
 
               if (isExcluded) {

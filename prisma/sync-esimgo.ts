@@ -7,15 +7,21 @@
  * 3. Updates exchange rates
  * 4. Calculates retail prices using Trvel pricing rules and updates Plan table
  *
+ * NEW: Supports flexible durations (1, 3, 5, 7, 10, 15, 30 days)
+ * - Stores all available durations per destination in JSON format
+ * - Chooses smart defaults (prefer 5, 7, 15 or alternatives)
+ * - Calculates best daily rate across all durations
+ *
  * Pricing Rules:
  * - Target: 10% under competitor trip cost
  * - Minimum margin: 50% over wholesale
- * - Round to .99 or .49 endings
+ * - Default: 60% markup over wholesale
+ * - Round to .99 or .49 endings (.900 for IDR)
  *
  * Usage: npx tsx prisma/sync-esimgo.ts
  */
 
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Prisma } from '@prisma/client';
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
 
@@ -44,7 +50,14 @@ const BUNDLE_GROUP = 'Standard Unlimited Essential';
 
 // Pricing constants
 const MINIMUM_MARGIN_MULTIPLIER = 1.5; // 50% minimum margin over wholesale
+const DEFAULT_MARKUP = 1.60; // 60% markup (the default)
 const COMPETITOR_DISCOUNT = 0.90; // Target 10% under competitor
+
+// All supported durations
+const ALL_DURATIONS = [1, 3, 5, 7, 10, 15, 30];
+
+// Preferred default durations (in order of preference)
+const PREFERRED_DEFAULTS = [5, 7, 15];
 
 // Currency exchange rates from USD (approximate, update regularly)
 const USD_EXCHANGE_RATES: Record<string, number> = {
@@ -77,6 +90,7 @@ const LOCALE_CURRENCIES: Record<string, string> = {
   'en-au': 'AUD',
   'en-sg': 'SGD',
   'en-gb': 'GBP',
+  'en-us': 'USD',
   'ms-my': 'MYR',
   'id-id': 'IDR',
 };
@@ -86,6 +100,7 @@ const COMPETITORS: Record<string, { name: string; dailyRate: number }> = {
   'AUD': { name: 'Telstra', dailyRate: 10 },
   'SGD': { name: 'Singtel', dailyRate: 15 },
   'GBP': { name: 'EE', dailyRate: 3.54 },
+  'USD': { name: 'T-Mobile', dailyRate: 15 },
   'MYR': { name: 'Maxis', dailyRate: 35 },
   'IDR': { name: 'Telkomsel', dailyRate: 100000 },
 };
@@ -103,7 +118,7 @@ interface EsimGoBundle {
   speed: string[];
   autostart: boolean;
   unlimited: boolean;
-  price: number; // in cents
+  price: number; // in dollars
   allowances: Array<{
     type: string;
     service: string;
@@ -112,6 +127,15 @@ interface EsimGoBundle {
     unit: string;
     unlimited: boolean;
   }>;
+}
+
+// Duration option stored in Plan.durations JSON array
+interface DurationOption {
+  duration: number;        // Days (1, 3, 5, 7, 10, 15, 30)
+  wholesale_cents: number; // Wholesale price in USD cents
+  retail_price: number;    // Retail price in local currency
+  bundle_name: string;     // eSIM-Go bundle identifier for fulfillment
+  daily_rate: number;      // Calculated: retail_price / duration
 }
 
 async function fetchCatalog(): Promise<EsimGoBundle[]> {
@@ -235,9 +259,9 @@ async function syncBundles(bundles: EsimGoBundle[]): Promise<void> {
       });
 
       // API returns price in dollars as a float, convert to cents for storage
-    const priceInCents = Math.round(bundle.price * 100);
+      const priceInCents = Math.round(bundle.price * 100);
 
-    const bundleData = {
+      const bundleData = {
         description: bundle.description?.slice(0, 2000) || null, // Truncate if too long
         group: BUNDLE_GROUP,
         country_iso: primaryCountry.iso,
@@ -276,31 +300,54 @@ async function syncBundles(bundles: EsimGoBundle[]): Promise<void> {
   console.log(`  Created: ${created}, Updated: ${updated}, Skipped: ${skipped}, Errors: ${errors}`);
 }
 
-interface BundleSet {
-  bundle5day: EsimGoBundle | null;
-  bundle7day: EsimGoBundle | null;
-  bundle15day: EsimGoBundle | null;
-}
-
-function findBundlesForCountry(bundles: EsimGoBundle[], countryIso: string): BundleSet {
-  // Find unlimited bundles for this country at specific durations
+/**
+ * Find ALL available unlimited bundles for a country
+ * Returns a Map of duration -> bundle (cheapest unlimited at each duration)
+ */
+function findAllBundlesForCountry(bundles: EsimGoBundle[], countryIso: string): Map<number, EsimGoBundle> {
   const countryBundles = bundles.filter(b =>
     b.countries.some(c => c.iso === countryIso) &&
     (b.unlimited || b.allowances?.some(a => a.unlimited))
   );
 
-  const findBestBundle = (duration: number): EsimGoBundle | null => {
-    const matches = countryBundles.filter(b => b.duration === duration);
-    if (matches.length === 0) return null;
-    // Return the cheapest unlimited bundle at this duration
-    return matches.sort((a, b) => a.price - b.price)[0];
-  };
+  const bundleMap = new Map<number, EsimGoBundle>();
 
-  return {
-    bundle5day: findBestBundle(5),
-    bundle7day: findBestBundle(7),
-    bundle15day: findBestBundle(15),
-  };
+  for (const duration of ALL_DURATIONS) {
+    const matches = countryBundles.filter(b => b.duration === duration);
+    if (matches.length > 0) {
+      // Pick the cheapest unlimited bundle at this duration
+      const cheapest = matches.sort((a, b) => a.price - b.price)[0];
+      bundleMap.set(duration, cheapest);
+    }
+  }
+
+  return bundleMap;
+}
+
+/**
+ * Choose default durations to display
+ * Prefer [5, 7, 15], but fall back to alternatives if not all available
+ */
+function chooseDefaultDurations(availableDurations: number[]): number[] {
+  // If we have all preferred durations, use them
+  const hasAllPreferred = PREFERRED_DEFAULTS.every(d => availableDurations.includes(d));
+  if (hasAllPreferred) {
+    return PREFERRED_DEFAULTS;
+  }
+
+  // Otherwise, pick up to 3 durations, favoring mid-range options
+  // Priority: 7, 5, 15, 10, 3, 30, 1
+  const priorityOrder = [7, 5, 15, 10, 3, 30, 1];
+  const defaults: number[] = [];
+
+  for (const duration of priorityOrder) {
+    if (availableDurations.includes(duration) && defaults.length < 3) {
+      defaults.push(duration);
+    }
+  }
+
+  // Sort by duration (ascending) for display
+  return defaults.sort((a, b) => a - b);
 }
 
 /**
@@ -348,7 +395,7 @@ function calculateRetailPrice(
   const wholesaleLocal = wholesaleUsd * exchangeRate;
 
   // Step 1: Base price (60% markup - the default)
-  const basePrice = wholesaleLocal * 1.60;
+  const basePrice = wholesaleLocal * DEFAULT_MARKUP;
 
   // Competitor trip cost in local currency
   const competitorTripCost = competitorDailyRate * planDuration;
@@ -375,9 +422,9 @@ function calculateRetailPrice(
 }
 
 async function syncPlans(bundles: EsimGoBundle[]): Promise<void> {
-  console.log('\nSyncing plans with retail prices...');
-  console.log('Pricing: 10% under competitor, min 50% margin, .99/.49 rounding');
-  console.log('Using native 5/7/15-day unlimited bundles\n');
+  console.log('\nSyncing plans with flexible durations...');
+  console.log('Pricing: 60% markup default, 10% under competitor cap, 50% min margin');
+  console.log('Supporting durations: 1, 3, 5, 7, 10, 15, 30 days\n');
 
   const locales = Object.keys(LOCALE_CURRENCIES);
   const destinations = Object.keys(DESTINATION_TO_ISO);
@@ -388,47 +435,60 @@ async function syncPlans(bundles: EsimGoBundle[]): Promise<void> {
 
   for (const destination of destinations) {
     const countryIso = DESTINATION_TO_ISO[destination];
-    const bundleSet = findBundlesForCountry(bundles, countryIso);
+    const bundleMap = findAllBundlesForCountry(bundles, countryIso);
 
     // Need at least one bundle to proceed
-    if (!bundleSet.bundle5day && !bundleSet.bundle7day && !bundleSet.bundle15day) {
+    if (bundleMap.size === 0) {
       console.log(`  ⚠️  ${destination} (${countryIso}): No bundles found - SKIPPING`);
       destinationsSkipped++;
       continue;
     }
 
-    // API prices are in dollars, convert to cents for storage
-    const price5dayCents = bundleSet.bundle5day ? Math.round(bundleSet.bundle5day.price * 100) : null;
-    const price7dayCents = bundleSet.bundle7day ? Math.round(bundleSet.bundle7day.price * 100) : null;
-    const price15dayCents = bundleSet.bundle15day ? Math.round(bundleSet.bundle15day.price * 100) : null;
+    const availableDurations = Array.from(bundleMap.keys()).sort((a, b) => a - b);
+    const defaultDurations = chooseDefaultDurations(availableDurations);
 
     console.log(`  ✓ ${destination} (${countryIso}):`);
-    if (bundleSet.bundle5day) {
-      console.log(`      5-day: ${bundleSet.bundle5day.name} @ $${bundleSet.bundle5day.price.toFixed(2)} USD`);
-    }
-    if (bundleSet.bundle7day) {
-      console.log(`      7-day: ${bundleSet.bundle7day.name} @ $${bundleSet.bundle7day.price.toFixed(2)} USD`);
-    }
-    if (bundleSet.bundle15day) {
-      console.log(`      15-day: ${bundleSet.bundle15day.name} @ $${bundleSet.bundle15day.price.toFixed(2)} USD`);
-    }
+    console.log(`      Available: [${availableDurations.join(', ')}] days`);
+    console.log(`      Defaults:  [${defaultDurations.join(', ')}] days`);
 
     for (const locale of locales) {
       const currency = LOCALE_CURRENCIES[locale];
       const competitor = COMPETITORS[currency];
       const competitorDailyRate = competitor?.dailyRate || 10;
 
+      // Build durations array with all pricing info
+      const durations: DurationOption[] = [];
+      let bestDailyRate = Infinity;
+
+      for (const [duration, bundle] of bundleMap) {
+        const wholesaleCents = Math.round(bundle.price * 100);
+        const retailPrice = calculateRetailPrice(wholesaleCents, currency, competitorDailyRate, duration);
+        const dailyRate = retailPrice / duration;
+
+        durations.push({
+          duration,
+          wholesale_cents: wholesaleCents,
+          retail_price: retailPrice,
+          bundle_name: bundle.name,
+          daily_rate: Math.round(dailyRate * 100) / 100, // Round to 2 decimal places
+        });
+
+        if (dailyRate < bestDailyRate) {
+          bestDailyRate = dailyRate;
+        }
+      }
+
+      // Sort durations by duration ascending
+      durations.sort((a, b) => a.duration - b.duration);
+
+      // Round best daily rate
+      const finalBestDailyRate = Math.round(bestDailyRate * 100) / 100;
+
       const planData = {
         currency,
-        wholesale_5day_cents: price5dayCents,
-        wholesale_7day_cents: price7dayCents,
-        wholesale_15day_cents: price15dayCents,
-        price_5day: price5dayCents ? calculateRetailPrice(price5dayCents, currency, competitorDailyRate, 5) : null,
-        price_7day: price7dayCents ? calculateRetailPrice(price7dayCents, currency, competitorDailyRate, 7) : null,
-        price_15day: price15dayCents ? calculateRetailPrice(price15dayCents, currency, competitorDailyRate, 15) : null,
-        bundle_5day: bundleSet.bundle5day?.name || null,
-        bundle_7day: bundleSet.bundle7day?.name || null,
-        bundle_15day: bundleSet.bundle15day?.name || null,
+        durations: durations as unknown as Prisma.InputJsonValue,
+        default_durations: defaultDurations,
+        best_daily_rate: finalBestDailyRate,
       };
 
       const existing = await prisma.plan.findUnique({
@@ -459,13 +519,18 @@ async function syncPlans(bundles: EsimGoBundle[]): Promise<void> {
     }
 
     // Show example retail prices for AUD
-    if (price5dayCents && price7dayCents && price15dayCents) {
-      const audCompetitor = COMPETITORS['AUD'];
-      const audRate = audCompetitor?.dailyRate || 10;
-      const audPrice5 = calculateRetailPrice(price5dayCents, 'AUD', audRate, 5);
-      const audPrice7 = calculateRetailPrice(price7dayCents, 'AUD', audRate, 7);
-      const audPrice15 = calculateRetailPrice(price15dayCents, 'AUD', audRate, 15);
-      console.log(`      Retail (AUD): 5d=$${audPrice5}, 7d=$${audPrice7}, 15d=$${audPrice15}`);
+    const audCompetitor = COMPETITORS['AUD'];
+    const audRate = audCompetitor?.dailyRate || 10;
+    const sampleDurations = defaultDurations.slice(0, 3);
+    const audPrices = sampleDurations.map(d => {
+      const bundle = bundleMap.get(d);
+      if (!bundle) return null;
+      const wholesaleCents = Math.round(bundle.price * 100);
+      const price = calculateRetailPrice(wholesaleCents, 'AUD', audRate, d);
+      return `${d}d=$${price}`;
+    }).filter(Boolean);
+    if (audPrices.length > 0) {
+      console.log(`      Retail (AUD): ${audPrices.join(', ')}`);
     }
   }
 
@@ -476,10 +541,10 @@ async function syncPlans(bundles: EsimGoBundle[]): Promise<void> {
 
 async function main() {
   console.log('='.repeat(60));
-  console.log('eSIM-Go Catalog Sync');
+  console.log('eSIM-Go Catalog Sync (Flexible Durations)');
   console.log('='.repeat(60));
   console.log(`API Token: ${ESIMGO_API_TOKEN ? '✓ Set' : '✗ Missing'}`);
-  console.log('Pricing: 10% under competitor, min 50% margin');
+  console.log('Pricing: 60% markup, 10% under competitor, 50% min margin');
   console.log('='.repeat(60));
 
   try {
@@ -500,7 +565,7 @@ async function main() {
     // Step 4: Sync bundles to database
     await syncBundles(bundles);
 
-    // Step 5: Update plans with retail prices
+    // Step 5: Update plans with retail prices (flexible durations)
     await syncPlans(bundles);
 
     console.log('\n' + '='.repeat(60));

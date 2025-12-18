@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Prisma } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -36,6 +36,15 @@ const COMPETITORS: Record<string, { name: string; dailyRate: number }> = {
 const MINIMUM_MARGIN_MULTIPLIER = 1.5; // 50% minimum margin
 const COMPETITOR_DISCOUNT = 0.90; // 10% under competitor
 
+// DurationOption interface matching the new schema
+interface DurationOption {
+  duration: number;
+  wholesale_cents: number;
+  retail_price: number;
+  bundle_name: string;
+  daily_rate: number;
+}
+
 // Destinations with wholesale costs in USD (approximate fallback values)
 // These are used when eSIM-Go sync hasn't run. Real prices come from sync-esimgo.ts
 const destinationsData = [
@@ -43,100 +52,80 @@ const destinationsData = [
     slug: 'japan',
     name: 'Japan',
     tagline: 'Stay connected from Tokyo to Osaka with unlimited data on NTT Docomo',
-    // Wholesale USD costs (approximate)
-    wholesale5day: 12.00,
-    wholesale7day: 16.80,
-    wholesale15day: 36.00,
+    // Wholesale USD costs per day (approximate)
+    wholesaleDailyRate: 2.40,
   },
   {
     slug: 'thailand',
     name: 'Thailand',
     tagline: 'Explore Bangkok to Phuket with reliable 4G/5G coverage on AIS',
-    wholesale5day: 10.00,
-    wholesale7day: 14.00,
-    wholesale15day: 30.00,
+    wholesaleDailyRate: 2.00,
   },
   {
     slug: 'south-korea',
     name: 'South Korea',
     tagline: 'Navigate Seoul and beyond with blazing-fast 5G on SK Telecom',
-    wholesale5day: 12.00,
-    wholesale7day: 16.80,
-    wholesale15day: 36.00,
+    wholesaleDailyRate: 2.40,
   },
   {
     slug: 'singapore',
     name: 'Singapore',
     tagline: 'Experience the Lion City with premium Singtel connectivity',
-    wholesale5day: 8.00,
-    wholesale7day: 11.20,
-    wholesale15day: 24.00,
+    wholesaleDailyRate: 1.60,
   },
   {
     slug: 'indonesia',
     name: 'Indonesia',
     tagline: 'From Bali to Jakarta with wide coverage on Telkomsel',
-    wholesale5day: 8.00,
-    wholesale7day: 11.20,
-    wholesale15day: 24.00,
+    wholesaleDailyRate: 1.60,
   },
   {
     slug: 'malaysia',
     name: 'Malaysia',
     tagline: 'Discover KL to Langkawi with reliable Maxis network',
-    wholesale5day: 8.00,
-    wholesale7day: 11.20,
-    wholesale15day: 24.00,
+    wholesaleDailyRate: 1.60,
   },
   {
     slug: 'vietnam',
     name: 'Vietnam',
     tagline: 'Travel from Hanoi to Ho Chi Minh with Viettel coverage',
-    wholesale5day: 8.00,
-    wholesale7day: 11.20,
-    wholesale15day: 24.00,
+    wholesaleDailyRate: 1.60,
   },
   {
     slug: 'philippines',
     name: 'Philippines',
     tagline: 'Island hop connected with Globe Telecom across 7,000+ islands',
-    wholesale5day: 8.00,
-    wholesale7day: 11.20,
-    wholesale15day: 24.00,
+    wholesaleDailyRate: 1.60,
   },
   {
     slug: 'united-kingdom',
     name: 'United Kingdom',
     tagline: 'Explore London to Edinburgh with premium EE network',
-    wholesale5day: 14.00,
-    wholesale7day: 19.60,
-    wholesale15day: 42.00,
+    wholesaleDailyRate: 2.80,
   },
   {
     slug: 'france',
     name: 'France',
     tagline: 'From Paris to Nice with reliable Orange France coverage',
-    wholesale5day: 14.00,
-    wholesale7day: 19.60,
-    wholesale15day: 42.00,
+    wholesaleDailyRate: 2.80,
   },
   {
     slug: 'italy',
     name: 'Italy',
     tagline: 'Rome, Venice, and beyond with TIM Italia network',
-    wholesale5day: 14.00,
-    wholesale7day: 19.60,
-    wholesale15day: 42.00,
+    wholesaleDailyRate: 2.80,
   },
   {
     slug: 'united-states',
     name: 'United States',
     tagline: 'Coast to coast coverage on T-Mobile USA',
-    wholesale5day: 16.00,
-    wholesale7day: 22.40,
-    wholesale15day: 48.00,
+    wholesaleDailyRate: 3.20,
   },
 ];
+
+// Available durations
+const AVAILABLE_DURATIONS = [5, 7, 15];
+const DEFAULT_DURATIONS = [5, 7, 15];
 
 const locales = ['en-au', 'en-sg', 'en-gb', 'en-us', 'ms-my', 'id-id'];
 
@@ -244,7 +233,8 @@ function calculateRetailPrice(
 
 async function main() {
   console.log('Seeding destinations and plans...\n');
-  console.log('Pricing: 10% under competitor, min 50% margin, .99/.49 rounding\n');
+  console.log('Pricing: 60% markup, .99/.49 rounding\n');
+  console.log('NOTE: This seed creates basic fallback data. Run sync-esimgo.ts for real pricing.\n');
 
   // Clear existing data
   console.log('Clearing existing destinations and plans...');
@@ -275,24 +265,34 @@ async function main() {
       });
       destinationCount++;
 
-      // Calculate retail prices using Trvel pricing formula
-      const price5day = calculateRetailPrice(dest.wholesale5day, currency, 5);
-      const price7day = calculateRetailPrice(dest.wholesale7day, currency, 7);
-      const price15day = calculateRetailPrice(dest.wholesale15day, currency, 15);
+      // Build durations array using new schema
+      const durations: DurationOption[] = AVAILABLE_DURATIONS.map(days => {
+        const wholesaleUsd = dest.wholesaleDailyRate * days;
+        const retailPrice = calculateRetailPrice(wholesaleUsd, currency, days);
+        const dailyRate = retailPrice / days;
 
-      // Create plan with calculated prices
-      console.log(`    Creating plan: ${currency} - 5d=${price5day}, 7d=${price7day}, 15d=${price15day}`);
+        return {
+          duration: days,
+          wholesale_cents: Math.round(wholesaleUsd * 100),
+          retail_price: retailPrice,
+          bundle_name: `seed-${dest.slug}-${days}day`,
+          daily_rate: dailyRate,
+        };
+      });
+
+      // Find best daily rate (lowest rate per day across all durations)
+      const bestDailyRate = Math.min(...durations.map(d => d.daily_rate));
+
+      // Create plan with new schema
+      console.log(`    Creating plan: ${currency} - ${durations.length} durations`);
       await prisma.plan.create({
         data: {
           destination_slug: dest.slug,
           locale,
           currency,
-          wholesale_5day_cents: Math.round(dest.wholesale5day * 100),
-          wholesale_7day_cents: Math.round(dest.wholesale7day * 100),
-          wholesale_15day_cents: Math.round(dest.wholesale15day * 100),
-          price_5day: price5day,
-          price_7day: price7day,
-          price_15day: price15day,
+          durations: durations as unknown as Prisma.InputJsonValue,
+          default_durations: DEFAULT_DURATIONS,
+          best_daily_rate: bestDailyRate,
         },
       });
       planCount++;

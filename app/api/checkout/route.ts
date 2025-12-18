@@ -2,13 +2,19 @@ import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { stripe, isTestMode } from '@/lib/stripe';
 import { prisma } from '@/lib/db';
+import { DurationOption } from '@/types';
 
-// Plan names for display
-const PLAN_NAMES: Record<number, string> = {
-  5: 'Quick Trip',
-  7: 'Week Explorer',
-  15: 'Extended Stay',
-};
+// Plan names for display based on duration
+function getPlanName(days: number): string {
+  if (days === 1) return '1-Day Quick Trip';
+  if (days === 3) return '3-Day Getaway';
+  if (days === 5) return 'Quick Trip';
+  if (days === 7) return 'Week Explorer';
+  if (days === 10) return '10-Day Adventure';
+  if (days === 15) return 'Extended Stay';
+  if (days === 30) return 'Monthly Traveler';
+  return `${days}-Day Plan`;
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -23,10 +29,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate duration
-    if (![5, 7, 15].includes(duration)) {
+    // Validate duration is a positive integer
+    if (typeof duration !== 'number' || duration <= 0 || !Number.isInteger(duration)) {
       return NextResponse.json(
-        { error: 'Invalid duration. Must be 5, 7, or 15.' },
+        { error: 'Invalid duration. Must be a positive integer.' },
         { status: 400 }
       );
     }
@@ -58,31 +64,32 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get the price based on duration
-    let price: number | null = null;
-    let bundleName: string | null = null;
+    // Get the price and bundle from durations array
+    const durations = plan.durations as unknown as DurationOption[];
+    const selectedDuration = durations.find(d => d.duration === duration);
 
-    switch (duration) {
-      case 5:
-        price = plan.price_5day ? Number(plan.price_5day) : null;
-        bundleName = plan.bundle_5day;
-        break;
-      case 7:
-        price = plan.price_7day ? Number(plan.price_7day) : null;
-        bundleName = plan.bundle_7day;
-        break;
-      case 15:
-        price = plan.price_15day ? Number(plan.price_15day) : null;
-        bundleName = plan.bundle_15day;
-        break;
+    if (!selectedDuration) {
+      console.error('Duration not available for this destination', {
+        destination,
+        duration,
+        locale,
+        availableDurations: durations.map(d => d.duration),
+      });
+      return NextResponse.json(
+        { error: `Duration ${duration} days is not available for this destination` },
+        { status: 400 }
+      );
     }
+
+    const price = selectedDuration.retail_price;
+    const bundleName = selectedDuration.bundle_name;
 
     if (!price || price <= 0) {
       console.error('Price not configured for plan', {
         destination,
         duration,
         locale,
-        plan,
+        selectedDuration,
       });
       return NextResponse.json(
         { error: 'Price not configured for this plan' },
@@ -95,7 +102,7 @@ export async function POST(request: NextRequest) {
 
     // Build product name for Stripe
     const destinationName = destinationData?.name || destination.replace(/-/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase());
-    const planName = PLAN_NAMES[duration] || `${duration}-Day Plan`;
+    const planName = getPlanName(duration);
     const productName = `${destinationName} eSIM - ${planName}`;
     const productDescription = `${duration}-day unlimited data eSIM for ${destinationName}`;
 
