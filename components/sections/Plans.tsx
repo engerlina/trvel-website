@@ -19,15 +19,15 @@ function getPlanIcon(days: number): React.ComponentType<{ className?: string }> 
 }
 
 // Get plan name based on duration
-function getPlanName(days: number): string {
-  if (days === 1) return '1 Day';
-  if (days === 3) return '3 Days';
-  if (days === 5) return '5 Days';
-  if (days === 7) return '1 Week';
-  if (days === 10) return '10 Days';
-  if (days === 15) return '2 Weeks';
-  if (days === 30) return '1 Month';
-  return `${days} Days`;
+function getPlanName(days: number): { name: string; subtext?: string } {
+  if (days === 1) return { name: '1 Day' };
+  if (days === 3) return { name: '3 Days' };
+  if (days === 5) return { name: '5 Days' };
+  if (days === 7) return { name: '1 Week', subtext: '7 days' };
+  if (days === 10) return { name: '10 Days' };
+  if (days === 15) return { name: '2 Weeks', subtext: '15 days' };
+  if (days === 30) return { name: '1 Month', subtext: '30 days' };
+  return { name: `${days} Days` };
 }
 
 const features = [
@@ -262,10 +262,10 @@ export function Plans() {
                       </div>
                       <div>
                         <h3 className="text-heading font-bold text-gray-900">
-                          {getPlanName(duration.duration)}
+                          {getPlanName(duration.duration).name}
                         </h3>
                         <p className="text-body-sm text-gray-500">
-                          {duration.duration} {duration.duration === 1 ? 'day' : t('days')}
+                          {getPlanName(duration.duration).subtext || `${duration.duration} ${duration.duration === 1 ? 'day' : t('days')}`}
                         </p>
                       </div>
                     </div>
@@ -361,10 +361,10 @@ export function Plans() {
                       </div>
                       <div>
                         <h3 className="text-body font-bold text-gray-900">
-                          {getPlanName(duration.duration)}
+                          {getPlanName(duration.duration).name}
                         </h3>
                         <p className="text-body-sm text-gray-500">
-                          {duration.duration} {duration.duration === 1 ? 'day' : 'days'}
+                          {getPlanName(duration.duration).subtext || `${duration.duration} ${duration.duration === 1 ? 'day' : 'days'}`}
                         </p>
                       </div>
                     </div>

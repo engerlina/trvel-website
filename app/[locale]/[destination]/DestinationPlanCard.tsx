@@ -6,6 +6,7 @@ import { Link } from '@/i18n/routing';
 
 interface DestinationPlanCardProps {
   name: string;
+  subtext?: string;
   price: string;
   perDay: string;
   popular: boolean;
@@ -17,6 +18,7 @@ interface DestinationPlanCardProps {
 
 export function DestinationPlanCard({
   name,
+  subtext,
   price,
   perDay,
   popular,
@@ -76,9 +78,15 @@ export function DestinationPlanCard({
       )}
 
       <div className="text-center pt-4">
-        <h3 className={`text-lg font-semibold mb-2 ${popular ? 'text-white' : 'text-navy-500'}`}>
+        <h3 className={`text-lg font-semibold ${popular ? 'text-white' : 'text-navy-500'}`}>
           {name}
         </h3>
+        {subtext && (
+          <p className={`text-sm mb-2 ${popular ? 'text-brand-100' : 'text-navy-400'}`}>
+            {subtext}
+          </p>
+        )}
+        {!subtext && <div className="mb-2" />}
 
         <div className="mb-4">
           <span className={`text-4xl font-bold ${popular ? 'text-white' : 'text-navy-500'}`}>

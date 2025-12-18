@@ -7,6 +7,7 @@ import { Button } from '@/components/ui';
 import {
   Globe,
   ChevronDown,
+  ChevronUp,
   Check,
   Zap,
   Star,
@@ -15,6 +16,7 @@ import {
   ArrowRight,
   Info,
   Search,
+  Clock,
 } from 'lucide-react';
 import * as Flags from 'country-flag-icons/react/3x2';
 import { isDestinationExcluded } from '@/lib/utils';
@@ -72,6 +74,7 @@ export default function GetStartedPage() {
   const [plansMap, setPlansMap] = useState<Record<string, Plan>>({});
   const [plansLoading, setPlansLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [showAllDurations, setShowAllDurations] = useState(false);
 
   // Dynamic destinations from API
   const [destinations, setDestinations] = useState<Destination[]>([]);
@@ -310,93 +313,154 @@ export default function GetStartedPage() {
                 <label className="block text-sm font-semibold text-navy-500 mb-3">
                   2. How long is your trip?
                 </label>
-                <div className="grid grid-cols-3 gap-3">
-                  {(() => {
-                    // Get available durations for selected destination
-                    const availableDurations = currentPlan?.durations || [];
-                    const defaultDurations = currentPlan?.default_durations || [];
+                {(() => {
+                  // Get available durations for selected destination
+                  const availableDurations = currentPlan?.durations || [];
+                  const defaultDurations = currentPlan?.default_durations || [];
 
-                    // If destination is selected, show its default durations
-                    // Otherwise, show the default 5/7/15 options
-                    const durationsToShow = availableDurations.length > 0
-                      ? (defaultDurations.length > 0
-                          ? availableDurations.filter(d => defaultDurations.includes(d.duration))
-                          : availableDurations.slice(0, 3))
-                      : [];
+                  // Sort all durations
+                  const sortedDurations = [...availableDurations].sort((a, b) => a.duration - b.duration);
 
-                    // If no destination selected, show placeholder options
-                    if (durationsToShow.length === 0) {
-                      return defaultPlanOptions.map((plan) => {
-                        const Icon = plan.icon;
-                        const isSelected = selectedDuration === plan.days;
-                        return (
-                          <button
-                            key={plan.id}
-                            type="button"
-                            onClick={() => setSelectedDuration(plan.days)}
-                            className={`relative p-4 rounded-xl border-2 transition-all text-center ${
-                              isSelected
-                                ? 'border-brand-500 bg-brand-50'
-                                : 'border-cream-200 bg-cream-50 hover:border-brand-300'
-                            }`}
-                          >
-                            {plan.popular && (
-                              <div className="absolute -top-2 left-1/2 -translate-x-1/2">
-                                <span className="px-2 py-0.5 bg-brand-500 text-white text-xs font-medium rounded-full">
-                                  Popular
-                                </span>
-                              </div>
-                            )}
-                            <Icon className={`w-5 h-5 mx-auto mb-2 ${isSelected ? 'text-brand-600' : 'text-navy-400'}`} />
-                            <p className={`font-semibold ${isSelected ? 'text-brand-600' : 'text-navy-500'}`}>
-                              {plan.label}
-                            </p>
-                            <p className="text-sm text-gray-400 mt-1">—</p>
-                          </button>
-                        );
-                      });
-                    }
+                  // Separate default and additional durations
+                  const defaultDurationsToShow = defaultDurations.length > 0
+                    ? sortedDurations.filter(d => defaultDurations.includes(d.duration))
+                    : sortedDurations.slice(0, 3);
 
-                    return durationsToShow.map((durationOption, index) => {
-                      const isSelected = selectedDuration === durationOption.duration;
-                      const isPopular = durationOption.duration === 7;
-                      // Choose icon based on duration
-                      const Icon = durationOption.duration <= 5 ? Zap : durationOption.duration <= 7 ? Star : TrendingUp;
+                  const additionalDurations = defaultDurations.length > 0
+                    ? sortedDurations.filter(d => !defaultDurations.includes(d.duration))
+                    : sortedDurations.slice(3);
 
-                      return (
+                  // If no destination selected, show placeholder options
+                  if (defaultDurationsToShow.length === 0) {
+                    return (
+                      <div className="grid grid-cols-3 gap-3">
+                        {defaultPlanOptions.map((plan) => {
+                          const Icon = plan.icon;
+                          const isSelected = selectedDuration === plan.days;
+                          return (
+                            <button
+                              key={plan.id}
+                              type="button"
+                              onClick={() => setSelectedDuration(plan.days)}
+                              className={`relative p-4 rounded-xl border-2 transition-all text-center ${
+                                isSelected
+                                  ? 'border-brand-500 bg-brand-50'
+                                  : 'border-cream-200 bg-cream-50 hover:border-brand-300'
+                              }`}
+                            >
+                              {plan.popular && (
+                                <div className="absolute -top-2 left-1/2 -translate-x-1/2">
+                                  <span className="px-2 py-0.5 bg-brand-500 text-white text-xs font-medium rounded-full">
+                                    Popular
+                                  </span>
+                                </div>
+                              )}
+                              <Icon className={`w-5 h-5 mx-auto mb-2 ${isSelected ? 'text-brand-600' : 'text-navy-400'}`} />
+                              <p className={`font-semibold ${isSelected ? 'text-brand-600' : 'text-navy-500'}`}>
+                                {plan.label}
+                              </p>
+                              <p className="text-sm text-gray-400 mt-1">—</p>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    );
+                  }
+
+                  return (
+                    <>
+                      {/* Default durations */}
+                      <div className="grid grid-cols-3 gap-3">
+                        {defaultDurationsToShow.map((durationOption) => {
+                          const isSelected = selectedDuration === durationOption.duration;
+                          const isPopular = durationOption.duration === 7;
+                          const Icon = durationOption.duration <= 5 ? Zap : durationOption.duration <= 7 ? Star : TrendingUp;
+
+                          return (
+                            <button
+                              key={durationOption.duration}
+                              type="button"
+                              onClick={() => setSelectedDuration(durationOption.duration)}
+                              className={`relative p-4 rounded-xl border-2 transition-all text-center ${
+                                isSelected
+                                  ? 'border-brand-500 bg-brand-50'
+                                  : 'border-cream-200 bg-cream-50 hover:border-brand-300'
+                              }`}
+                            >
+                              {isPopular && (
+                                <div className="absolute -top-2 left-1/2 -translate-x-1/2">
+                                  <span className="px-2 py-0.5 bg-brand-500 text-white text-xs font-medium rounded-full">
+                                    Popular
+                                  </span>
+                                </div>
+                              )}
+                              <Icon className={`w-5 h-5 mx-auto mb-2 ${isSelected ? 'text-brand-600' : 'text-navy-400'}`} />
+                              <p className={`font-semibold ${isSelected ? 'text-brand-600' : 'text-navy-500'}`}>
+                                {durationOption.duration} Days
+                              </p>
+                              {plansLoading ? (
+                                <div className="h-4 w-12 mx-auto mt-1 bg-gray-200 rounded animate-pulse" />
+                              ) : (
+                                <p className="text-sm text-navy-400 mt-1">
+                                  {currencySymbol}{formatPrice(durationOption.retail_price, currency)}
+                                </p>
+                              )}
+                            </button>
+                          );
+                        })}
+                      </div>
+
+                      {/* Show More Button */}
+                      {additionalDurations.length > 0 && (
                         <button
-                          key={durationOption.duration}
                           type="button"
-                          onClick={() => setSelectedDuration(durationOption.duration)}
-                          className={`relative p-4 rounded-xl border-2 transition-all text-center ${
-                            isSelected
-                              ? 'border-brand-500 bg-brand-50'
-                              : 'border-cream-200 bg-cream-50 hover:border-brand-300'
-                          }`}
+                          onClick={() => setShowAllDurations(!showAllDurations)}
+                          className="w-full mt-3 flex items-center justify-center gap-2 py-2.5 px-4 text-sm font-medium text-brand-600 hover:text-brand-700 transition-colors border border-dashed border-brand-300 hover:border-brand-400 rounded-xl bg-brand-50/50 hover:bg-brand-50"
                         >
-                          {isPopular && (
-                            <div className="absolute -top-2 left-1/2 -translate-x-1/2">
-                              <span className="px-2 py-0.5 bg-brand-500 text-white text-xs font-medium rounded-full">
-                                Popular
-                              </span>
-                            </div>
-                          )}
-                          <Icon className={`w-5 h-5 mx-auto mb-2 ${isSelected ? 'text-brand-600' : 'text-navy-400'}`} />
-                          <p className={`font-semibold ${isSelected ? 'text-brand-600' : 'text-navy-500'}`}>
-                            {durationOption.duration} Days
-                          </p>
-                          {plansLoading ? (
-                            <div className="h-4 w-12 mx-auto mt-1 bg-gray-200 rounded animate-pulse" />
-                          ) : (
-                            <p className="text-sm text-navy-400 mt-1">
-                              {currencySymbol}{formatPrice(durationOption.retail_price, currency)}
-                            </p>
-                          )}
+                          <Clock className="w-4 h-4" />
+                          {showAllDurations ? 'Show fewer options' : `${additionalDurations.length} more option${additionalDurations.length > 1 ? 's' : ''}`}
+                          {showAllDurations ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                         </button>
-                      );
-                    });
-                  })()}
-                </div>
+                      )}
+
+                      {/* Additional durations (expandable) */}
+                      {showAllDurations && additionalDurations.length > 0 && (
+                        <div className={`grid gap-2 mt-3 ${
+                          additionalDurations.length <= 2 ? 'grid-cols-2' :
+                          additionalDurations.length <= 4 ? 'grid-cols-2 md:grid-cols-4' :
+                          'grid-cols-3 md:grid-cols-5'
+                        }`}>
+                          {additionalDurations.map((durationOption) => {
+                            const isSelected = selectedDuration === durationOption.duration;
+                            return (
+                              <button
+                                key={durationOption.duration}
+                                type="button"
+                                onClick={() => setSelectedDuration(durationOption.duration)}
+                                className={`p-3 rounded-xl border-2 transition-all text-center ${
+                                  isSelected
+                                    ? 'border-brand-500 bg-brand-50'
+                                    : 'border-cream-200 bg-cream-50 hover:border-brand-300'
+                                }`}
+                              >
+                                <p className={`font-semibold text-sm ${isSelected ? 'text-brand-600' : 'text-navy-500'}`}>
+                                  {durationOption.duration} Days
+                                </p>
+                                {plansLoading ? (
+                                  <div className="h-3 w-10 mx-auto mt-1 bg-gray-200 rounded animate-pulse" />
+                                ) : (
+                                  <p className="text-xs text-navy-400 mt-0.5">
+                                    {currencySymbol}{formatPrice(durationOption.retail_price, currency)}
+                                  </p>
+                                )}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </>
+                  );
+                })()}
               </div>
 
               {/* Plan Summary */}

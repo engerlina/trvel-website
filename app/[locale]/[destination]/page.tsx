@@ -18,7 +18,7 @@ import {
   Star,
   MapPin,
 } from 'lucide-react';
-import { DestinationPlanCard } from './DestinationPlanCard';
+import { DestinationPlansSection } from './DestinationPlansSection';
 import {
   JP, TH, KR, SG, ID, MY, VN, PH, GB, FR, IT, US,
   type FlagComponent,
@@ -158,26 +158,6 @@ export default async function DestinationPage({ params }: DestinationPageProps) 
   const durations = (planData?.durations || []) as unknown as DurationOption[];
   const defaultDurations = planData?.default_durations || [];
 
-  // Build plans from durations, using default_durations to determine which to show
-  const plansToShow = defaultDurations.length > 0
-    ? durations.filter(d => defaultDurations.includes(d.duration))
-    : durations.slice(0, 3); // Fallback to first 3 if no defaults
-
-  const plans = plansToShow.map((d, index) => ({
-    name: d.duration === 1 ? '1 Day' :
-          d.duration === 3 ? '3 Days' :
-          d.duration === 5 ? '5 Days' :
-          d.duration === 7 ? '1 Week' :
-          d.duration === 10 ? '10 Days' :
-          d.duration === 15 ? '2 Weeks' :
-          d.duration === 30 ? '1 Month' :
-          `${d.duration} Days`,
-    duration: d.duration,
-    price: formatPrice(d.retail_price, currency),
-    perDay: formatPrice(d.daily_rate, currency),
-    popular: index === 1 && plansToShow.length >= 3, // Middle option is popular
-  }));
-
   const currencySymbol = currency === 'IDR' ? 'Rp' : currency === 'GBP' ? '£' : '$';
 
   return (
@@ -268,65 +248,19 @@ export default async function DestinationPage({ params }: DestinationPageProps) 
               </p>
             </div>
 
-            {/* Plan cards */}
-            {plans.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-                {plans.map((plan) => (
-                  <DestinationPlanCard
-                    key={plan.name}
-                    name={plan.name}
-                    price={plan.price}
-                    perDay={plan.perDay}
-                    popular={plan.popular}
-                    currencySymbol={currencySymbol}
-                    destination={destination}
-                    duration={plan.duration}
-                    locale={locale}
-                  />
-                ))}
-              </div>
-            ) : (
-              <div className="max-w-xl mx-auto text-center">
-                <div className="bg-cream-100 rounded-2xl p-8 border border-cream-200">
-                  <div className="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center mx-auto mb-4">
-                    <Clock className="w-8 h-8 text-amber-500" />
-                  </div>
-                  <h3 className="text-heading font-bold text-navy-500 mb-2">
-                    Plans Coming Soon
-                  </h3>
-                  <p className="text-body text-navy-400 mb-6">
-                    We're working on bringing eSIM coverage to {destinationData.name}.
-                    Check back soon or explore our other destinations below.
-                  </p>
-                  <Link
-                    href={`/${locale}#destinations`}
-                    className="inline-flex items-center gap-2 px-6 py-3 bg-brand-500 hover:bg-brand-600 text-white font-medium rounded-xl transition-colors"
-                  >
-                    Browse Destinations
-                    <ArrowRight className="w-4 h-4" />
-                  </Link>
-                </div>
-              </div>
-            )}
-
-            {/* Competitor comparison with link - only show if we have plans */}
-            {competitorData && plans.length > 0 && (
-              <div className="mt-12 text-center">
-                <p className="text-navy-400 mb-3">
-                  Compare to {competitorData.name} roaming at{' '}
-                  <span className="font-semibold text-navy-500">
-                    {currencySymbol}{formatPrice(competitorData.daily_rate, currency)}/day
-                  </span>
-                </p>
-                <Link
-                  href={`/compare/${competitorData.name.toLowerCase()}-vs-esim-${destination}`}
-                  className="inline-flex items-center gap-2 text-brand-600 hover:text-brand-700 font-medium"
-                >
-                  See full comparison
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-              </div>
-            )}
+            <DestinationPlansSection
+              destinationName={destinationData.name}
+              destination={destination}
+              locale={locale}
+              currency={currency}
+              currencySymbol={currencySymbol}
+              durations={durations}
+              defaultDurations={defaultDurations}
+              competitorData={competitorData ? {
+                name: competitorData.name,
+                daily_rate: Number(competitorData.daily_rate),
+              } : null}
+            />
           </div>
         </section>
 
