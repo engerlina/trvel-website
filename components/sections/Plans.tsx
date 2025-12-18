@@ -174,6 +174,7 @@ export function Plans() {
         <div className={`grid gap-6 lg:gap-8 max-w-5xl mx-auto mb-8 ${
           defaultPlans.length === 1 ? 'md:grid-cols-1 max-w-md' :
           defaultPlans.length === 2 ? 'md:grid-cols-2 max-w-3xl' :
+          defaultPlans.length === 0 ? 'md:grid-cols-1 max-w-2xl' :
           'md:grid-cols-3'
         }`}>
           {plansLoading ? (
@@ -198,6 +199,31 @@ export function Plans() {
                 </div>
               </Card>
             ))
+          ) : defaultPlans.length === 0 ? (
+            // No plans available
+            <Card padding="none" className="relative">
+              <div className="p-8 text-center">
+                <div className="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center mx-auto mb-4">
+                  <AlertTriangle className="w-8 h-8 text-amber-500" />
+                </div>
+                <h3 className="text-heading font-bold text-gray-900 mb-2">
+                  Plans Coming Soon
+                </h3>
+                <p className="text-body text-gray-600 mb-4">
+                  We're working on bringing eSIM coverage to {currentDestName}.
+                  Check back soon or browse our other destinations.
+                </p>
+                <Button
+                  variant="secondary"
+                  onClick={() => {
+                    const plansSection = document.getElementById('destinations');
+                    plansSection?.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                >
+                  View Available Destinations
+                </Button>
+              </div>
+            </Card>
           ) : (
             defaultPlans.map((duration, index) => {
               const Icon = getPlanIcon(duration.duration);

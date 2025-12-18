@@ -269,24 +269,48 @@ export default async function DestinationPage({ params }: DestinationPageProps) 
             </div>
 
             {/* Plan cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-              {plans.map((plan) => (
-                <DestinationPlanCard
-                  key={plan.name}
-                  name={plan.name}
-                  price={plan.price}
-                  perDay={plan.perDay}
-                  popular={plan.popular}
-                  currencySymbol={currencySymbol}
-                  destination={destination}
-                  duration={plan.duration}
-                  locale={locale}
-                />
-              ))}
-            </div>
+            {plans.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+                {plans.map((plan) => (
+                  <DestinationPlanCard
+                    key={plan.name}
+                    name={plan.name}
+                    price={plan.price}
+                    perDay={plan.perDay}
+                    popular={plan.popular}
+                    currencySymbol={currencySymbol}
+                    destination={destination}
+                    duration={plan.duration}
+                    locale={locale}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="max-w-xl mx-auto text-center">
+                <div className="bg-cream-100 rounded-2xl p-8 border border-cream-200">
+                  <div className="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center mx-auto mb-4">
+                    <Clock className="w-8 h-8 text-amber-500" />
+                  </div>
+                  <h3 className="text-heading font-bold text-navy-500 mb-2">
+                    Plans Coming Soon
+                  </h3>
+                  <p className="text-body text-navy-400 mb-6">
+                    We're working on bringing eSIM coverage to {destinationData.name}.
+                    Check back soon or explore our other destinations below.
+                  </p>
+                  <Link
+                    href={`/${locale}#destinations`}
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-brand-500 hover:bg-brand-600 text-white font-medium rounded-xl transition-colors"
+                  >
+                    Browse Destinations
+                    <ArrowRight className="w-4 h-4" />
+                  </Link>
+                </div>
+              </div>
+            )}
 
-            {/* Competitor comparison with link */}
-            {competitorData && (
+            {/* Competitor comparison with link - only show if we have plans */}
+            {competitorData && plans.length > 0 && (
               <div className="mt-12 text-center">
                 <p className="text-navy-400 mb-3">
                   Compare to {competitorData.name} roaming at{' '}
