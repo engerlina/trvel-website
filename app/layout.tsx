@@ -40,10 +40,12 @@ export const metadata: Metadata = {
     description: 'Get unlimited travel eSIM plans for 30+ destinations. Instant activation, 24/7 support via live chat & phone, and 10-minute connection guarantee.',
     images: [
       {
-        url: '/og-image.png',
+        url: `${BASE_URL}/og-image.png`,
+        secureUrl: `${BASE_URL}/og-image.png`,
         width: 1200,
         height: 630,
         alt: 'Trvel - Travel eSIM Plans',
+        type: 'image/png',
       },
     ],
   },
@@ -51,7 +53,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Trvel - Travel eSIM Plans',
     description: 'Get unlimited travel eSIM plans for 30+ destinations. Instant activation, 24/7 support.',
-    images: ['/twitter-image.png'],
+    images: [`${BASE_URL}/twitter-image.png`],
     creator: '@trvelco',
   },
   robots: {
