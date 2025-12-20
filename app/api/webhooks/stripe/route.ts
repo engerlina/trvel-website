@@ -106,6 +106,16 @@ export async function POST(request: NextRequest) {
     const { destination_slug, duration, locale, bundle_name } = session.metadata || {};
 
     try {
+      // Check if order already exists (webhook retry)
+      const existingOrder = await prisma.order.findUnique({
+        where: { stripe_session_id: session.id },
+      });
+
+      if (existingOrder) {
+        console.log('Order already exists, skipping:', existingOrder.order_number);
+        return NextResponse.json({ received: true, duplicate: true });
+      }
+
       // 1. Find or create customer
       let customer = await prisma.customer.findUnique({
         where: { email: customerEmail },
