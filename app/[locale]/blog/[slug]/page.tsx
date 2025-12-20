@@ -33,15 +33,16 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       description: post.excerpt || post.content.slice(0, 160),
       url: `${BASE_URL}/${locale}/blog/${slug}`,
       type: 'article',
+      siteName: 'Trvel',
       publishedTime: post.published_at?.toISOString(),
       authors: post.author ? [post.author.name] : undefined,
-      images: post.featured_image ? [post.featured_image] : undefined,
+      images: [post.featured_image || `${BASE_URL}/og-image.png`],
     },
     twitter: {
       card: 'summary_large_image',
       title: post.title,
       description: post.excerpt || post.content.slice(0, 160),
-      images: post.featured_image ? [post.featured_image] : undefined,
+      images: [post.featured_image || `${BASE_URL}/og-image.png`],
     },
   };
 }

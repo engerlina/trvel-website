@@ -104,6 +104,22 @@ export async function generateMetadata({ params }: DestinationPageProps): Promis
       description,
       url: `${BASE_URL}/${locale}/${destination}`,
       type: 'website',
+      siteName: 'Trvel',
+      images: [
+        {
+          url: `${BASE_URL}/og-image.png`,
+          width: 1200,
+          height: 630,
+          alt: `${destinationData.name} eSIM - Trvel`,
+          type: 'image/png',
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [`${BASE_URL}/og-image.png`],
     },
   };
 }

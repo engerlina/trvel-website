@@ -86,7 +86,14 @@ export default function RootLayout({
         {/* Umami Analytics */}
         <Script
           defer
-          src="https://analytics.vertial.com/script.js"
+          src="http://localhost:3002/tracker.js"
+          data-website-id="c6676273-d652-42da-b101-02ff592c29c1"
+          strategy="afterInteractive"
+        />
+        {/* JC Dashboard Analytics */}
+        <Script
+          defer
+          src="https://jc-dashboard-xi.vercel.app/tracker.js"
           data-website-id="c6676273-d652-42da-b101-02ff592c29c1"
           strategy="afterInteractive"
         />

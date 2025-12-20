@@ -51,6 +51,23 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       url: `${BASE_URL}/${locale}`,
       locale: localeToOgLocale[locale] || 'en_AU',
       alternateLocale: Object.values(localeToOgLocale).filter(l => l !== localeToOgLocale[locale]),
+      type: 'website',
+      siteName: 'Trvel',
+      images: [
+        {
+          url: `${BASE_URL}/og-image.png`,
+          width: 1200,
+          height: 630,
+          alt: 'Trvel - Travel eSIM Plans',
+          type: 'image/png',
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: t('headline'),
+      description: t('subheadline'),
+      images: [`${BASE_URL}/og-image.png`],
     },
   };
 }
