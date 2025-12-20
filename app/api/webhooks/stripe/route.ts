@@ -99,6 +99,12 @@ async function retryOrderProvisioning(
         orderReference: order.order_number,
       });
 
+      // Set status to 'ordering' BEFORE calling API to prevent race conditions
+      await prisma.order.update({
+        where: { id: order.id },
+        data: { esim_status: 'ordering' },
+      });
+
       if (isTestMode) {
         const mockIccid = `TEST-${Date.now()}`;
         const mockSmdpAddress = 'rsp.test.esim-go.io';
@@ -458,11 +464,20 @@ export async function POST(request: NextRequest) {
           return NextResponse.json({ received: true, duplicate: true });
         }
 
+        // If eSIM is currently being provisioned (status = 'ordering'), don't retry yet
+        // This prevents race condition where concurrent webhooks both provision eSIMs
+        if (existingOrder.esim_status === 'ordering') {
+          console.log('Order is currently being provisioned, skipping to avoid duplicate:', existingOrder.order_number);
+          return NextResponse.json({ received: true, provisioning_in_progress: true });
+        }
+
         // Order exists but incomplete - need to retry provisioning/email
+        // Only retry if status is 'pending' or 'failed' (not 'ordering')
         console.log('Order exists but incomplete, retrying:', {
           orderNumber: existingOrder.order_number,
           hasQrCode: !!existingOrder.esim_qr_code,
           emailSent: existingOrder.confirmation_email_sent,
+          esimStatus: existingOrder.esim_status,
         });
 
         // Retry provisioning and email for this existing order
@@ -570,6 +585,12 @@ export async function POST(request: NextRequest) {
           console.log(`Provisioning eSIM via eSIM Go (${isTestMode ? 'TEST' : 'LIVE'} mode):`, {
             bundle_name,
             orderReference: orderNumber,
+          });
+
+          // Set status to 'ordering' BEFORE calling API to prevent race conditions
+          await prisma.order.update({
+            where: { id: order.id },
+            data: { esim_status: 'ordering' },
           });
 
           if (isTestMode) {

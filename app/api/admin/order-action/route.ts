@@ -56,12 +56,23 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'eSIM already provisioned', message: 'eSIM already provisioned' }, { status: 400 });
     }
 
+    // Check if provisioning is already in progress (prevents race condition)
+    if (order.esim_status === 'ordering') {
+      return NextResponse.json({ error: 'eSIM provisioning already in progress', message: 'eSIM provisioning already in progress' }, { status: 400 });
+    }
+
     if (!order.bundle_name) {
       return NextResponse.json({ error: 'No bundle name for this order' }, { status: 400 });
     }
 
     try {
       console.log(`Admin: Provisioning eSIM for ${order.order_number}`);
+
+      // Set status to 'ordering' BEFORE calling API to prevent race conditions
+      await prisma.order.update({
+        where: { id: order.id },
+        data: { esim_status: 'ordering' },
+      });
 
       let esimData: {
         iccid: string;
@@ -146,6 +157,11 @@ export async function POST(request: NextRequest) {
       });
     } catch (error) {
       console.error('Failed to provision eSIM:', error);
+      // Reset status to 'failed' so retry is possible
+      await prisma.order.update({
+        where: { id: order.id },
+        data: { esim_status: 'failed' },
+      });
       return NextResponse.json({
         error: 'Failed to provision eSIM',
         details: error instanceof Error ? error.message : 'Unknown error'
