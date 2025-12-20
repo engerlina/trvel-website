@@ -32,9 +32,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'home.hero' });
 
+  // Use optimized OG title/description (50-60 chars title, 110-160 chars description)
+  const ogTitle = t('ogTitle');
+  const ogDescription = t('ogDescription');
+
   return {
-    title: t('headline'),
-    description: t('subheadline'),
+    title: ogTitle,
+    description: ogDescription,
     alternates: {
       canonical: `${BASE_URL}/${locale}`,
       languages: {
@@ -46,8 +50,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       },
     },
     openGraph: {
-      title: t('headline'),
-      description: t('subheadline'),
+      title: ogTitle,
+      description: ogDescription,
       url: `${BASE_URL}/${locale}`,
       locale: localeToOgLocale[locale] || 'en_AU',
       alternateLocale: Object.values(localeToOgLocale).filter(l => l !== localeToOgLocale[locale]),
@@ -65,8 +69,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     },
     twitter: {
       card: 'summary_large_image',
-      title: t('headline'),
-      description: t('subheadline'),
+      title: ogTitle,
+      description: ogDescription,
       images: [`${BASE_URL}/og-image.png`],
     },
   };
