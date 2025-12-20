@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     default: 'Trvel - Travel eSIM Plans | Stay Connected Worldwide',
     template: '%s | Trvel',
   },
-  description: 'Get unlimited travel eSIM plans for 30+ destinations. Instant activation, 24/7 support via live chat & phone, and 10-minute connection guarantee. No roaming bills.',
+  description: 'Get unlimited travel eSIM plans for 190+ destinations. Instant activation, 24/7 support via live chat & phone, and 10-minute connection guarantee. No roaming bills.',
   keywords: ['travel eSIM', 'international data', 'roaming', 'Japan eSIM', 'Thailand eSIM', 'travel data plan', 'eSIM for travel', 'unlimited data abroad'],
   authors: [{ name: 'Trvel' }],
   creator: 'Trvel',
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
     url: BASE_URL,
     siteName: 'Trvel',
     title: 'Trvel - Travel eSIM Plans | Stay Connected Worldwide',
-    description: 'Get unlimited travel eSIM plans for 30+ destinations. Instant activation, 24/7 support via live chat & phone, and 10-minute connection guarantee.',
+    description: 'Get unlimited travel eSIM plans for 190+ destinations. Instant activation, 24/7 support via live chat & phone, and 10-minute connection guarantee.',
     images: [
       {
         url: `${BASE_URL}/og-image.png`,
@@ -52,7 +52,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Trvel - Travel eSIM Plans',
-    description: 'Get unlimited travel eSIM plans for 30+ destinations. Instant activation, 24/7 support.',
+    description: 'Get unlimited travel eSIM plans for 190+ destinations. Instant activation, 24/7 support.',
     images: [`${BASE_URL}/twitter-image.png`],
     creator: '@trvelco',
   },
