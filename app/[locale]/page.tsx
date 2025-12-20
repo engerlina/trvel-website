@@ -14,7 +14,7 @@ import {
 import { DestinationProvider } from '@/contexts/DestinationContext';
 import { JsonLd } from '@/components/seo';
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://trvel.co';
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.trvel.co';
 
 interface PageProps {
   params: Promise<{ locale: string }>;

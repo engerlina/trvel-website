@@ -8,7 +8,7 @@ import { prisma } from '@/lib/db';
 import { Link } from '@/i18n/routing';
 import { Clock, Calendar, ArrowLeft, Twitter, Linkedin, Facebook } from 'lucide-react';
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://trvel.co';
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.trvel.co';
 
 interface PageProps {
   params: Promise<{ locale: string; slug: string }>;

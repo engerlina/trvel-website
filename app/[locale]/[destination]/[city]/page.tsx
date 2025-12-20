@@ -26,7 +26,7 @@ import {
 } from 'country-flag-icons/react/3x2';
 import { DurationOption } from '@/types';
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://trvel.co';
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.trvel.co';
 
 function formatPrice(price: unknown, currency: string): string {
   if (price === null || price === undefined) return '—';

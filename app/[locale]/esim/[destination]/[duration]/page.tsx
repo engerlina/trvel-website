@@ -25,7 +25,7 @@ import {
 } from 'country-flag-icons/react/3x2';
 import { DurationOption } from '@/types';
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://trvel.co';
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.trvel.co';
 
 // Parse duration from slug (e.g., "7-day" -> 7)
 function parseDuration(slug: string): number | null {

@@ -14,7 +14,7 @@ const webhookSecret = getWebhookSecret();
 
 // Email sender - using verified Resend domain
 const emailFrom = 'Jonathan from Trvel <noreply@e.trvel.co>';
-const logoUrl = 'https://trvel.co/android-chrome-192x192.png';
+const logoUrl = 'https://www.trvel.co/android-chrome-192x192.png';
 
 // Generate order number: TRV-YYYYMMDD-XXX
 async function generateOrderNumber(): Promise<string> {
@@ -480,7 +480,7 @@ export async function POST(request: NextRequest) {
     <div style="text-align: center; margin-top: 40px; padding-top: 24px; border-top: 1px solid #F2E2CE;">
       <p style="color: #888a9d; font-size: 12px; margin: 0;">
         Trvel • Travel eSIMs made simple<br>
-        <a href="https://trvel.co" style="color: #63BFBF; text-decoration: none;">trvel.co</a>
+        <a href="https://www.trvel.co" style="color: #63BFBF; text-decoration: none;">trvel.co</a>
       </p>
     </div>
   </div>

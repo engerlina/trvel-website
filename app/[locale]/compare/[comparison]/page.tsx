@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import { DurationOption } from '@/types';
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://trvel.co';
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.trvel.co';
 
 // Parse comparison slug: "{carrier}-vs-esim-{destination}"
 function parseComparisonSlug(slug: string): { carrier: string; destination: string } | null {

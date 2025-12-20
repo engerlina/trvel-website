@@ -3,7 +3,7 @@ import { Header, Footer } from '@/components/layout';
 import { Link } from '@/i18n/routing';
 import { FileText, ArrowRight } from 'lucide-react';
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://trvel.co';
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.trvel.co';
 const LAST_UPDATED = '17 December 2024';
 
 interface TermsPageProps {

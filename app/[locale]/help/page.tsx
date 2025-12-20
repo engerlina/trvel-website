@@ -17,7 +17,7 @@ import {
   ArrowRight,
 } from 'lucide-react';
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://trvel.co';
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.trvel.co';
 
 interface HelpPageProps {
   params: Promise<{

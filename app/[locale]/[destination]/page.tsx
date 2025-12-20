@@ -25,7 +25,7 @@ import {
 } from 'country-flag-icons/react/3x2';
 import { DurationOption } from '@/types';
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://trvel.co';
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.trvel.co';
 
 // Format price with proper decimal places (always show 2 decimals, except IDR)
 // Accepts number, string, Prisma Decimal, or null/undefined

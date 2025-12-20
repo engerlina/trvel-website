@@ -15,5 +15,21 @@ module.exports = withNextIntl({
       },
     ],
   },
+  async redirects() {
+    return [
+      // Redirect non-www to www (except for API routes which need to work on both)
+      {
+        source: '/:path((?!api).*)',
+        has: [
+          {
+            type: 'host',
+            value: 'trvel.co',
+          },
+        ],
+        destination: 'https://www.trvel.co/:path*',
+        permanent: true,
+      },
+    ];
+  },
 });
 

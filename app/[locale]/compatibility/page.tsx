@@ -4,7 +4,7 @@ import { EsimChecker } from '@/components/compatibility/EsimChecker';
 import { Link } from '@/i18n/routing';
 import { ArrowRight, Smartphone } from 'lucide-react';
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://trvel.co';
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.trvel.co';
 
 interface CompatibilityPageProps {
   params: Promise<{

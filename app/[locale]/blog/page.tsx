@@ -5,7 +5,7 @@ import { BlogCard } from '@/components/blog';
 import { prisma } from '@/lib/db';
 import { Plane, MapPin, Compass } from 'lucide-react';
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://trvel.co';
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.trvel.co';
 
 interface PageProps {
   params: Promise<{ locale: string }>;
