@@ -88,10 +88,10 @@ export default function RootLayout({
   return (
     <html lang="en" data-theme="trvel">
       <body className={inter.className}>
-        {/* Umami Analytics */}
+        {/* Vertial Analytics */}
         <Script
           defer
-          src="http://localhost:3002/tracker.js"
+          src="https://analytics.vertial.com/script.js"
           data-website-id="c6676273-d652-42da-b101-02ff592c29c1"
           strategy="afterInteractive"
         />
