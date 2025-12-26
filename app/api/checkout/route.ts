@@ -113,6 +113,7 @@ export async function POST(request: NextRequest) {
       price,
       priceInCents,
       currency: plan.currency,
+      gclid: gclid || 'NOT PROVIDED',
     });
 
     // Get the origin for redirect URLs
