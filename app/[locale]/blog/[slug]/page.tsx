@@ -4,7 +4,7 @@ import { getTranslations } from 'next-intl/server';
 import Image from 'next/image';
 import { Header, Footer } from '@/components/layout';
 import { BlogCard, MarkdownContent } from '@/components/blog';
-import { prisma } from '@/lib/db';
+import { prisma, withRetry } from '@/lib/db';
 import { Link } from '@/i18n/routing';
 import { Clock, Calendar, ArrowLeft, Twitter, Linkedin, Facebook } from 'lucide-react';
 
@@ -48,32 +48,36 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 async function getPost(locale: string, slug: string) {
-  return prisma.post.findUnique({
-    where: {
-      slug_locale: { slug, locale },
-    },
-    include: {
-      author: true,
-      category: true,
-    },
-  });
+  return withRetry(() =>
+    prisma.post.findUnique({
+      where: {
+        slug_locale: { slug, locale },
+      },
+      include: {
+        author: true,
+        category: true,
+      },
+    })
+  );
 }
 
 async function getRelatedPosts(locale: string, currentSlug: string, categoryId?: number | null) {
-  return prisma.post.findMany({
-    where: {
-      locale,
-      slug: { not: currentSlug },
-      published_at: { not: null },
-      ...(categoryId && { category_id: categoryId }),
-    },
-    include: {
-      author: true,
-      category: true,
-    },
-    orderBy: { published_at: 'desc' },
-    take: 3,
-  });
+  return withRetry(() =>
+    prisma.post.findMany({
+      where: {
+        locale,
+        slug: { not: currentSlug },
+        published_at: { not: null },
+        ...(categoryId && { category_id: categoryId }),
+      },
+      include: {
+        author: true,
+        category: true,
+      },
+      orderBy: { published_at: 'desc' },
+      take: 3,
+    })
+  );
 }
 
 export default async function BlogPostPage({ params }: PageProps) {
@@ -309,10 +313,12 @@ export default async function BlogPostPage({ params }: PageProps) {
 // Returns empty array if database is unavailable (e.g., during Vercel build)
 export async function generateStaticParams() {
   try {
-    const posts = await prisma.post.findMany({
-      where: { published_at: { not: null } },
-      select: { slug: true, locale: true },
-    });
+    const posts = await withRetry(() =>
+      prisma.post.findMany({
+        where: { published_at: { not: null } },
+        select: { slug: true, locale: true },
+      })
+    );
 
     return posts.map((post) => ({
       locale: post.locale,

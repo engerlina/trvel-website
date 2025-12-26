@@ -3,6 +3,12 @@ const withNextIntl = require('next-intl/plugin')(
 );
 
 module.exports = withNextIntl({
+  // Limit concurrent static page generation to prevent DB connection exhaustion
+  experimental: {
+    // Reduce parallelism during build to prevent connection pool exhaustion
+    workerThreads: false,
+    cpus: 1,
+  },
   images: {
     remotePatterns: [
       {
