@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
+import { getGclid } from '@/hooks/useGclid';
 
 interface CheckoutButtonProps {
   destination: string;
@@ -19,6 +20,9 @@ export default function CheckoutButton({ destination, duration, locale, promoCod
     setIsLoading(true);
     setError(null);
 
+    // Get gclid for Google Ads attribution
+    const gclid = getGclid();
+
     try {
       const response = await fetch('/api/checkout', {
         method: 'POST',
@@ -30,6 +34,7 @@ export default function CheckoutButton({ destination, duration, locale, promoCod
           duration,
           locale,
           promoCode,
+          ...(gclid && { gclid }),
         }),
       });
 

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Check, ArrowRight } from 'lucide-react';
 import { Link } from '@/i18n/routing';
+import { getGclid } from '@/hooks/useGclid';
 
 interface DestinationPlanCardProps {
   name: string;
@@ -32,6 +33,9 @@ export function DestinationPlanCard({
   const handleCheckout = async () => {
     setIsLoading(true);
 
+    // Get gclid for Google Ads attribution
+    const gclid = getGclid();
+
     try {
       const response = await fetch('/api/checkout', {
         method: 'POST',
@@ -42,6 +46,7 @@ export function DestinationPlanCard({
           destination,
           duration,
           locale,
+          ...(gclid && { gclid }),
         }),
       });
 

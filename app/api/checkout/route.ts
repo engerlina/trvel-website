@@ -19,7 +19,7 @@ function getPlanName(days: number): string {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { destination, duration, locale, promoCode } = body;
+    const { destination, duration, locale, promoCode, gclid } = body;
 
     // Validate required fields
     if (!destination || !duration || !locale) {
@@ -123,6 +123,9 @@ export async function POST(request: NextRequest) {
     const sessionOptions: Stripe.Checkout.SessionCreateParams = {
       mode: 'payment',
       payment_method_types: ['card'],
+      // Pass gclid as client_reference_id for Google Ads conversion tracking
+      // This allows the webhook to attribute the conversion back to Google Ads
+      ...(gclid && { client_reference_id: gclid }),
       line_items: [
         {
           price_data: {

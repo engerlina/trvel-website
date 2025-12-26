@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui';
 import { useDestination } from '@/contexts/DestinationContext';
+import { getGclid } from '@/hooks/useGclid';
 
 interface DirectCheckoutButtonProps {
   destination: string;
@@ -31,6 +32,9 @@ export function DirectCheckoutButton({
 
     setIsLoading(true);
 
+    // Get gclid for Google Ads attribution
+    const gclid = getGclid();
+
     try {
       const response = await fetch('/api/checkout', {
         method: 'POST',
@@ -41,6 +45,7 @@ export function DirectCheckoutButton({
           destination,
           duration,
           locale,
+          ...(gclid && { gclid }),
         }),
       });
 

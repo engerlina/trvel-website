@@ -136,3 +136,59 @@ TEST_STRIPE_WEBHOOK_SECRET=whsec_...
 - Coupons/Promotion codes are managed in Stripe Dashboard
 - Checkout automatically allows customers to enter promo codes
 - Can also pass `promoCode` param to pre-apply a code
+
+## Google Ads & GA4 Conversion Tracking
+
+Server-side conversion tracking that bypasses ad blockers, iOS tracking prevention, Safari cookie deletion, and Stripe redirect attribution loss.
+
+### Architecture
+
+```
+User clicks Google Ad (with ?gclid=...)
+  → Website captures gclid in localStorage (GoogleAdsCapture.tsx)
+  → User starts checkout, gclid passed to /api/checkout
+  → Stripe Checkout stores gclid as client_reference_id
+  → Payment succeeds, Stripe webhook fires
+  → Webhook extracts gclid from session.client_reference_id
+  → Server sends conversion to Google Ads API + GA4 Measurement Protocol
+```
+
+### Key Files
+
+- `lib/google-ads.ts` - Google Ads Conversion API utility
+- `lib/ga4.ts` - GA4 Measurement Protocol utility
+- `hooks/useGclid.ts` - Client-side gclid capture and storage
+- `components/GoogleAdsCapture.tsx` - Invisible component in root layout
+- `app/api/webhooks/stripe/route.ts` - Sends conversions after payment
+
+### Environment Variables
+
+```bash
+# Google Ads Conversion API
+GOOGLE_ADS_CUSTOMER_ID="123-456-7890"
+GOOGLE_ADS_CONVERSION_ACTION_ID="987654321"
+GOOGLE_ADS_DEVELOPER_TOKEN="your_developer_token"
+GOOGLE_ADS_CLIENT_ID="your_oauth_client_id"
+GOOGLE_ADS_CLIENT_SECRET="your_oauth_client_secret"
+GOOGLE_ADS_REFRESH_TOKEN="your_oauth_refresh_token"
+
+# GA4 Measurement Protocol
+GA4_API_SECRET="your_ga4_api_secret"
+```
+
+### Setup Instructions
+
+1. **Google Ads Conversion Action**:
+   - Go to Google Ads > Goals > Conversions > New conversion action
+   - Choose "Import" > "Other data sources" > "Track conversions from clicks"
+   - Note the Conversion Action ID
+
+2. **Google Ads API Access**:
+   - Apply for API access at Google Ads API Center
+   - Create OAuth credentials in Google Cloud Console
+   - Generate refresh token using Google's OAuth Playground
+
+3. **GA4 API Secret**:
+   - Go to GA4 Admin > Data Streams > Your Stream
+   - Click "Measurement Protocol API secrets"
+   - Create a new secret

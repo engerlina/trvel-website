@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
 import Script from 'next/script';
+import { GoogleAdsCapture } from '@/components/GoogleAdsCapture';
 import './globals.css';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -88,6 +89,8 @@ export default function RootLayout({
   return (
     <html lang="en" data-theme="trvel">
       <body className={inter.className}>
+        {/* Capture Google Ads gclid from URL */}
+        <GoogleAdsCapture />
         {/* Vertial Analytics */}
         <Script
           defer

@@ -9,8 +9,91 @@ import {
   generateQrCodeString,
   EsimGoOrderResponse,
 } from '@/lib/esimgo';
+import { uploadClickConversion, isGoogleAdsConfigured } from '@/lib/google-ads';
+import { sendGA4PurchaseEvent, isGA4Configured } from '@/lib/ga4';
 
 const webhookSecret = getWebhookSecret();
+
+/**
+ * Send server-side conversion events to Google Ads and GA4
+ *
+ * This bypasses client-side blockers and ensures 100% of conversions are tracked:
+ * - Ad blockers (30-60% of Safari users)
+ * - iOS tracking prevention
+ * - Safari cookie deletion
+ * - Stripe redirect attribution loss
+ */
+async function sendConversionEvents(
+  session: Stripe.Checkout.Session,
+  orderNumber: string,
+  destinationSlug: string
+): Promise<void> {
+  const gclid = session.client_reference_id;
+  const amountTotal = session.amount_total || 0;
+  const currency = session.currency?.toUpperCase() || 'AUD';
+  const conversionValue = amountTotal / 100; // Convert from cents
+
+  // Send to Google Ads if configured and we have a gclid
+  if (gclid && isGoogleAdsConfigured()) {
+    try {
+      const result = await uploadClickConversion({
+        gclid,
+        conversionValue,
+        currencyCode: currency,
+        orderId: orderNumber,
+      });
+
+      if (result.success) {
+        console.log('Google Ads conversion uploaded:', {
+          orderNumber,
+          value: conversionValue,
+          currency,
+          gclid: gclid.substring(0, 20) + '...',
+        });
+      } else {
+        console.warn('Google Ads conversion upload failed:', result.error);
+      }
+    } catch (error) {
+      console.error('Error sending Google Ads conversion:', error);
+    }
+  } else if (!gclid) {
+    console.log('No gclid - skipping Google Ads conversion (organic or direct traffic)');
+  }
+
+  // Send to GA4 if configured
+  if (isGA4Configured()) {
+    try {
+      const result = await sendGA4PurchaseEvent({
+        clientId: gclid || `stripe.${session.id}`,
+        transactionId: session.id,
+        value: conversionValue,
+        currency,
+        destination: destinationSlug,
+        items: [
+          {
+            item_name: `${destinationSlug} eSIM`,
+            item_category: 'eSIM',
+            price: conversionValue,
+            quantity: 1,
+          },
+        ],
+      });
+
+      if (result.success) {
+        console.log('GA4 purchase event sent:', {
+          orderNumber,
+          transactionId: session.id,
+          value: conversionValue,
+          currency,
+        });
+      } else {
+        console.warn('GA4 purchase event failed:', result.error);
+      }
+    } catch (error) {
+      console.error('Error sending GA4 event:', error);
+    }
+  }
+}
 
 // Email sender - using verified Resend domain
 const emailFrom = 'Jonathan from Trvel <noreply@e.trvel.co>';
@@ -566,6 +649,11 @@ export async function POST(request: NextRequest) {
       });
 
       console.log('Created order:', order.order_number);
+
+      // 3.5 Send server-side conversion events (Google Ads + GA4)
+      // This runs async and doesn't block order processing
+      sendConversionEvents(session, orderNumber, destination_slug || 'unknown')
+        .catch((err) => console.error('Conversion event error:', err));
 
       // 4. Provision eSIM via eSIM Go API
       let esimData: {
