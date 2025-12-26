@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { prisma } from '@/lib/db';
+import { prisma, withRetry } from '@/lib/db';
 import { notFound } from 'next/navigation';
 import { Header, Footer } from '@/components/layout';
 import { Link } from '@/i18n/routing';
@@ -23,9 +23,11 @@ interface BrandPageProps {
 export async function generateMetadata({ params }: BrandPageProps): Promise<Metadata> {
   const { locale, brand } = await params;
 
-  const brandData = await prisma.deviceBrand.findUnique({
-    where: { slug: brand },
-  });
+  const brandData = await withRetry(() =>
+    prisma.deviceBrand.findUnique({
+      where: { slug: brand },
+    })
+  );
 
   if (!brandData) {
     return { title: 'Brand Not Found' };
@@ -52,28 +54,32 @@ export async function generateMetadata({ params }: BrandPageProps): Promise<Meta
 export default async function BrandPage({ params }: BrandPageProps) {
   const { locale, brand } = await params;
 
-  const brandData = await prisma.deviceBrand.findUnique({
-    where: { slug: brand },
-    include: {
-      devices: {
-        orderBy: [
-          { release_year: 'desc' },
-          { sort_order: 'asc' },
-        ],
+  const brandData = await withRetry(() =>
+    prisma.deviceBrand.findUnique({
+      where: { slug: brand },
+      include: {
+        devices: {
+          orderBy: [
+            { release_year: 'desc' },
+            { sort_order: 'asc' },
+          ],
+        },
       },
-    },
-  });
+    })
+  );
 
   if (!brandData) {
     notFound();
   }
 
   // Get other brands for cross-linking
-  const otherBrands = await prisma.deviceBrand.findMany({
-    where: { slug: { not: brand } },
-    orderBy: { sort_order: 'asc' },
-    take: 5,
-  });
+  const otherBrands = await withRetry(() =>
+    prisma.deviceBrand.findMany({
+      where: { slug: { not: brand } },
+      orderBy: { sort_order: 'asc' },
+      take: 5,
+    })
+  );
 
   const compatibleDevices = brandData.devices.filter(d => d.is_compatible);
   const incompatibleDevices = brandData.devices.filter(d => !d.is_compatible);
@@ -279,9 +285,11 @@ export default async function BrandPage({ params }: BrandPageProps) {
 // Generate static params for all brands
 export async function generateStaticParams() {
   try {
-    const brands = await prisma.deviceBrand.findMany({
-      select: { slug: true },
-    });
+    const brands = await withRetry(() =>
+      prisma.deviceBrand.findMany({
+        select: { slug: true },
+      })
+    );
 
     const locales = ['en-au', 'en-sg', 'en-gb', 'en-us', 'ms-my', 'id-id'];
     const params: { locale: string; brand: string }[] = [];

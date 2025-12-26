@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { prisma } from '@/lib/db';
+import { prisma, withRetry } from '@/lib/db';
 import { notFound } from 'next/navigation';
 import { Header, Footer } from '@/components/layout';
 import { Link } from '@/i18n/routing';
@@ -109,17 +109,21 @@ export async function generateMetadata({ params }: DurationPageProps): Promise<M
     return { title: 'Plan Not Found' };
   }
 
-  const destinationData = await prisma.destination.findUnique({
-    where: { slug_locale: { slug: destination, locale } },
-  });
+  const destinationData = await withRetry(() =>
+    prisma.destination.findUnique({
+      where: { slug_locale: { slug: destination, locale } },
+    })
+  );
 
   if (!destinationData) {
     return { title: 'Destination Not Found' };
   }
 
-  const planData = await prisma.plan.findUnique({
-    where: { destination_slug_locale: { destination_slug: destination, locale } },
-  });
+  const planData = await withRetry(() =>
+    prisma.plan.findUnique({
+      where: { destination_slug_locale: { destination_slug: destination, locale } },
+    })
+  );
 
   // Find price from durations array
   const durations = (planData?.durations || []) as unknown as DurationOption[];
@@ -157,22 +161,28 @@ export default async function DurationPage({ params }: DurationPageProps) {
     notFound();
   }
 
-  const destinationData = await prisma.destination.findUnique({
-    where: { slug_locale: { slug: destination, locale } },
-  });
+  const destinationData = await withRetry(() =>
+    prisma.destination.findUnique({
+      where: { slug_locale: { slug: destination, locale } },
+    })
+  );
 
   if (!destinationData) {
     notFound();
   }
 
-  const planData = await prisma.plan.findUnique({
-    where: { destination_slug_locale: { destination_slug: destination, locale } },
-  });
+  const planData = await withRetry(() =>
+    prisma.plan.findUnique({
+      where: { destination_slug_locale: { destination_slug: destination, locale } },
+    })
+  );
 
   const competitorData = planData?.currency
-    ? await prisma.competitor.findUnique({
-        where: { currency: planData.currency },
-      })
+    ? await withRetry(() =>
+        prisma.competitor.findUnique({
+          where: { currency: planData.currency },
+        })
+      )
     : null;
 
   const FlagIcon = flagMap[destination] || Globe;
@@ -475,9 +485,11 @@ export default async function DurationPage({ params }: DurationPageProps) {
 export async function generateStaticParams() {
   try {
     // Get all plans with their available durations
-    const plans = await prisma.plan.findMany({
-      select: { destination_slug: true, locale: true, durations: true },
-    });
+    const plans = await withRetry(() =>
+      prisma.plan.findMany({
+        select: { destination_slug: true, locale: true, durations: true },
+      })
+    );
 
     const params: { locale: string; destination: string; duration: string }[] = [];
 

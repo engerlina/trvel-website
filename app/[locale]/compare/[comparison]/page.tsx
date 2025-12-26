@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { prisma } from '@/lib/db';
+import { prisma, withRetry } from '@/lib/db';
 import { notFound } from 'next/navigation';
 import { Header, Footer } from '@/components/layout';
 import { Link } from '@/i18n/routing';
@@ -77,9 +77,11 @@ export async function generateMetadata({ params }: ComparisonPageProps): Promise
 
   // Use try-catch to handle missing data gracefully
   try {
-    const destinationData = await prisma.destination.findUnique({
-      where: { slug_locale: { slug: parsed.destination, locale } },
-    });
+    const destinationData = await withRetry(() =>
+      prisma.destination.findUnique({
+        where: { slug_locale: { slug: parsed.destination, locale } },
+      })
+    );
 
     if (!destinationData) {
       return { title: `${carrierName} Roaming vs eSIM | Trvel` };
@@ -118,12 +120,16 @@ export default async function ComparisonPage({ params }: ComparisonPageProps) {
 
   // Parallel database calls for better performance
   const [destinationData, planData] = await Promise.all([
-    prisma.destination.findUnique({
-      where: { slug_locale: { slug: destination, locale } },
-    }),
-    prisma.plan.findUnique({
-      where: { destination_slug_locale: { destination_slug: destination, locale } },
-    }),
+    withRetry(() =>
+      prisma.destination.findUnique({
+        where: { slug_locale: { slug: destination, locale } },
+      })
+    ),
+    withRetry(() =>
+      prisma.plan.findUnique({
+        where: { destination_slug_locale: { destination_slug: destination, locale } },
+      })
+    ),
   ]);
 
   if (!destinationData) {
@@ -132,9 +138,11 @@ export default async function ComparisonPage({ params }: ComparisonPageProps) {
 
   // Fetch competitor data (depends on planData.currency)
   const competitorData = planData?.currency
-    ? await prisma.competitor.findUnique({
-        where: { currency: planData.currency },
-      })
+    ? await withRetry(() =>
+        prisma.competitor.findUnique({
+          where: { currency: planData.currency },
+        })
+      )
     : null;
 
   const carrierName = competitorData?.name || CARRIER_NAMES[carrier] || carrier;
@@ -399,9 +407,11 @@ export default async function ComparisonPage({ params }: ComparisonPageProps) {
 // Generate static params for common comparisons
 export async function generateStaticParams() {
   try {
-    const destinations = await prisma.destination.findMany({
-      select: { slug: true, locale: true },
-    });
+    const destinations = await withRetry(() =>
+      prisma.destination.findMany({
+        select: { slug: true, locale: true },
+      })
+    );
 
     const params: { locale: string; comparison: string }[] = [];
 

@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { prisma } from '@/lib/db';
+import { prisma, withRetry } from '@/lib/db';
 import { notFound } from 'next/navigation';
 import { Header, Footer } from '@/components/layout';
 import { Link } from '@/i18n/routing';
@@ -31,13 +31,15 @@ interface DevicePageProps {
 export async function generateMetadata({ params }: DevicePageProps): Promise<Metadata> {
   const { locale, brand, device } = await params;
 
-  const deviceData = await prisma.device.findFirst({
-    where: {
-      slug: device,
-      brand: { slug: brand },
-    },
-    include: { brand: true },
-  });
+  const deviceData = await withRetry(() =>
+    prisma.device.findFirst({
+      where: {
+        slug: device,
+        brand: { slug: brand },
+      },
+      include: { brand: true },
+    })
+  );
 
   if (!deviceData) {
     return { title: 'Device Not Found' };
@@ -67,38 +69,44 @@ export async function generateMetadata({ params }: DevicePageProps): Promise<Met
 export default async function DevicePage({ params }: DevicePageProps) {
   const { locale, brand, device } = await params;
 
-  const deviceData = await prisma.device.findFirst({
-    where: {
-      slug: device,
-      brand: { slug: brand },
-    },
-    include: { brand: true },
-  });
+  const deviceData = await withRetry(() =>
+    prisma.device.findFirst({
+      where: {
+        slug: device,
+        brand: { slug: brand },
+      },
+      include: { brand: true },
+    })
+  );
 
   if (!deviceData) {
     notFound();
   }
 
   // Get other devices from same brand for cross-linking
-  const relatedDevices = await prisma.device.findMany({
-    where: {
-      brand: { slug: brand },
-      slug: { not: device },
-      is_compatible: true,
-    },
-    orderBy: [
-      { release_year: 'desc' },
-      { sort_order: 'asc' },
-    ],
-    take: 6,
-  });
+  const relatedDevices = await withRetry(() =>
+    prisma.device.findMany({
+      where: {
+        brand: { slug: brand },
+        slug: { not: device },
+        is_compatible: true,
+      },
+      orderBy: [
+        { release_year: 'desc' },
+        { sort_order: 'asc' },
+      ],
+      take: 6,
+    })
+  );
 
   // Get some popular destinations for CTA
-  const destinations = await prisma.destination.findMany({
-    where: { locale },
-    take: 4,
-    orderBy: { name: 'asc' },
-  });
+  const destinations = await withRetry(() =>
+    prisma.destination.findMany({
+      where: { locale },
+      take: 4,
+      orderBy: { name: 'asc' },
+    })
+  );
 
   const setupSteps = deviceData.brand.name === 'Apple'
     ? [
@@ -443,9 +451,11 @@ export default async function DevicePage({ params }: DevicePageProps) {
 // Generate static params for all brand/device combinations
 export async function generateStaticParams() {
   try {
-    const devices = await prisma.device.findMany({
-      select: { slug: true, brand: { select: { slug: true } } },
-    });
+    const devices = await withRetry(() =>
+      prisma.device.findMany({
+        select: { slug: true, brand: { select: { slug: true } } },
+      })
+    );
 
     const locales = ['en-au', 'en-sg', 'en-gb', 'en-us', 'ms-my', 'id-id'];
     const params: { locale: string; brand: string; device: string }[] = [];

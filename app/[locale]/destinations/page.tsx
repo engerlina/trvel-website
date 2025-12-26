@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
-import { prisma } from '@/lib/db';
+import { prisma, withRetry } from '@/lib/db';
 import { Header, Footer } from '@/components/layout';
 import { Link } from '@/i18n/routing';
 import {
@@ -88,15 +88,19 @@ export default async function DestinationsPage({ params }: DestinationsPageProps
   const t = await getTranslations({ locale, namespace: 'destinations' });
 
   // Fetch all destinations with their plans for the current locale
-  const destinations = await prisma.destination.findMany({
-    where: { locale },
-    orderBy: { name: 'asc' },
-  });
+  const destinations = await withRetry(() =>
+    prisma.destination.findMany({
+      where: { locale },
+      orderBy: { name: 'asc' },
+    })
+  );
 
   // Fetch all plans for this locale
-  const plans = await prisma.plan.findMany({
-    where: { locale },
-  });
+  const plans = await withRetry(() =>
+    prisma.plan.findMany({
+      where: { locale },
+    })
+  );
 
   // Create a map of destination slug to plan
   const planMap = new Map(plans.map(p => [p.destination_slug, p]));

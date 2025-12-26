@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import { Header, Footer } from '@/components/layout';
 import { BlogCard } from '@/components/blog';
-import { prisma } from '@/lib/db';
+import { prisma, withRetry } from '@/lib/db';
 import { Plane, MapPin, Compass } from 'lucide-react';
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.trvel.co';
@@ -34,33 +34,39 @@ async function getPosts(locale: string, categorySlug?: string) {
   // First find the category if slug provided
   let categoryId: number | undefined;
   if (categorySlug) {
-    const category = await prisma.category.findUnique({
-      where: {
-        slug_locale: { slug: categorySlug, locale },
-      },
-    });
+    const category = await withRetry(() =>
+      prisma.category.findUnique({
+        where: {
+          slug_locale: { slug: categorySlug, locale },
+        },
+      })
+    );
     categoryId = category?.id;
   }
 
-  return prisma.post.findMany({
-    where: {
-      locale,
-      published_at: { not: null },
-      ...(categoryId && { category_id: categoryId }),
-    },
-    include: {
-      author: true,
-      category: true,
-    },
-    orderBy: { published_at: 'desc' },
-  });
+  return withRetry(() =>
+    prisma.post.findMany({
+      where: {
+        locale,
+        published_at: { not: null },
+        ...(categoryId && { category_id: categoryId }),
+      },
+      include: {
+        author: true,
+        category: true,
+      },
+      orderBy: { published_at: 'desc' },
+    })
+  );
 }
 
 async function getCategories(locale: string) {
-  return prisma.category.findMany({
-    where: { locale },
-    orderBy: { name: 'asc' },
-  });
+  return withRetry(() =>
+    prisma.category.findMany({
+      where: { locale },
+      orderBy: { name: 'asc' },
+    })
+  );
 }
 
 export default async function BlogPage({ params, searchParams }: PageProps) {

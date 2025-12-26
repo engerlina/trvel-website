@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
-import { prisma } from '@/lib/db';
+import { prisma, withRetry } from '@/lib/db';
 import { notFound } from 'next/navigation';
 import { Header, Footer } from '@/components/layout';
 import { Link } from '@/i18n/routing';
@@ -69,21 +69,25 @@ interface DestinationPageProps {
 export async function generateMetadata({ params }: DestinationPageProps): Promise<Metadata> {
   const { locale, destination } = await params;
 
-  const destinationData = await prisma.destination.findUnique({
-    where: {
-      slug_locale: { slug: destination, locale },
-    },
-  });
+  const destinationData = await withRetry(() =>
+    prisma.destination.findUnique({
+      where: {
+        slug_locale: { slug: destination, locale },
+      },
+    })
+  );
 
   if (!destinationData) {
     return { title: 'Destination Not Found' };
   }
 
-  const planData = await prisma.plan.findUnique({
-    where: {
-      destination_slug_locale: { destination_slug: destination, locale },
-    },
-  });
+  const planData = await withRetry(() =>
+    prisma.plan.findUnique({
+      where: {
+        destination_slug_locale: { destination_slug: destination, locale },
+      },
+    })
+  );
 
   // Use best_daily_rate for display
   const dailyRate = planData?.best_daily_rate ? Number(planData.best_daily_rate).toFixed(2) : '';
@@ -128,29 +132,35 @@ export default async function DestinationPage({ params }: DestinationPageProps) 
   const { locale, destination } = await params;
   const t = await getTranslations({ locale, namespace: 'destination' });
 
-  const destinationData = await prisma.destination.findUnique({
-    where: {
-      slug_locale: { slug: destination, locale },
-    },
-    include: {
-      cities: {
-        take: 6,
-        orderBy: { population: 'desc' },
+  const destinationData = await withRetry(() =>
+    prisma.destination.findUnique({
+      where: {
+        slug_locale: { slug: destination, locale },
       },
-    },
-  });
+      include: {
+        cities: {
+          take: 6,
+          orderBy: { population: 'desc' },
+        },
+      },
+    })
+  );
 
-  const planData = await prisma.plan.findUnique({
-    where: {
-      destination_slug_locale: { destination_slug: destination, locale },
-    },
-  });
+  const planData = await withRetry(() =>
+    prisma.plan.findUnique({
+      where: {
+        destination_slug_locale: { destination_slug: destination, locale },
+      },
+    })
+  );
 
   // Fetch competitor data based on plan currency
   const competitorData = planData?.currency
-    ? await prisma.competitor.findUnique({
-        where: { currency: planData.currency },
-      })
+    ? await withRetry(() =>
+        prisma.competitor.findUnique({
+          where: { currency: planData.currency },
+        })
+      )
     : null;
 
   if (!destinationData) {
@@ -407,10 +417,12 @@ export default async function DestinationPage({ params }: DestinationPageProps) 
 // Pages will be generated on-demand with ISR
 export async function generateStaticParams() {
   try {
-    const destinations = await prisma.destination.findMany({
-      select: { slug: true, locale: true },
-      distinct: ['slug', 'locale'],
-    });
+    const destinations = await withRetry(() =>
+      prisma.destination.findMany({
+        select: { slug: true, locale: true },
+        distinct: ['slug', 'locale'],
+      })
+    );
 
     return destinations.map((dest) => ({
       locale: dest.locale,

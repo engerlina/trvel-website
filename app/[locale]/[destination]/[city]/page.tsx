@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { prisma } from '@/lib/db';
+import { prisma, withRetry } from '@/lib/db';
 import { notFound } from 'next/navigation';
 import { Header, Footer } from '@/components/layout';
 import { Link } from '@/i18n/routing';
@@ -57,18 +57,22 @@ interface CityPageProps {
 export async function generateMetadata({ params }: CityPageProps): Promise<Metadata> {
   const { locale, destination, city } = await params;
 
-  const cityData = await prisma.city.findUnique({
-    where: { slug_locale: { slug: city, locale } },
-    include: { destination: true },
-  });
+  const cityData = await withRetry(() =>
+    prisma.city.findUnique({
+      where: { slug_locale: { slug: city, locale } },
+      include: { destination: true },
+    })
+  );
 
   if (!cityData) {
     return { title: 'City Not Found' };
   }
 
-  const planData = await prisma.plan.findUnique({
-    where: { destination_slug_locale: { destination_slug: destination, locale } },
-  });
+  const planData = await withRetry(() =>
+    prisma.plan.findUnique({
+      where: { destination_slug_locale: { destination_slug: destination, locale } },
+    })
+  );
 
   const dailyRate = planData?.best_daily_rate ? formatPrice(planData.best_daily_rate, planData.currency) : '';
   const currencySymbol = planData?.currency === 'IDR' ? 'Rp' : planData?.currency === 'GBP' ? '£' : '$';
@@ -97,42 +101,52 @@ export async function generateMetadata({ params }: CityPageProps): Promise<Metad
 export default async function CityPage({ params }: CityPageProps) {
   const { locale, destination, city } = await params;
 
-  const cityData = await prisma.city.findUnique({
-    where: { slug_locale: { slug: city, locale } },
-    include: { destination: true },
-  });
+  const cityData = await withRetry(() =>
+    prisma.city.findUnique({
+      where: { slug_locale: { slug: city, locale } },
+      include: { destination: true },
+    })
+  );
 
   if (!cityData) {
     notFound();
   }
 
-  const destinationData = cityData.destination || await prisma.destination.findUnique({
-    where: { slug_locale: { slug: destination, locale } },
-  });
+  const destinationData = cityData.destination || await withRetry(() =>
+    prisma.destination.findUnique({
+      where: { slug_locale: { slug: destination, locale } },
+    })
+  );
 
   if (!destinationData) {
     notFound();
   }
 
-  const planData = await prisma.plan.findUnique({
-    where: { destination_slug_locale: { destination_slug: destination, locale } },
-  });
+  const planData = await withRetry(() =>
+    prisma.plan.findUnique({
+      where: { destination_slug_locale: { destination_slug: destination, locale } },
+    })
+  );
 
   const competitorData = planData?.currency
-    ? await prisma.competitor.findUnique({
-        where: { currency: planData.currency },
-      })
+    ? await withRetry(() =>
+        prisma.competitor.findUnique({
+          where: { currency: planData.currency },
+        })
+      )
     : null;
 
   // Get other cities in this destination for internal linking
-  const otherCities = await prisma.city.findMany({
-    where: {
-      locale,
-      destination_id: destinationData.id,
-      NOT: { slug: city },
-    },
-    take: 5,
-  });
+  const otherCities = await withRetry(() =>
+    prisma.city.findMany({
+      where: {
+        locale,
+        destination_id: destinationData.id,
+        NOT: { slug: city },
+      },
+      take: 5,
+    })
+  );
 
   const FlagIcon = flagMap[cityData.country_iso] || Globe;
   const currency = planData?.currency || 'AUD';
@@ -418,9 +432,11 @@ export default async function CityPage({ params }: CityPageProps) {
 // Generate static params for all cities
 export async function generateStaticParams() {
   try {
-    const cities = await prisma.city.findMany({
-      select: { slug: true, locale: true, destination: { select: { slug: true } } },
-    });
+    const cities = await withRetry(() =>
+      prisma.city.findMany({
+        select: { slug: true, locale: true, destination: { select: { slug: true } } },
+      })
+    );
 
     return cities
       .filter((city) => city.destination)
