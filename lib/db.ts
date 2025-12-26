@@ -4,12 +4,40 @@ const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
 
-// Create Prisma client with connection pool limits to prevent
-// overwhelming the database during static page generation
+/**
+ * Enhance database URL with connection pool parameters
+ * During static generation, Next.js generates many pages concurrently
+ * We need a larger connection pool to handle concurrent requests
+ */
+function getDatabaseUrl(): string {
+  const url = process.env.DATABASE_URL;
+  if (!url) {
+    throw new Error('DATABASE_URL environment variable is not set');
+  }
+
+  try {
+    const urlObj = new URL(url);
+    // Set connection pool parameters
+    urlObj.searchParams.set('connection_limit', '10');
+    urlObj.searchParams.set('pool_timeout', '60');
+    return urlObj.toString();
+  } catch {
+    // If URL parsing fails, append parameters manually
+    const separator = url.includes('?') ? '&' : '?';
+    return `${url}${separator}connection_limit=10&pool_timeout=60`;
+  }
+}
+
+// Create Prisma client with connection pool configuration
 export const prisma =
   globalForPrisma.prisma ??
   new PrismaClient({
     log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
+    datasources: {
+      db: {
+        url: getDatabaseUrl(),
+      },
+    },
   });
 
 // Prevent multiple instances in development (hot reload)
