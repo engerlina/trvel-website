@@ -7,7 +7,11 @@ const globalForPrisma = globalThis as unknown as {
 /**
  * Enhance database URL with connection pool parameters
  * During static generation, Next.js generates many pages concurrently
- * We need a larger connection pool to handle concurrent requests
+ * We need proper connection pooling to handle concurrent requests
+ * 
+ * Note: For Supabase, ensure DATABASE_URL uses the connection pooler:
+ * - Pooler: pooler.xxx.supabase.co:6543 (transaction mode, recommended for Prisma)
+ * - Direct: db.xxx.supabase.co:5432 (for migrations only, use DIRECT_URL)
  */
 function getDatabaseUrl(): string {
   const url = process.env.DATABASE_URL;
@@ -17,14 +21,31 @@ function getDatabaseUrl(): string {
 
   try {
     const urlObj = new URL(url);
-    // Set connection pool parameters
-    urlObj.searchParams.set('connection_limit', '10');
-    urlObj.searchParams.set('pool_timeout', '60');
+    
+    // Check if already has connection parameters to avoid duplicates
+    const hasConnectionLimit = urlObj.searchParams.has('connection_limit');
+    const hasPoolTimeout = urlObj.searchParams.has('pool_timeout');
+    
+    // Only set if not already present
+    if (!hasConnectionLimit) {
+      // For Supabase pooler, use lower limit (pooler handles it at infrastructure level)
+      // For direct connections, use higher limit
+      const isSupabasePooler = urlObj.hostname.includes('pooler.supabase.co');
+      urlObj.searchParams.set('connection_limit', isSupabasePooler ? '20' : '15');
+    }
+    
+    if (!hasPoolTimeout) {
+      urlObj.searchParams.set('pool_timeout', '60');
+    }
+    
+    // Always set connect_timeout for faster failure detection
+    urlObj.searchParams.set('connect_timeout', '10');
+    
     return urlObj.toString();
   } catch {
     // If URL parsing fails, append parameters manually
     const separator = url.includes('?') ? '&' : '?';
-    return `${url}${separator}connection_limit=10&pool_timeout=60`;
+    return `${url}${separator}connection_limit=15&pool_timeout=60&connect_timeout=10`;
   }
 }
 
@@ -52,11 +73,13 @@ export async function disconnectPrisma() {
 /**
  * Retry wrapper for Prisma operations that may fail due to connection pool exhaustion
  * Use this for critical database operations during static generation
+ * 
+ * Increased retries and delays for build-time operations
  */
 export async function withRetry<T>(
   operation: () => Promise<T>,
-  maxRetries: number = 3,
-  baseDelayMs: number = 1000
+  maxRetries: number = 5,
+  baseDelayMs: number = 2000
 ): Promise<T> {
   let lastError: Error | undefined;
 
@@ -77,7 +100,8 @@ export async function withRetry<T>(
       }
 
       // Exponential backoff with jitter
-      const delay = baseDelayMs * Math.pow(2, attempt) + Math.random() * 500;
+      // Longer delays for connection pool issues (2s, 4s, 8s, 16s, 32s)
+      const delay = baseDelayMs * Math.pow(2, attempt) + Math.random() * 1000;
 
       console.warn(
         `Database connection retry ${attempt + 1}/${maxRetries} after ${Math.round(delay)}ms`,

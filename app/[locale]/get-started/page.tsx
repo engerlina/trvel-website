@@ -21,6 +21,7 @@ import {
 import * as Flags from 'country-flag-icons/react/3x2';
 import { isDestinationExcluded } from '@/lib/utils';
 import { DurationOption } from '@/types';
+import { getGclid } from '@/hooks/useGclid';
 
 interface Destination {
   id: string;
@@ -161,6 +162,9 @@ export default function GetStartedPage() {
 
     setIsLoading(true);
 
+    // Get gclid for Google Ads attribution
+    const gclid = getGclid();
+
     try {
       const response = await fetch('/api/checkout', {
         method: 'POST',
@@ -169,6 +173,7 @@ export default function GetStartedPage() {
           destination: selectedDestination,
           duration: selectedDuration,
           locale,
+          ...(gclid && { gclid }),
         }),
       });
 

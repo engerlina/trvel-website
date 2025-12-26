@@ -9,6 +9,8 @@ module.exports = withNextIntl({
     workerThreads: false,
     cpus: 1,
   },
+  // Increase timeout for static page generation to handle database queries
+  staticPageGenerationTimeout: 120,
   images: {
     remotePatterns: [
       {

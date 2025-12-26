@@ -5,6 +5,7 @@ import { ChevronDown, ChevronUp, Clock, TrendingUp, ArrowRight, Check } from 'lu
 import { DestinationPlanCard } from './DestinationPlanCard';
 import { DurationOption } from '@/types';
 import { Link } from '@/i18n/routing';
+import { getGclid } from '@/hooks/useGclid';
 
 // Compact plan card for additional plans
 function CompactPlanCard({
@@ -24,11 +25,20 @@ function CompactPlanCard({
 
   const handleCheckout = async () => {
     setIsLoading(true);
+
+    // Get gclid for Google Ads attribution
+    const gclid = getGclid();
+
     try {
       const response = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ destination, duration: plan.duration, locale }),
+        body: JSON.stringify({
+          destination,
+          duration: plan.duration,
+          locale,
+          ...(gclid && { gclid }),
+        }),
       });
       const data = await response.json();
       if (data.url) {

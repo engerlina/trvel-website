@@ -36,11 +36,6 @@ export function DestinationPlanCard({
     // Get gclid for Google Ads attribution
     const gclid = getGclid();
 
-    // Debug: Log what we're getting from localStorage
-    console.log('DestinationPlanCard handleCheckout - gclid:', gclid);
-    console.log('DestinationPlanCard handleCheckout - localStorage gclid:', typeof window !== 'undefined' ? localStorage.getItem('gclid') : 'SSR');
-    console.log('DestinationPlanCard handleCheckout - localStorage timestamp:', typeof window !== 'undefined' ? localStorage.getItem('gclid_timestamp') : 'SSR');
-
     try {
       const response = await fetch('/api/checkout', {
         method: 'POST',
