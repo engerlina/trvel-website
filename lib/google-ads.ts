@@ -23,42 +23,22 @@ interface GoogleAdsResponse {
   partialFailureError?: string;
 }
 
-// Get OAuth2 access token using service account
+// Get OAuth2 access token using refresh token
 async function getAccessToken(): Promise<string | null> {
-  const serviceAccountEmail = process.env.GOOGLE_ADS_SERVICE_ACCOUNT_EMAIL;
-  const privateKey = process.env.GOOGLE_ADS_PRIVATE_KEY?.replace(/\\n/g, '\n');
+  const refreshToken = process.env.GOOGLE_ADS_REFRESH_TOKEN;
+  const clientId = process.env.GOOGLE_ADS_CLIENT_ID;
+  const clientSecret = process.env.GOOGLE_ADS_CLIENT_SECRET;
 
-  if (!serviceAccountEmail || !privateKey) {
-    console.warn('Google Ads service account credentials not configured');
+  if (!refreshToken || !clientId || !clientSecret) {
+    console.warn('Google Ads OAuth credentials not configured', {
+      hasRefreshToken: !!refreshToken,
+      hasClientId: !!clientId,
+      hasClientSecret: !!clientSecret,
+    });
     return null;
   }
 
   try {
-    // Create JWT for service account authentication
-    const now = Math.floor(Date.now() / 1000);
-    const header = {
-      alg: 'RS256',
-      typ: 'JWT',
-    };
-    const payload = {
-      iss: serviceAccountEmail,
-      scope: 'https://www.googleapis.com/auth/adwords',
-      aud: 'https://oauth2.googleapis.com/token',
-      iat: now,
-      exp: now + 3600,
-    };
-
-    // Note: In production, use a proper JWT library like jose or jsonwebtoken
-    // For now, we'll use the simpler refresh token approach
-    const refreshToken = process.env.GOOGLE_ADS_REFRESH_TOKEN;
-    const clientId = process.env.GOOGLE_ADS_CLIENT_ID;
-    const clientSecret = process.env.GOOGLE_ADS_CLIENT_SECRET;
-
-    if (!refreshToken || !clientId || !clientSecret) {
-      console.warn('Google Ads OAuth credentials not configured');
-      return null;
-    }
-
     const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
       method: 'POST',
       headers: {
@@ -79,6 +59,7 @@ async function getAccessToken(): Promise<string | null> {
     }
 
     const tokenData = await tokenResponse.json();
+    console.log('Google Ads access token obtained successfully');
     return tokenData.access_token;
   } catch (error) {
     console.error('Error getting Google Ads access token:', error);
@@ -206,6 +187,8 @@ export function isGoogleAdsConfigured(): boolean {
     process.env.GOOGLE_ADS_CUSTOMER_ID &&
     process.env.GOOGLE_ADS_CONVERSION_ACTION_ID &&
     process.env.GOOGLE_ADS_DEVELOPER_TOKEN &&
-    (process.env.GOOGLE_ADS_REFRESH_TOKEN || process.env.GOOGLE_ADS_PRIVATE_KEY)
+    process.env.GOOGLE_ADS_REFRESH_TOKEN &&
+    process.env.GOOGLE_ADS_CLIENT_ID &&
+    process.env.GOOGLE_ADS_CLIENT_SECRET
   );
 }
