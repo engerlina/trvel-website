@@ -22,20 +22,23 @@ function getDatabaseUrl(): string {
   try {
     const urlObj = new URL(url);
     
-    // Check if already has connection parameters to avoid duplicates
-    const hasConnectionLimit = urlObj.searchParams.has('connection_limit');
-    const hasPoolTimeout = urlObj.searchParams.has('pool_timeout');
+    // Check current values and override if they're too low
+    const currentConnectionLimit = urlObj.searchParams.get('connection_limit');
+    const currentPoolTimeout = urlObj.searchParams.get('pool_timeout');
     
-    // Only set if not already present
-    if (!hasConnectionLimit) {
-      // For Supabase pooler, use lower limit (pooler handles it at infrastructure level)
-      // For direct connections, use higher limit
-      const isSupabasePooler = urlObj.hostname.includes('pooler.supabase.co');
-      urlObj.searchParams.set('connection_limit', isSupabasePooler ? '20' : '15');
+    // Determine recommended values based on connection type
+    const isSupabasePooler = urlObj.hostname.includes('pooler.supabase.co') || 
+                            urlObj.hostname.includes('supabase.co') && urlObj.port === '6543';
+    const recommendedConnectionLimit = isSupabasePooler ? '20' : '15';
+    const recommendedPoolTimeout = '60';
+    
+    // Override if not set or if current value is too low (below our recommended minimum)
+    if (!currentConnectionLimit || parseInt(currentConnectionLimit) < 10) {
+      urlObj.searchParams.set('connection_limit', recommendedConnectionLimit);
     }
     
-    if (!hasPoolTimeout) {
-      urlObj.searchParams.set('pool_timeout', '60');
+    if (!currentPoolTimeout || parseInt(currentPoolTimeout) < 30) {
+      urlObj.searchParams.set('pool_timeout', recommendedPoolTimeout);
     }
     
     // Always set connect_timeout for faster failure detection
@@ -43,9 +46,11 @@ function getDatabaseUrl(): string {
     
     return urlObj.toString();
   } catch {
-    // If URL parsing fails, append parameters manually
-    const separator = url.includes('?') ? '&' : '?';
-    return `${url}${separator}connection_limit=15&pool_timeout=60&connect_timeout=10`;
+    // If URL parsing fails, append parameters manually (overriding any existing ones)
+    // Remove existing parameters first by parsing and rebuilding
+    const baseUrl = url.split('?')[0];
+    const separator = baseUrl.includes('?') ? '&' : '?';
+    return `${baseUrl}${separator}connection_limit=20&pool_timeout=60&connect_timeout=10`;
   }
 }
 
