@@ -10,7 +10,8 @@ module.exports = withNextIntl({
     cpus: 1,
   },
   // Increase timeout for static page generation to handle database queries
-  staticPageGenerationTimeout: 120,
+  // Longer timeout to account for queued operations due to semaphore
+  staticPageGenerationTimeout: 180,
   images: {
     remotePatterns: [
       {
