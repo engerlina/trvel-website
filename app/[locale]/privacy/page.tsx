@@ -199,7 +199,7 @@ export default async function PrivacyPage({ params }: PrivacyPageProps) {
                 <li><strong>Withdrawal:</strong> Withdraw consent where processing is based on consent</li>
               </ul>
               <p>
-                To exercise these rights, please contact us at privacy@trvel.co. We will respond to
+                To exercise these rights, please contact us at support@trvel.co. We will respond to
                 your request within 30 days (or sooner where required by law).
               </p>
 
@@ -261,7 +261,7 @@ export default async function PrivacyPage({ params }: PrivacyPageProps) {
               <div className="bg-cream-50 rounded-xl p-6 border border-cream-200 not-prose">
                 <p className="font-semibold text-navy-500 mb-2">Vertial Holdings Pty Ltd</p>
                 <p className="text-navy-400 text-sm mb-1">ABN: 72 629 494 926</p>
-                <p className="text-navy-400 text-sm mb-1">Email: privacy@trvel.co</p>
+                <p className="text-navy-400 text-sm mb-1">Email: support@trvel.co</p>
                 <p className="text-navy-400 text-sm">New South Wales, Australia</p>
               </div>
 
