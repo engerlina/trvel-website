@@ -525,6 +525,9 @@ export async function POST(request: NextRequest) {
     const customerEmail = session.customer_details?.email;
     const customerName = session.customer_details?.name;
     const customerPhone = session.customer_details?.phone;
+    const stripeCustomerId = typeof session.customer === 'string'
+      ? session.customer
+      : session.customer?.id || null;
 
     if (!customerEmail) {
       console.error('No customer email found in session');
@@ -589,21 +592,24 @@ export async function POST(request: NextRequest) {
             email: customerEmail,
             name: customerName || null,
             phone: customerPhone || null,
+            stripe_customer_id: stripeCustomerId,
           },
         });
-        console.log('Created new customer:', customer.id);
+        console.log('Created new customer:', customer.id, 'stripe:', stripeCustomerId);
       } else {
         // Update customer info if we have new data
-        if (customerName || customerPhone) {
+        const needsUpdate = customerName || customerPhone || (stripeCustomerId && !customer.stripe_customer_id);
+        if (needsUpdate) {
           customer = await prisma.customer.update({
             where: { id: customer.id },
             data: {
               name: customerName || customer.name,
               phone: customerPhone || customer.phone,
+              stripe_customer_id: stripeCustomerId || customer.stripe_customer_id,
             },
           });
         }
-        console.log('Found existing customer:', customer.id);
+        console.log('Found existing customer:', customer.id, 'stripe:', customer.stripe_customer_id);
       }
 
       // 2. Fetch destination name from database
