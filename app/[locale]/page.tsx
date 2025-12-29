@@ -43,6 +43,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     alternates: {
       canonical: `${BASE_URL}/${locale}`,
       languages: {
+        'x-default': `${BASE_URL}/en-au`,
         'en-AU': `${BASE_URL}/en-au`,
         'en-SG': `${BASE_URL}/en-sg`,
         'en-GB': `${BASE_URL}/en-gb`,

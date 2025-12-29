@@ -23,6 +23,15 @@ export async function generateMetadata({ params }: TermsPageProps): Promise<Meta
     description,
     alternates: {
       canonical: `${BASE_URL}/${locale}/terms`,
+      languages: {
+        'x-default': `${BASE_URL}/en-au/terms`,
+        'en-AU': `${BASE_URL}/en-au/terms`,
+        'en-SG': `${BASE_URL}/en-sg/terms`,
+        'en-GB': `${BASE_URL}/en-gb/terms`,
+        'en-US': `${BASE_URL}/en-us/terms`,
+        'ms-MY': `${BASE_URL}/ms-my/terms`,
+        'id-ID': `${BASE_URL}/id-id/terms`,
+      },
     },
     openGraph: {
       title,

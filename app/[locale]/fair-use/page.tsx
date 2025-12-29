@@ -23,6 +23,15 @@ export async function generateMetadata({ params }: FairUsePageProps): Promise<Me
     description,
     alternates: {
       canonical: `${BASE_URL}/${locale}/fair-use`,
+      languages: {
+        'x-default': `${BASE_URL}/en-au/fair-use`,
+        'en-AU': `${BASE_URL}/en-au/fair-use`,
+        'en-SG': `${BASE_URL}/en-sg/fair-use`,
+        'en-GB': `${BASE_URL}/en-gb/fair-use`,
+        'en-US': `${BASE_URL}/en-us/fair-use`,
+        'ms-MY': `${BASE_URL}/ms-my/fair-use`,
+        'id-ID': `${BASE_URL}/id-id/fair-use`,
+      },
     },
     openGraph: {
       title,

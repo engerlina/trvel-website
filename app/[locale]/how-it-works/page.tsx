@@ -36,6 +36,15 @@ export async function generateMetadata({ params }: HowItWorksPageProps): Promise
     description,
     alternates: {
       canonical: `${BASE_URL}/${locale}/how-it-works`,
+      languages: {
+        'x-default': `${BASE_URL}/en-au/how-it-works`,
+        'en-AU': `${BASE_URL}/en-au/how-it-works`,
+        'en-SG': `${BASE_URL}/en-sg/how-it-works`,
+        'en-GB': `${BASE_URL}/en-gb/how-it-works`,
+        'en-US': `${BASE_URL}/en-us/how-it-works`,
+        'ms-MY': `${BASE_URL}/ms-my/how-it-works`,
+        'id-ID': `${BASE_URL}/id-id/how-it-works`,
+      },
     },
     openGraph: {
       title,

@@ -23,6 +23,15 @@ export async function generateMetadata({ params }: CompatibilityPageProps): Prom
     description,
     alternates: {
       canonical: `${BASE_URL}/${locale}/compatibility`,
+      languages: {
+        'x-default': `${BASE_URL}/en-au/compatibility`,
+        'en-AU': `${BASE_URL}/en-au/compatibility`,
+        'en-SG': `${BASE_URL}/en-sg/compatibility`,
+        'en-GB': `${BASE_URL}/en-gb/compatibility`,
+        'en-US': `${BASE_URL}/en-us/compatibility`,
+        'ms-MY': `${BASE_URL}/ms-my/compatibility`,
+        'id-ID': `${BASE_URL}/id-id/compatibility`,
+      },
     },
     openGraph: {
       title,

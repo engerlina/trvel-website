@@ -105,7 +105,16 @@ export function Footer() {
               <span className="text-xl font-bold text-cream-100">Trvel</span>
             </Link>
             <p className="text-body-sm text-cream-400 mb-6">
-              Travel light. Stay connected. Premium eSIMs for travelers who demand reliability.
+              Travel light. Stay connected. Premium{' '}
+              <a
+                href="https://www.gsma.com/esim/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-brand-400 hover:text-brand-300 transition-colors"
+              >
+                eSIMs
+              </a>{' '}
+              for travelers who demand reliability.
             </p>
             {/* Contact */}
             <div className="space-y-3">
@@ -233,9 +242,30 @@ export function Footer() {
             <div className="flex items-center gap-6">
               <span className="text-body-sm text-cream-500">Payments secured by</span>
               <div className="flex items-center gap-3">
-                <div className="px-3 py-1 bg-navy-400 rounded text-body-sm text-cream-400">Stripe</div>
-                <div className="px-3 py-1 bg-navy-400 rounded text-body-sm text-cream-400">Apple Pay</div>
-                <div className="px-3 py-1 bg-navy-400 rounded text-body-sm text-cream-400">Google Pay</div>
+                <a
+                  href="https://stripe.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3 py-1 bg-navy-400 rounded text-body-sm text-cream-400 hover:text-cream-200 transition-colors"
+                >
+                  Stripe
+                </a>
+                <a
+                  href="https://www.apple.com/apple-pay/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3 py-1 bg-navy-400 rounded text-body-sm text-cream-400 hover:text-cream-200 transition-colors"
+                >
+                  Apple Pay
+                </a>
+                <a
+                  href="https://pay.google.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3 py-1 bg-navy-400 rounded text-body-sm text-cream-400 hover:text-cream-200 transition-colors"
+                >
+                  Google Pay
+                </a>
               </div>
             </div>
           </div>
