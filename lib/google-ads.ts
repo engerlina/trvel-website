@@ -131,7 +131,7 @@ export async function uploadClickConversion(data: ConversionData): Promise<Googl
     });
 
     const response = await fetch(
-      `https://googleads.googleapis.com/v18/customers/${formattedCustomerId}:uploadClickConversions`,
+      `https://googleads.googleapis.com/v22/customers/${formattedCustomerId}:uploadClickConversions`,
       {
         method: 'POST',
         headers: {

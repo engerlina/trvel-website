@@ -27,10 +27,7 @@ export function getGclid(): string | null {
     const gclid = localStorage.getItem(GCLID_STORAGE_KEY);
     const timestamp = localStorage.getItem(GCLID_TIMESTAMP_KEY);
 
-    console.log('getGclid called:', { gclid, timestamp });
-
     if (!gclid || !timestamp) {
-      console.log('getGclid returning null - missing gclid or timestamp');
       return null;
     }
 
