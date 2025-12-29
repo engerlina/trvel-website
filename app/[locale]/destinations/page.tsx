@@ -206,8 +206,10 @@ export default async function DestinationsPage({ params }: DestinationsPageProps
           const regionDestinations = destinationsByRegion[region];
           if (!regionDestinations || regionDestinations.length === 0) return null;
 
+          const regionId = region.toLowerCase().replace(/\s+/g, '-');
+
           return (
-            <section key={region} className="py-12 bg-white even:bg-cream-50">
+            <section key={region} id={regionId} className="py-12 bg-white even:bg-cream-50 scroll-mt-20">
               <div className="container-wide">
                 <div className="flex items-center gap-3 mb-8">
                   <h2 className="text-heading-xl font-bold text-navy-500">

@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { Shield, Lock, MessageCircle, Mail, ChevronRight, Phone } from 'lucide-react';
 import { AU, SG, GB, US, MY, ID, type FlagComponent } from 'country-flag-icons/react/3x2';
 
+
 const destinations = [
   { name: 'Japan', slug: 'japan' },
   { name: 'Thailand', slug: 'thailand' },
@@ -44,16 +45,7 @@ const locales: { code: string; label: string; Flag: FlagComponent; currency: str
 
 export function Footer() {
   return (
-    <footer
-      className="bg-navy-500 text-cream-300"
-      style={{
-        backgroundImage: 'none',
-        background: '#010326',
-        backgroundSize: 'auto',
-        backgroundRepeat: 'no-repeat',
-        backgroundPosition: '0 0'
-      }}
-    >
+    <footer className="bg-navy-500 text-cream-300">
       {/* Trust Bar */}
       <div className="border-b border-navy-400">
         <div className="container-wide py-8">
@@ -239,32 +231,32 @@ export function Footer() {
             <p className="text-body-sm text-cream-500">
               © {new Date().getFullYear()} Trvel. All rights reserved.
             </p>
-            <div className="flex items-center gap-6">
+            <div className="flex items-center gap-4">
               <span className="text-body-sm text-cream-500">Payments secured by</span>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-4">
                 <a
                   href="https://stripe.com"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-3 py-1 bg-navy-400 rounded text-body-sm text-cream-400 hover:text-cream-200 transition-colors"
+                  className="hover:opacity-80 transition-opacity"
                 >
-                  Stripe
+                  <Image src="/stripe.png" alt="Stripe" width={50} height={21} className="h-5 w-auto brightness-0 invert" />
                 </a>
                 <a
                   href="https://www.apple.com/apple-pay/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-3 py-1 bg-navy-400 rounded text-body-sm text-cream-400 hover:text-cream-200 transition-colors"
+                  className="hover:opacity-80 transition-opacity"
                 >
-                  Apple Pay
+                  <Image src="/apple-logo.png" alt="Apple Pay" width={50} height={21} className="h-5 w-auto brightness-0 invert" />
                 </a>
                 <a
                   href="https://pay.google.com"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-3 py-1 bg-navy-400 rounded text-body-sm text-cream-400 hover:text-cream-200 transition-colors"
+                  className="hover:opacity-80 transition-opacity"
                 >
-                  Google Pay
+                  <Image src="/google.png" alt="Google Pay" width={50} height={21} className="h-5 w-auto brightness-0 invert" />
                 </a>
               </div>
             </div>
