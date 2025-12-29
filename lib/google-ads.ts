@@ -138,9 +138,7 @@ export async function uploadClickConversion(data: ConversionData): Promise<Googl
           Authorization: `Bearer ${accessToken}`,
           'Content-Type': 'application/json',
           'developer-token': process.env.GOOGLE_ADS_DEVELOPER_TOKEN || '',
-          ...(process.env.GOOGLE_ADS_LOGIN_CUSTOMER_ID && {
-            'login-customer-id': process.env.GOOGLE_ADS_LOGIN_CUSTOMER_ID.replace(/-/g, ''),
-          }),
+          // Note: Do NOT use login-customer-id - it causes permission errors with this setup
         },
         body: JSON.stringify(requestBody),
       }
