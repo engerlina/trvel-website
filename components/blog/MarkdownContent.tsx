@@ -19,7 +19,7 @@ export function MarkdownContent({ content }: MarkdownContentProps) {
           const isInternal = href?.startsWith('/');
           if (isInternal) {
             return (
-              <Link href={href || '/'} className="text-brand-500 hover:text-brand-600 hover:underline">
+              <Link href={href || '/'} className="text-brand-600 hover:text-brand-700 underline decoration-brand-300 hover:decoration-brand-500">
                 {children}
               </Link>
             );
@@ -29,7 +29,7 @@ export function MarkdownContent({ content }: MarkdownContentProps) {
               href={href}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-brand-500 hover:text-brand-600 hover:underline"
+              className="text-brand-600 hover:text-brand-700 underline decoration-brand-300 hover:decoration-brand-500"
               {...props}
             >
               {children}

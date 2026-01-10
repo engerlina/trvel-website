@@ -167,8 +167,8 @@ export function Hero() {
           <h1 id="hero-heading" className="animate-fade-up animate-delay-100 text-display-lg md:text-display-xl font-bold text-navy-500 mb-6">
             <span className="block">Travelling to</span>
             <span className="flex items-center justify-center gap-4">
-              <span className="text-brand-400">{typedDestination}</span>
-              <span className="animate-blink text-brand-400 font-light">|</span>
+              <span className="text-brand-600">{typedDestination}</span>
+              <span className="animate-blink text-brand-500 font-light">|</span>
               {CurrentFlag && typedDestination && (
                 <CurrentFlag className="w-12 h-auto rounded shadow-sm inline-block" />
               )}

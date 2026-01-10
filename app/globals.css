@@ -4,18 +4,20 @@
 
 @layer base {
   :root {
-    /* New color scheme - Travel Illustrations palette */
+    /* Brand colors - Travel Illustrations palette */
     --color-navy: #010326;
     --color-teal: #63BFBF;
+    --color-teal-text: #2d7a7a; /* WCAG AA accessible on white */
     --color-cream: #F2E2CE;
     --color-coral: #F28379;
     --color-coral-red: #F25757;
+    --color-muted: #6b6d80; /* WCAG AA accessible muted text */
 
     /* Gradients */
-    --gradient-brand: linear-gradient(135deg, #63BFBF 0%, #4fa9a9 100%);
+    --gradient-brand: linear-gradient(135deg, #63BFBF 0%, #3d9e9e 100%);
     --gradient-accent: linear-gradient(135deg, #F28379 0%, #F25757 100%);
     --gradient-cta: linear-gradient(135deg, #F25757 0%, #d93d3d 100%);
-    --gradient-success: linear-gradient(135deg, #63BFBF 0%, #4fa9a9 100%);
+    --gradient-success: linear-gradient(135deg, #3d9e9e 0%, #2d7a7a 100%);
     --gradient-hero: linear-gradient(180deg, #F2E2CE 0%, #ffffff 100%);
   }
 

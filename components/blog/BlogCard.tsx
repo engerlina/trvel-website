@@ -134,11 +134,11 @@ export function BlogCard({
           {/* Content */}
           <div className="flex-1 min-w-0">
             {category && (
-              <span className="text-xs font-semibold text-brand-500 uppercase tracking-wider">
+              <span className="text-xs font-semibold text-brand-600 uppercase tracking-wider">
                 {category.replace('-', ' ')}
               </span>
             )}
-            <h3 className="text-base font-semibold text-navy-500 mt-1 line-clamp-2 group-hover:text-brand-500 transition-colors">
+            <h3 className="text-base font-semibold text-navy-500 mt-1 line-clamp-2 group-hover:text-brand-600 transition-colors">
               {title}
             </h3>
             {formattedDate && (
@@ -213,7 +213,7 @@ export function BlogCard({
           </div>
 
           {/* Title */}
-          <h3 className="text-lg font-bold text-navy-500 mb-2 line-clamp-2 group-hover:text-brand-500 transition-colors">
+          <h3 className="text-lg font-bold text-navy-500 mb-2 line-clamp-2 group-hover:text-brand-600 transition-colors">
             {title}
           </h3>
 

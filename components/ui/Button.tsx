@@ -32,9 +32,9 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         focus-visible:ring-accent-500
       `,
       secondary: `
-        bg-white text-brand-400
+        bg-white text-brand-600
         border-2 border-brand-400
-        hover:bg-brand-50 hover:border-brand-500 hover:-translate-y-0.5
+        hover:bg-brand-50 hover:border-brand-500 hover:text-brand-700 hover:-translate-y-0.5
         active:translate-y-0 active:bg-brand-100
         focus-visible:ring-brand-400
       `,
