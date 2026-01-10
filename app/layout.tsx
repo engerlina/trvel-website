@@ -2,9 +2,13 @@ import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
 import Script from 'next/script';
 import { GoogleAdsCapture } from '@/components/GoogleAdsCapture';
+import { LazyElevenLabs } from '@/components/LazyElevenLabs';
 import './globals.css';
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap', // Improves FCP by showing fallback font immediately
+});
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.trvel.co';
 
@@ -88,24 +92,17 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" data-theme="trvel">
+      <head>
+        {/* Preconnect to critical third-party origins for faster loading */}
+        <link rel="preconnect" href="https://www.googletagmanager.com" />
+        <link rel="preconnect" href="https://www.google-analytics.com" />
+        <link rel="dns-prefetch" href="https://analytics.vertial.com" />
+      </head>
       <body className={inter.className}>
         {/* Capture Google Ads gclid from URL */}
         <GoogleAdsCapture />
-        {/* Vertial Analytics */}
-        <Script
-          defer
-          src="https://analytics.vertial.com/script.js"
-          data-website-id="c6676273-d652-42da-b101-02ff592c29c1"
-          strategy="afterInteractive"
-        />
-        {/* JC Dashboard Analytics */}
-        <Script
-          defer
-          src="https://jc-dashboard-xi.vercel.app/tracker.js"
-          data-website-id="c6676273-d652-42da-b101-02ff592c29c1"
-          strategy="afterInteractive"
-        />
-        {/* Google Analytics */}
+
+        {/* Google Analytics - Priority for conversion tracking */}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-LQP0KHTXLH"
           strategy="afterInteractive"
@@ -118,14 +115,25 @@ export default function RootLayout({
             gtag('config', 'G-LQP0KHTXLH');
           `}
         </Script>
-        {children}
-        {/* ElevenLabs ConvAI Widget */}
-        {/* @ts-expect-error - Custom element not recognized by React */}
-        <elevenlabs-convai agent-id="agent_7501kcncsd2rftrtv8ap6n6q4czt"></elevenlabs-convai>
+
+        {/* Secondary Analytics - Deferred to reduce main thread blocking */}
         <Script
-          src="https://unpkg.com/@elevenlabs/convai-widget-embed"
-          strategy="afterInteractive"
+          defer
+          src="https://analytics.vertial.com/script.js"
+          data-website-id="c6676273-d652-42da-b101-02ff592c29c1"
+          strategy="lazyOnload"
         />
+        <Script
+          defer
+          src="https://jc-dashboard-xi.vercel.app/tracker.js"
+          data-website-id="c6676273-d652-42da-b101-02ff592c29c1"
+          strategy="lazyOnload"
+        />
+
+        {children}
+
+        {/* ElevenLabs ConvAI Widget - Lazy loaded on user interaction */}
+        <LazyElevenLabs />
       </body>
     </html>
   );
