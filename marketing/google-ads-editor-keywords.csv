@@ -1,9 +1,4 @@
-Campaign,Ad Group,Keyword,Match Type,Final URL,Status
-Search - Travel eSIM - AU,Travel eSIM - General,travel esim,Phrase,https://www.trvel.co/en-au,Enabled
-Search - Travel eSIM - AU,Travel eSIM - General,esim for travel,Phrase,https://www.trvel.co/en-au,Enabled
-Search - Travel eSIM - AU,Travel eSIM - General,international esim,Phrase,https://www.trvel.co/en-au,Enabled
-Search - Travel eSIM - AU,Travel eSIM - General,travel sim card,Phrase,https://www.trvel.co/en-au,Enabled
-Search - Travel eSIM - AU,Travel eSIM - General,buy esim online,Phrase,https://www.trvel.co/en-au,Enabled
+Campaign,Ad Group,Keyword,Criterion Type,Final URL,Status
 Search - Travel eSIM - AU,Japan eSIM,[japan esim],Exact,https://www.trvel.co/en-au/japan,Enabled
 Search - Travel eSIM - AU,Japan eSIM,[esim japan],Exact,https://www.trvel.co/en-au/japan,Enabled
 Search - Travel eSIM - AU,Japan eSIM,[japan travel sim],Exact,https://www.trvel.co/en-au/japan,Enabled
@@ -72,9 +67,3 @@ Search - Travel eSIM - AU,Malaysia eSIM,[malaysia travel sim],Exact,https://www.
 Search - Travel eSIM - AU,Malaysia eSIM,[malaysia data sim],Exact,https://www.trvel.co/en-au/malaysia,Enabled
 Search - Travel eSIM - AU,Malaysia eSIM,[malaysia sim card tourist],Exact,https://www.trvel.co/en-au/malaysia,Enabled
 Search - Travel eSIM - AU,Malaysia eSIM,[esim for malaysia],Exact,https://www.trvel.co/en-au/malaysia,Enabled
-Search - Travel eSIM - AU,USA eSIM,[usa esim],Exact,https://www.trvel.co/en-au/united-states,Paused
-Search - Travel eSIM - AU,USA eSIM,[america esim],Exact,https://www.trvel.co/en-au/united-states,Paused
-Search - Travel eSIM - AU,USA eSIM,[us travel sim],Exact,https://www.trvel.co/en-au/united-states,Paused
-Search - Travel eSIM - AU,Europe eSIM,[europe esim],Exact,https://www.trvel.co/en-au/destinations#europe,Paused
-Search - Travel eSIM - AU,Europe eSIM,[uk esim],Exact,https://www.trvel.co/en-au/united-kingdom,Paused
-Search - Travel eSIM - AU,Asia eSIM,[asia esim],Exact,https://www.trvel.co/en-au/destinations#asia,Paused

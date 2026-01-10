@@ -38,6 +38,44 @@ module.exports = withNextIntl({
         destination: 'https://www.trvel.co/:path*',
         permanent: true,
       },
+      // Redirect missing pages that were crawled
+      {
+        source: '/about',
+        destination: '/en-au',
+        permanent: true,
+      },
+      {
+        source: '/:locale(en-au|en-sg|en-gb|en-us|ms-my|id-id)/about',
+        destination: '/:locale',
+        permanent: true,
+      },
+      {
+        source: '/refunds',
+        destination: '/en-au/terms',
+        permanent: true,
+      },
+      {
+        source: '/:locale(en-au|en-sg|en-gb|en-us|ms-my|id-id)/refunds',
+        destination: '/:locale/terms',
+        permanent: true,
+      },
+      // Redirect malformed URLs
+      {
+        source: '/day',
+        destination: '/en-au',
+        permanent: true,
+      },
+      {
+        source: '/hari',
+        destination: '/id-id',
+        permanent: true,
+      },
+      // Fix duplicate locale in URL
+      {
+        source: '/:locale(en-au|en-sg|en-gb|en-us|ms-my|id-id)/:locale2(en-au|en-sg|en-gb|en-us|ms-my|id-id)/:path*',
+        destination: '/:locale/:path*',
+        permanent: true,
+      },
     ];
   },
 });

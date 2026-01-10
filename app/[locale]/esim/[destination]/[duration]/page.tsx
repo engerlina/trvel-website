@@ -143,6 +143,15 @@ export async function generateMetadata({ params }: DurationPageProps): Promise<M
     description,
     alternates: {
       canonical: `${BASE_URL}/${locale}/esim/${destination}/${duration}`,
+      languages: {
+        'x-default': `${BASE_URL}/en-au/esim/${destination}/${duration}`,
+        'en-AU': `${BASE_URL}/en-au/esim/${destination}/${duration}`,
+        'en-SG': `${BASE_URL}/en-sg/esim/${destination}/${duration}`,
+        'en-GB': `${BASE_URL}/en-gb/esim/${destination}/${duration}`,
+        'en-US': `${BASE_URL}/en-us/esim/${destination}/${duration}`,
+        'ms-MY': `${BASE_URL}/ms-my/esim/${destination}/${duration}`,
+        'id-ID': `${BASE_URL}/id-id/esim/${destination}/${duration}`,
+      },
     },
     openGraph: {
       title,

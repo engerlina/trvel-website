@@ -56,6 +56,15 @@ export async function generateMetadata({ params }: DevicePageProps): Promise<Met
     description,
     alternates: {
       canonical: `${BASE_URL}/${locale}/compatibility/${brand}/${device}`,
+      languages: {
+        'x-default': `${BASE_URL}/en-au/compatibility/${brand}/${device}`,
+        'en-AU': `${BASE_URL}/en-au/compatibility/${brand}/${device}`,
+        'en-SG': `${BASE_URL}/en-sg/compatibility/${brand}/${device}`,
+        'en-GB': `${BASE_URL}/en-gb/compatibility/${brand}/${device}`,
+        'en-US': `${BASE_URL}/en-us/compatibility/${brand}/${device}`,
+        'ms-MY': `${BASE_URL}/ms-my/compatibility/${brand}/${device}`,
+        'id-ID': `${BASE_URL}/id-id/compatibility/${brand}/${device}`,
+      },
     },
     openGraph: {
       title,

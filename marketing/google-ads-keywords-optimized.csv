@@ -1,0 +1,22 @@
+Campaign,Ad Group,Keyword,Match Type,Final URL,Status,Notes
+Search - Travel eSIM - AU,Japan eSIM,[japan esim],Exact,https://www.trvel.co/en-au/japan,Enabled,High intent - top AU destination
+Search - Travel eSIM - AU,Japan eSIM,[esim japan],Exact,https://www.trvel.co/en-au/japan,Enabled,Variant
+Search - Travel eSIM - AU,Japan eSIM,[japan travel sim],Exact,https://www.trvel.co/en-au/japan,Enabled,Travel intent
+Search - Travel eSIM - AU,Japan eSIM,[tokyo esim],Exact,https://www.trvel.co/en-au/japan,Enabled,City specific
+Search - Travel eSIM - AU,Thailand eSIM,[thailand esim],Exact,https://www.trvel.co/en-au/thailand,Enabled,High volume AU destination
+Search - Travel eSIM - AU,Thailand eSIM,[esim thailand],Exact,https://www.trvel.co/en-au/thailand,Enabled,Variant
+Search - Travel eSIM - AU,Thailand eSIM,[bangkok esim],Exact,https://www.trvel.co/en-au/thailand,Enabled,City specific
+Search - Travel eSIM - AU,Thailand eSIM,[phuket esim],Exact,https://www.trvel.co/en-au/thailand,Enabled,City specific
+Search - Travel eSIM - AU,Indonesia eSIM,[indonesia esim],Exact,https://www.trvel.co/en-au/indonesia,Enabled,Popular - Bali traffic
+Search - Travel eSIM - AU,Indonesia eSIM,[bali esim],Exact,https://www.trvel.co/en-au/indonesia,Enabled,High intent - Bali trips
+Search - Travel eSIM - AU,Indonesia eSIM,[esim bali],Exact,https://www.trvel.co/en-au/indonesia,Enabled,Variant
+Search - Travel eSIM - AU,Indonesia eSIM,[jakarta esim],Exact,https://www.trvel.co/en-au/indonesia,Enabled,Business travel
+Search - Travel eSIM - AU,Singapore eSIM,[singapore esim],Exact,https://www.trvel.co/en-au/singapore,Enabled,Business + leisure
+Search - Travel eSIM - AU,Singapore eSIM,[esim singapore],Exact,https://www.trvel.co/en-au/singapore,Enabled,Variant
+Search - Travel eSIM - AU,South Korea eSIM,[korea esim],Exact,https://www.trvel.co/en-au/south-korea,Enabled,Growing destination
+Search - Travel eSIM - AU,South Korea eSIM,[south korea esim],Exact,https://www.trvel.co/en-au/south-korea,Enabled,Full name
+Search - Travel eSIM - AU,South Korea eSIM,[seoul esim],Exact,https://www.trvel.co/en-au/south-korea,Enabled,City specific
+Search - Travel eSIM - AU,Vietnam eSIM,[vietnam esim],Exact,https://www.trvel.co/en-au/vietnam,Enabled,Budget travel destination
+Search - Travel eSIM - AU,Vietnam eSIM,[esim vietnam],Exact,https://www.trvel.co/en-au/vietnam,Enabled,Variant
+Search - Travel eSIM - AU,Malaysia eSIM,[malaysia esim],Exact,https://www.trvel.co/en-au/malaysia,Enabled,Regional hub
+Search - Travel eSIM - AU,Malaysia eSIM,[kuala lumpur esim],Exact,https://www.trvel.co/en-au/malaysia,Enabled,City specific

@@ -22,11 +22,42 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return { title: 'Post Not Found' };
   }
 
+  // Find which locales have this post (blog posts are locale-specific)
+  const postLocales = await withRetry(() =>
+    prisma.post.findMany({
+      where: { slug },
+      select: { locale: true },
+    })
+  );
+
+  // Build hreflang only for locales where post exists
+  const localeToHreflang: Record<string, string> = {
+    'en-au': 'en-AU',
+    'en-sg': 'en-SG',
+    'en-gb': 'en-GB',
+    'en-us': 'en-US',
+    'ms-my': 'ms-MY',
+    'id-id': 'id-ID',
+  };
+
+  const languages: Record<string, string> = {};
+  for (const { locale: postLocale } of postLocales) {
+    const hreflangKey = localeToHreflang[postLocale];
+    if (hreflangKey) {
+      languages[hreflangKey] = `${BASE_URL}/${postLocale}/blog/${slug}`;
+    }
+  }
+
+  // Set x-default to en-au if available, otherwise first available locale
+  const defaultLocale = postLocales.find(p => p.locale === 'en-au')?.locale || postLocales[0]?.locale || 'en-au';
+  languages['x-default'] = `${BASE_URL}/${defaultLocale}/blog/${slug}`;
+
   return {
     title: post.title,
     description: post.excerpt || post.content.slice(0, 160),
     alternates: {
       canonical: `${BASE_URL}/${locale}/blog/${slug}`,
+      languages,
     },
     openGraph: {
       title: post.title,
