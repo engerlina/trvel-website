@@ -16,6 +16,8 @@ const destinations = [
 const company = [
   { name: 'About Us', href: '/about' },
   { name: 'How It Works', href: '/how-it-works' },
+  { name: 'Customer Reviews', href: '/reviews' },
+  { name: 'Our Guarantee', href: '/guarantee' },
   { name: 'Blog', href: '/blog' },
   { name: 'Help Center', href: '/help' },
 ];
@@ -45,7 +47,7 @@ const locales: { code: string; label: string; Flag: FlagComponent; currency: str
 
 export function Footer() {
   return (
-    <footer className="bg-navy-500 text-cream-300">
+    <footer className="bg-navy-500 text-cream-300 no-decoration">
       {/* Trust Bar */}
       <div className="border-b border-navy-400">
         <div className="container-wide py-8">

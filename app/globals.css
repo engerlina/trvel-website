@@ -34,6 +34,16 @@
   h1, h2, h3, h4, h5, h6 {
     @apply font-semibold tracking-tight;
   }
+
+  /* Remove all link underlines globally */
+  a {
+    text-decoration: none !important;
+  }
+
+  /* Remove focus outlines except for keyboard navigation */
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
 }
 
 @layer components {
@@ -69,6 +79,25 @@
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+
+  /* Fix dotted line artifacts in footer */
+  .no-decoration,
+  .no-decoration *,
+  .no-decoration a,
+  .no-decoration a:link,
+  .no-decoration a:visited,
+  .no-decoration a:hover,
+  .no-decoration a:active {
+    text-decoration: none !important;
+    text-decoration-line: none !important;
+    text-decoration-style: solid !important;
+    border-style: solid !important;
+  }
+
+  .no-decoration svg,
+  .no-decoration svg * {
+    stroke-dasharray: none !important;
   }
 
   .animate-delay-100 {
