@@ -30,8 +30,21 @@ function getPlanName(days: number): { name: string; subtext?: string } {
   return { name: `${days} Days` };
 }
 
-const features = [
-  'unlimitedData',
+// Get data label based on data tier
+function getDataLabel(dataType?: string, dataAmountMb?: number): string {
+  if (!dataType || dataType === 'unlimited') {
+    return 'unlimitedData'; // Translation key
+  }
+  // For capped data plans, return formatted string
+  if (dataAmountMb && dataAmountMb >= 1000) {
+    return `${dataAmountMb / 1000}GB data included`;
+  }
+  // Fallback to data_type label
+  return `${dataType.toUpperCase()} data included`;
+}
+
+// Features without data - data is added dynamically per plan
+const baseFeatures = [
   'instantActivation',
   'liveSupport',
   'moneyBackGuarantee',
@@ -166,7 +179,7 @@ export function Plans() {
             <span className="font-medium transition-opacity duration-300" key={`desc-${currentDestSlug}`}>
               {currentDestName}
             </span>
-            . All plans include unlimited data.
+            . Instant delivery, transparent pricing.
           </p>
         </div>
 
@@ -285,7 +298,18 @@ export function Plans() {
 
                     {/* Features */}
                     <ul className="space-y-3 mb-8">
-                      {features.map((feature) => (
+                      {/* Dynamic data label based on plan's data_type */}
+                      <li className="flex items-center gap-3">
+                        <div className="w-5 h-5 rounded-full bg-success-100 flex items-center justify-center flex-shrink-0">
+                          <Check className="w-3 h-3 text-success-600" />
+                        </div>
+                        <span className="text-body-sm text-gray-600">
+                          {duration.data_type === 'unlimited' || !duration.data_type
+                            ? t('features.unlimitedData')
+                            : getDataLabel(duration.data_type, duration.data_amount_mb)}
+                        </span>
+                      </li>
+                      {baseFeatures.map((feature) => (
                         <li key={feature} className="flex items-center gap-3">
                           <div className="w-5 h-5 rounded-full bg-success-100 flex items-center justify-center flex-shrink-0">
                             <Check className="w-3 h-3 text-success-600" />
@@ -300,7 +324,9 @@ export function Plans() {
                       destination={currentDestSlug}
                       duration={duration.duration}
                       locale={locale}
+                      dataType={duration.data_type}
                       variant={isPopular ? 'primary' : 'secondary'}
+                      disabled={plansLoading}
                     >
                       {t('selectPlan')}
                     </DirectCheckoutButton>
@@ -387,7 +413,9 @@ export function Plans() {
                       destination={currentDestSlug}
                       duration={duration.duration}
                       locale={locale}
+                      dataType={duration.data_type}
                       variant="secondary"
+                      disabled={plansLoading}
                     >
                       Select
                     </DirectCheckoutButton>
