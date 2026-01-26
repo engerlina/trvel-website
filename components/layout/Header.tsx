@@ -45,7 +45,7 @@ export function Header() {
 
         {/* Desktop Navigation */}
         <div className="navbar-center hidden md:flex">
-          <ul className="menu menu-horizontal px-1 gap-2">
+          <ul className="menu menu-horizontal px-1 gap-1 lg:gap-2">
             <li><Link href="/destinations" className="text-body">{t('destinations')}</Link></li>
             <li><Link href="/compatibility" className="text-body">Check Device</Link></li>
             <li><Link href="/how-it-works" className="text-body">How It Works</Link></li>
@@ -54,7 +54,7 @@ export function Header() {
         </div>
 
         {/* Desktop Actions */}
-        <div className="navbar-end gap-2">
+        <div className="navbar-end gap-4 lg:gap-6">
           {/* Phone Number - Only shown if locale has one */}
           {currentLocale.phone && (
             <a
