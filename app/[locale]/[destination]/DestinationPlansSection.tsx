@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { ChevronDown, ChevronUp, Clock, TrendingUp, ArrowRight, Check } from 'lucide-react';
+import { ChevronDown, ChevronUp, Clock, TrendingUp, ArrowRight, Check, Infinity, Database } from 'lucide-react';
 import { DestinationPlanCard } from './DestinationPlanCard';
 import { DurationOption, DataTier } from '@/types';
 import { Link } from '@/i18n/routing';
@@ -16,6 +16,11 @@ function getDataLabel(dataType?: DataTier, dataAmountMb?: number): string {
     return `${dataAmountMb / 1000}GB`;
   }
   return dataType.toUpperCase();
+}
+
+// Check if plan is unlimited
+function isUnlimitedPlan(dataType?: DataTier): boolean {
+  return !dataType || dataType === 'unlimited';
 }
 
 // Compact plan card for additional plans
@@ -33,6 +38,8 @@ function CompactPlanCard({
   locale: string;
 }) {
   const [isLoading, setIsLoading] = useState(false);
+  const isUnlimited = isUnlimitedPlan(plan.dataType);
+  const DataIcon = isUnlimited ? Infinity : Database;
 
   const handleCheckout = async () => {
     setIsLoading(true);
@@ -62,9 +69,20 @@ function CompactPlanCard({
   };
 
   return (
-    <div className="relative rounded-2xl p-5 bg-cream-50 border border-cream-200 hover:border-brand-200 hover:shadow-lg transition-all">
+    <div className={`relative rounded-2xl overflow-hidden bg-cream-50 hover:shadow-lg transition-all ${
+      isUnlimited ? 'border-2 border-brand-200' : 'border-2 border-amber-200'
+    }`}>
+      {/* Data Tier Indicator Bar */}
+      <div
+        className={`h-1 w-full ${
+          isUnlimited
+            ? 'bg-gradient-to-r from-brand-400 to-brand-500'
+            : 'bg-gradient-to-r from-amber-400 to-amber-500'
+        }`}
+      />
+
       {isBestValue && (
-        <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+        <div className="absolute top-3 left-1/2 -translate-x-1/2 z-10">
           <span className="inline-flex items-center gap-1 px-3 py-1 bg-success-500 text-white text-xs font-semibold rounded-full shadow">
             <TrendingUp className="w-3 h-3" />
             Best Value
@@ -72,19 +90,20 @@ function CompactPlanCard({
         </div>
       )}
 
-      <div className="text-center pt-2">
+      <div className={`text-center p-5 ${isBestValue ? 'pt-8' : ''}`}>
+        {/* Data tier badge */}
+        <span className={`inline-flex items-center gap-1 px-2 py-1 text-xs font-semibold rounded-full mb-2 ${
+          isUnlimited
+            ? 'bg-brand-100 text-brand-700'
+            : 'bg-amber-100 text-amber-700'
+        }`}>
+          <DataIcon className="w-3 h-3" />
+          {getDataLabel(plan.dataType, plan.dataAmountMb)}
+        </span>
+
         <h3 className="text-base font-semibold text-navy-500 mb-1">
           {plan.name}
         </h3>
-
-        {/* Data tier badge */}
-        <span className={`inline-block px-2 py-0.5 text-xs font-medium rounded-full mb-2 ${
-          plan.dataType === 'unlimited' || !plan.dataType
-            ? 'bg-brand-100 text-brand-700'
-            : 'bg-cream-200 text-navy-600'
-        }`}>
-          {getDataLabel(plan.dataType, plan.dataAmountMb)}
-        </span>
 
         <div className="mb-2">
           <span className="text-2xl font-bold text-navy-500">
@@ -99,7 +118,11 @@ function CompactPlanCard({
         <button
           onClick={handleCheckout}
           disabled={isLoading}
-          className="w-full py-2.5 rounded-xl font-semibold transition-all bg-brand-500 text-white hover:bg-brand-600 disabled:opacity-50 text-sm"
+          className={`w-full py-2.5 rounded-xl font-semibold transition-all disabled:opacity-50 text-sm ${
+            isUnlimited
+              ? 'bg-brand-500 text-white hover:bg-brand-600'
+              : 'bg-amber-500 text-white hover:bg-amber-600'
+          }`}
         >
           {isLoading ? 'Processing...' : 'Get Started'}
         </button>
@@ -245,8 +268,26 @@ export function DestinationPlansSection({
     );
   }
 
+  // Check if we have mixed plan types to show legend
+  const hasMixedTypes = sortedDurations.some(d => isUnlimitedPlan(d.data_type)) &&
+                        sortedDurations.some(d => !isUnlimitedPlan(d.data_type));
+
   return (
     <>
+      {/* Plan Type Legend - only show if we have both types */}
+      {hasMixedTypes && (
+        <div className="flex flex-wrap items-center justify-center gap-4 mb-8">
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand-50 border border-brand-200">
+            <Infinity className="w-4 h-4 text-brand-600" />
+            <span className="text-sm font-medium text-brand-700">Unlimited Data</span>
+          </div>
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-50 border border-amber-200">
+            <Database className="w-4 h-4 text-amber-600" />
+            <span className="text-sm font-medium text-amber-700">Fixed Data (Budget)</span>
+          </div>
+        </div>
+      )}
+
       {/* Plan cards */}
       <div className={`grid gap-6 max-w-4xl mx-auto ${
         plans.length === 1 ? 'grid-cols-1 max-w-md' :

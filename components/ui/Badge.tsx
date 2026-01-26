@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 
-type BadgeVariant = 'brand' | 'success' | 'neutral';
+type BadgeVariant = 'brand' | 'success' | 'neutral' | 'budget' | 'unlimited';
 
 interface BadgeProps {
   variant?: BadgeVariant;
@@ -13,6 +13,8 @@ const variantClasses: Record<BadgeVariant, string> = {
   brand: 'badge-primary bg-brand-100 text-brand-700 border-brand-200',
   success: 'badge-success bg-success-100 text-success-600 border-success-200',
   neutral: 'badge-ghost bg-gray-100 text-gray-700 border-gray-200',
+  budget: 'bg-amber-50 text-amber-700 border-amber-200',
+  unlimited: 'bg-brand-50 text-brand-700 border-brand-200',
 };
 
 export function Badge({ variant = 'brand', children, className = '' }: BadgeProps) {

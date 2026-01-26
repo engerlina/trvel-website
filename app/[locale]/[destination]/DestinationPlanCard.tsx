@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Check, ArrowRight } from 'lucide-react';
+import { Check, ArrowRight, Infinity, Database } from 'lucide-react';
 import { Link } from '@/i18n/routing';
 import { getGclid } from '@/hooks/useGclid';
 import { DataTier } from '@/types';
@@ -20,17 +20,33 @@ interface DestinationPlanCardProps {
   dataAmountMb?: number;
 }
 
-// Get human-readable data label based on tier
-function getDataLabel(dataType?: DataTier, dataAmountMb?: number): string {
-  if (!dataType || dataType === 'unlimited') {
-    return 'Unlimited data';
+// Get the data tier display info
+function getDataTierInfo(dataType?: DataTier, dataAmountMb?: number): {
+  label: string;
+  shortLabel: string;
+  isUnlimited: boolean;
+  Icon: React.ComponentType<{ className?: string }>;
+} {
+  const isUnlimited = !dataType || dataType === 'unlimited';
+
+  if (isUnlimited) {
+    return {
+      label: 'Unlimited data',
+      shortLabel: 'Unlimited',
+      isUnlimited: true,
+      Icon: Infinity,
+    };
   }
-  // Convert MB to GB for display
-  if (dataAmountMb && dataAmountMb >= 1000) {
-    return `${dataAmountMb / 1000}GB data`;
-  }
-  // Fallback to tier name
-  return dataType.toUpperCase() + ' data';
+
+  // Calculate GB from MB
+  const gbAmount = dataAmountMb ? Math.round(dataAmountMb / 1000) : parseInt(dataType?.replace('gb', '') || '1');
+
+  return {
+    label: `${gbAmount}GB data`,
+    shortLabel: `${gbAmount}GB`,
+    isUnlimited: false,
+    Icon: Database,
+  };
 }
 
 export function DestinationPlanCard({
@@ -47,7 +63,8 @@ export function DestinationPlanCard({
   dataAmountMb,
 }: DestinationPlanCardProps) {
   const [isLoading, setIsLoading] = useState(false);
-  const dataLabel = getDataLabel(dataType, dataAmountMb);
+  const tierInfo = getDataTierInfo(dataType, dataAmountMb);
+  const DataIcon = tierInfo.Icon;
 
   const handleCheckout = async () => {
     setIsLoading(true);
@@ -85,24 +102,56 @@ export function DestinationPlanCard({
     }
   };
 
+  // Determine card styling based on tier and popularity
+  const isUnlimited = tierInfo.isUnlimited;
+
   return (
     <div
-      className={`relative rounded-2xl p-6 transition-all ${
+      className={`relative rounded-2xl overflow-hidden transition-all ${
         popular
           ? 'bg-gradient-to-br from-brand-500 to-brand-600 text-white shadow-xl shadow-brand-500/25 scale-105 z-10'
-          : 'bg-cream-50 border border-cream-200 hover:border-brand-200 hover:shadow-lg'
+          : isUnlimited
+          ? 'bg-cream-50 border-2 border-brand-200 hover:border-brand-300 hover:shadow-lg'
+          : 'bg-cream-50 border-2 border-amber-200 hover:border-amber-300 hover:shadow-lg'
       }`}
     >
+      {/* Data Tier Indicator Bar - only for non-popular cards */}
+      {!popular && (
+        <div
+          className={`h-1.5 w-full ${
+            isUnlimited
+              ? 'bg-gradient-to-r from-brand-400 to-brand-500'
+              : 'bg-gradient-to-r from-amber-400 to-amber-500'
+          }`}
+        />
+      )}
+
       {/* Popular badge */}
       {popular && (
-        <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10">
           <span className="px-4 py-1 bg-accent-500 text-white text-sm font-semibold rounded-full shadow-lg">
             Most Popular
           </span>
         </div>
       )}
 
-      <div className="text-center pt-4">
+      <div className={`text-center p-6 ${popular ? 'pt-10' : 'pt-5'}`}>
+        {/* Data Tier Badge */}
+        <div className="mb-3">
+          <span
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold ${
+              popular
+                ? 'bg-white/20 text-white'
+                : isUnlimited
+                ? 'bg-brand-100 text-brand-700'
+                : 'bg-amber-100 text-amber-700'
+            }`}
+          >
+            <DataIcon className="w-4 h-4" />
+            {tierInfo.label}
+          </span>
+        </div>
+
         <h3 className={`text-lg font-semibold ${popular ? 'text-white' : 'text-navy-500'}`}>
           {name}
         </h3>
@@ -125,17 +174,58 @@ export function DestinationPlanCard({
 
         {/* Features */}
         <ul className={`space-y-3 mb-6 text-left ${popular ? 'text-brand-100' : 'text-navy-400'}`}>
+          {/* Data feature - styled by tier */}
           <li className="flex items-center gap-2">
-            <Check className={`w-4 h-4 ${popular ? 'text-brand-200' : 'text-brand-500'}`} />
-            {dataLabel}
+            <div
+              className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 ${
+                popular
+                  ? 'bg-white/20'
+                  : isUnlimited
+                  ? 'bg-brand-100'
+                  : 'bg-amber-100'
+              }`}
+            >
+              <DataIcon
+                className={`w-3 h-3 ${
+                  popular
+                    ? 'text-white'
+                    : isUnlimited
+                    ? 'text-brand-600'
+                    : 'text-amber-600'
+                }`}
+              />
+            </div>
+            <span
+              className={`font-medium ${
+                popular
+                  ? 'text-white'
+                  : isUnlimited
+                  ? 'text-brand-700'
+                  : 'text-amber-700'
+              }`}
+            >
+              {tierInfo.label}
+            </span>
           </li>
           <li className="flex items-center gap-2">
-            <Check className={`w-4 h-4 ${popular ? 'text-brand-200' : 'text-brand-500'}`} />
+            <div
+              className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 ${
+                popular ? 'bg-white/20' : 'bg-brand-100'
+              }`}
+            >
+              <Check className={`w-3 h-3 ${popular ? 'text-white' : 'text-brand-600'}`} />
+            </div>
             Premium network
           </li>
           <li className="flex items-center gap-2">
-            <Check className={`w-4 h-4 ${popular ? 'text-brand-200' : 'text-brand-500'}`} />
-            24/7 live chat & phone support
+            <div
+              className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 ${
+                popular ? 'bg-white/20' : 'bg-brand-100'
+              }`}
+            >
+              <Check className={`w-3 h-3 ${popular ? 'text-white' : 'text-brand-600'}`} />
+            </div>
+            24/7 live support
           </li>
         </ul>
 
@@ -145,7 +235,9 @@ export function DestinationPlanCard({
           className={`block w-full py-3 rounded-xl font-semibold transition-all disabled:opacity-50 ${
             popular
               ? 'bg-white text-brand-600 hover:bg-cream-50'
-              : 'bg-brand-500 text-white hover:bg-brand-600'
+              : isUnlimited
+              ? 'bg-brand-500 text-white hover:bg-brand-600'
+              : 'bg-amber-500 text-white hover:bg-amber-600'
           }`}
         >
           {isLoading ? (
@@ -172,6 +264,13 @@ export function DestinationPlanCard({
             'Get Started'
           )}
         </button>
+
+        {/* Budget label for fixed data plans */}
+        {!popular && !isUnlimited && (
+          <p className="text-center text-sm text-amber-600 mt-3 font-medium">
+            💰 Budget-friendly option
+          </p>
+        )}
 
         {/* Link to duration-specific page for SEO */}
         <Link

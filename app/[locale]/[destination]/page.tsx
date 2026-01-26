@@ -279,7 +279,7 @@ export default async function DestinationPage({ params }: DestinationPageProps) 
                 Choose Your Plan
               </h2>
               <p className="text-body-lg text-navy-300">
-                All plans include unlimited data, premium network access, and 24/7 support
+                Premium network access, 24/7 support, and instant delivery
               </p>
             </div>
 

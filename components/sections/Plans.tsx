@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
-import { Check, Zap, Star, TrendingUp, AlertTriangle, Globe, ChevronDown, ChevronUp, Clock } from 'lucide-react';
+import { Check, Zap, Star, TrendingUp, AlertTriangle, Globe, ChevronDown, ChevronUp, Clock, Infinity, Database } from 'lucide-react';
 import { Badge } from '@/components/ui';
 import { Card } from '@/components/ui';
 import { Button } from '@/components/ui';
@@ -41,6 +41,40 @@ function getDataLabel(dataType?: string, dataAmountMb?: number): string {
   }
   // Fallback to data_type label
   return `${dataType.toUpperCase()} data included`;
+}
+
+// Check if a plan is unlimited
+function isUnlimitedPlan(dataType?: string): boolean {
+  return !dataType || dataType === 'unlimited';
+}
+
+// Get the data tier display info
+function getDataTierInfo(dataType?: string, dataAmountMb?: number): {
+  label: string;
+  shortLabel: string;
+  isUnlimited: boolean;
+  icon: React.ComponentType<{ className?: string }>;
+} {
+  const isUnlimited = !dataType || dataType === 'unlimited';
+
+  if (isUnlimited) {
+    return {
+      label: 'Unlimited Data',
+      shortLabel: 'Unlimited',
+      isUnlimited: true,
+      icon: Infinity,
+    };
+  }
+
+  // Calculate GB from MB
+  const gbAmount = dataAmountMb ? Math.round(dataAmountMb / 1000) : parseInt(dataType?.replace('gb', '') || '1');
+
+  return {
+    label: `${gbAmount}GB Data`,
+    shortLabel: `${gbAmount}GB`,
+    isUnlimited: false,
+    icon: Database,
+  };
 }
 
 // Features without data - data is added dynamically per plan
@@ -181,6 +215,18 @@ export function Plans() {
             </span>
             . Instant delivery, transparent pricing.
           </p>
+
+          {/* Plan Type Legend */}
+          <div className="flex flex-wrap items-center justify-center gap-4 mt-6">
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand-50 border border-brand-200">
+              <Infinity className="w-4 h-4 text-brand-600" />
+              <span className="text-sm font-medium text-brand-700">Unlimited Data</span>
+            </div>
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-50 border border-amber-200">
+              <Database className="w-4 h-4 text-amber-600" />
+              <span className="text-sm font-medium text-amber-700">Fixed Data (Budget)</span>
+            </div>
+          </div>
         </div>
 
         {/* Plans Grid */}
@@ -242,16 +288,34 @@ export function Plans() {
               const Icon = getPlanIcon(duration.duration);
               const isPopular = index === 1 && defaultPlans.length >= 3; // Middle option is popular
               const isBestValue = bestDailyDuration?.duration === duration.duration;
+              const tierInfo = getDataTierInfo(duration.data_type, duration.data_amount_mb);
+              const DataIcon = tierInfo.icon;
 
               return (
                 <Card
-                  key={duration.duration}
+                  key={`${duration.duration}-${duration.data_type}`}
                   hover
                   padding="none"
-                  className={`relative ${isPopular ? 'border-brand-500 border-2 shadow-glow' : ''}`}
+                  className={`relative overflow-hidden ${
+                    isPopular
+                      ? 'border-brand-500 border-2 shadow-glow'
+                      : tierInfo.isUnlimited
+                      ? 'border-brand-200'
+                      : 'border-amber-200'
+                  }`}
                 >
+                  {/* Data Tier Indicator Bar */}
+                  <div
+                    className={`h-1.5 w-full ${
+                      tierInfo.isUnlimited
+                        ? 'bg-gradient-to-r from-brand-400 to-brand-500'
+                        : 'bg-gradient-to-r from-amber-400 to-amber-500'
+                    }`}
+                  />
+
+                  {/* Badges */}
                   {isPopular && (
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                    <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10">
                       <Badge variant="brand">
                         <Star className="w-3 h-3" />
                         {t('mostPopular')}
@@ -259,7 +323,7 @@ export function Plans() {
                     </div>
                   )}
                   {isBestValue && !isPopular && (
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                    <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10">
                       <Badge variant="success">
                         <TrendingUp className="w-3 h-3" />
                         Best Value
@@ -267,18 +331,41 @@ export function Plans() {
                     </div>
                   )}
 
-                  <div className="p-8">
+                  <div className={`p-8 ${isPopular || isBestValue ? 'pt-12' : ''}`}>
+                    {/* Data Tier Badge - Prominent */}
+                    <div className="mb-4">
+                      <span
+                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold ${
+                          tierInfo.isUnlimited
+                            ? 'bg-brand-100 text-brand-700'
+                            : 'bg-amber-100 text-amber-700'
+                        }`}
+                      >
+                        <DataIcon className="w-4 h-4" />
+                        {tierInfo.label}
+                      </span>
+                    </div>
+
                     {/* Plan Icon & Name */}
                     <div className="flex items-center gap-3 mb-4">
-                      <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${isPopular ? 'bg-brand-100' : 'bg-gray-100'}`}>
-                        <Icon className={`w-6 h-6 ${isPopular ? 'text-brand-600' : 'text-gray-600'}`} />
+                      <div
+                        className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+                          tierInfo.isUnlimited ? 'bg-brand-100' : 'bg-amber-100'
+                        }`}
+                      >
+                        <Icon
+                          className={`w-6 h-6 ${
+                            tierInfo.isUnlimited ? 'text-brand-600' : 'text-amber-600'
+                          }`}
+                        />
                       </div>
                       <div>
                         <h3 className="text-heading font-bold text-gray-900">
                           {getPlanName(duration.duration).name}
                         </h3>
                         <p className="text-body-sm text-gray-500">
-                          {getPlanName(duration.duration).subtext || `${duration.duration} ${duration.duration === 1 ? 'day' : t('days')}`}
+                          {getPlanName(duration.duration).subtext ||
+                            `${duration.duration} ${duration.duration === 1 ? 'day' : t('days')}`}
                         </p>
                       </div>
                     </div>
@@ -286,27 +373,44 @@ export function Plans() {
                     {/* Price */}
                     <div className="mb-6">
                       <div className="flex items-baseline gap-1">
-                        <span className="text-display font-bold text-gray-900 transition-all duration-300" key={`price-${currentDestSlug}-${duration.duration}`}>
-                          {currencySymbol}{formatPrice(duration.retail_price, currency)}
+                        <span
+                          className="text-display font-bold text-gray-900 transition-all duration-300"
+                          key={`price-${currentDestSlug}-${duration.duration}-${duration.data_type}`}
+                        >
+                          {currencySymbol}
+                          {formatPrice(duration.retail_price, currency)}
                         </span>
                         <span className="text-body text-gray-500">{currency}</span>
                       </div>
                       <p className="text-body-sm text-gray-500 mt-1">
-                        {currencySymbol}{formatPrice(duration.daily_rate, currency)}/day
+                        {currencySymbol}
+                        {formatPrice(duration.daily_rate, currency)}/day
                       </p>
                     </div>
 
                     {/* Features */}
                     <ul className="space-y-3 mb-8">
-                      {/* Dynamic data label based on plan's data_type */}
+                      {/* Data feature - styled by tier */}
                       <li className="flex items-center gap-3">
-                        <div className="w-5 h-5 rounded-full bg-success-100 flex items-center justify-center flex-shrink-0">
-                          <Check className="w-3 h-3 text-success-600" />
+                        <div
+                          className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 ${
+                            tierInfo.isUnlimited ? 'bg-brand-100' : 'bg-amber-100'
+                          }`}
+                        >
+                          <DataIcon
+                            className={`w-3 h-3 ${
+                              tierInfo.isUnlimited ? 'text-brand-600' : 'text-amber-600'
+                            }`}
+                          />
                         </div>
-                        <span className="text-body-sm text-gray-600">
-                          {duration.data_type === 'unlimited' || !duration.data_type
+                        <span
+                          className={`text-body-sm font-medium ${
+                            tierInfo.isUnlimited ? 'text-brand-700' : 'text-amber-700'
+                          }`}
+                        >
+                          {tierInfo.isUnlimited
                             ? t('features.unlimitedData')
-                            : getDataLabel(duration.data_type, duration.data_amount_mb)}
+                            : `${tierInfo.shortLabel} data included`}
                         </span>
                       </li>
                       {baseFeatures.map((feature) => (
@@ -314,22 +418,31 @@ export function Plans() {
                           <div className="w-5 h-5 rounded-full bg-success-100 flex items-center justify-center flex-shrink-0">
                             <Check className="w-3 h-3 text-success-600" />
                           </div>
-                          <span className="text-body-sm text-gray-600">{t(`features.${feature}`)}</span>
+                          <span className="text-body-sm text-gray-600">
+                            {t(`features.${feature}`)}
+                          </span>
                         </li>
                       ))}
                     </ul>
 
-                    {/* CTA */}
+                    {/* CTA - styled by tier */}
                     <DirectCheckoutButton
                       destination={currentDestSlug}
                       duration={duration.duration}
                       locale={locale}
                       dataType={duration.data_type}
-                      variant={isPopular ? 'primary' : 'secondary'}
+                      variant={tierInfo.isUnlimited ? 'primary' : 'secondary'}
                       disabled={plansLoading}
                     >
                       {t('selectPlan')}
                     </DirectCheckoutButton>
+
+                    {/* Budget label for fixed data plans */}
+                    {!tierInfo.isUnlimited && (
+                      <p className="text-center text-body-sm text-amber-600 mt-3 font-medium">
+                        💰 Budget-friendly option
+                      </p>
+                    )}
                   </div>
                 </Card>
               );
@@ -362,16 +475,29 @@ export function Plans() {
             {additionalPlans.map((duration) => {
               const Icon = getPlanIcon(duration.duration);
               const isBestValue = bestDailyDuration?.duration === duration.duration;
+              const tierInfo = getDataTierInfo(duration.data_type, duration.data_amount_mb);
+              const DataIcon = tierInfo.icon;
 
               return (
                 <Card
-                  key={duration.duration}
+                  key={`${duration.duration}-${duration.data_type}`}
                   hover
                   padding="none"
-                  className="relative"
+                  className={`relative overflow-hidden ${
+                    tierInfo.isUnlimited ? 'border-brand-200' : 'border-amber-200'
+                  }`}
                 >
+                  {/* Data Tier Indicator Bar */}
+                  <div
+                    className={`h-1 w-full ${
+                      tierInfo.isUnlimited
+                        ? 'bg-gradient-to-r from-brand-400 to-brand-500'
+                        : 'bg-gradient-to-r from-amber-400 to-amber-500'
+                    }`}
+                  />
+
                   {isBestValue && (
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                    <div className="absolute top-3 left-1/2 -translate-x-1/2 z-10">
                       <Badge variant="success">
                         <TrendingUp className="w-3 h-3" />
                         Best Value
@@ -379,18 +505,41 @@ export function Plans() {
                     </div>
                   )}
 
-                  <div className="p-6">
+                  <div className={`p-6 ${isBestValue ? 'pt-10' : ''}`}>
+                    {/* Compact Data Tier Badge */}
+                    <div className="mb-3">
+                      <span
+                        className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold ${
+                          tierInfo.isUnlimited
+                            ? 'bg-brand-100 text-brand-700'
+                            : 'bg-amber-100 text-amber-700'
+                        }`}
+                      >
+                        <DataIcon className="w-3 h-3" />
+                        {tierInfo.shortLabel}
+                      </span>
+                    </div>
+
                     {/* Compact Plan Header */}
                     <div className="flex items-center gap-3 mb-3">
-                      <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-gray-100">
-                        <Icon className="w-5 h-5 text-gray-600" />
+                      <div
+                        className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                          tierInfo.isUnlimited ? 'bg-brand-100' : 'bg-amber-100'
+                        }`}
+                      >
+                        <Icon
+                          className={`w-5 h-5 ${
+                            tierInfo.isUnlimited ? 'text-brand-600' : 'text-amber-600'
+                          }`}
+                        />
                       </div>
                       <div>
                         <h3 className="text-body font-bold text-gray-900">
                           {getPlanName(duration.duration).name}
                         </h3>
                         <p className="text-body-sm text-gray-500">
-                          {getPlanName(duration.duration).subtext || `${duration.duration} ${duration.duration === 1 ? 'day' : 'days'}`}
+                          {getPlanName(duration.duration).subtext ||
+                            `${duration.duration} ${duration.duration === 1 ? 'day' : 'days'}`}
                         </p>
                       </div>
                     </div>
@@ -399,12 +548,14 @@ export function Plans() {
                     <div className="mb-4">
                       <div className="flex items-baseline gap-1">
                         <span className="text-heading-lg font-bold text-gray-900">
-                          {currencySymbol}{formatPrice(duration.retail_price, currency)}
+                          {currencySymbol}
+                          {formatPrice(duration.retail_price, currency)}
                         </span>
                         <span className="text-body-sm text-gray-500">{currency}</span>
                       </div>
                       <p className="text-body-sm text-gray-500">
-                        {currencySymbol}{formatPrice(duration.daily_rate, currency)}/day
+                        {currencySymbol}
+                        {formatPrice(duration.daily_rate, currency)}/day
                       </p>
                     </div>
 
@@ -414,7 +565,7 @@ export function Plans() {
                       duration={duration.duration}
                       locale={locale}
                       dataType={duration.data_type}
-                      variant="secondary"
+                      variant={tierInfo.isUnlimited ? 'primary' : 'secondary'}
                       disabled={plansLoading}
                     >
                       Select
