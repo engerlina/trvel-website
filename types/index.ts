@@ -1,12 +1,15 @@
 import { Plan, Destination, Post } from '@prisma/client';
 
-export type Locale = 'en-au' | 'en-sg' | 'en-gb' | 'en-us' | 'ms-my' | 'id-id';
+export type Locale = 'en-au' | 'en-sg' | 'en-gb' | 'en-us' | 'ms-my' | 'id-id' | 'en-ca' | 'en-nz';
 
 export type PlanWithRelations = Plan;
 
 export type DestinationWithRelations = Destination;
 
 export type PostWithRelations = Post;
+
+// Data tier types for pricing display
+export type DataTier = 'unlimited' | '1gb' | '2gb' | '3gb' | '5gb' | '10gb';
 
 // Duration option stored in Plan.durations JSON array
 export interface DurationOption {
@@ -15,6 +18,8 @@ export interface DurationOption {
   retail_price: number;    // Retail price in local currency
   bundle_name: string;     // eSIM-Go bundle identifier for fulfillment
   daily_rate: number;      // Calculated: retail_price / duration
+  data_type: DataTier;     // Data tier: 'unlimited', '1gb', '2gb', etc.
+  data_amount_mb?: number; // Data amount in MB (null/undefined for unlimited)
 }
 
 // Plan data for API responses

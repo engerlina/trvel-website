@@ -33,6 +33,8 @@ yarn-error.log*
 
 # claude code config with secrets
 .claude/mcp.json
+.mcp.json
+.claude/google-ads-credentials.json
 
 # typescript
 *.tsbuildinfo

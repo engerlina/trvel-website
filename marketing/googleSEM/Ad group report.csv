@@ -1,0 +1,16 @@
+Ad group report
+"December 27, 2025 - January 25, 2026"
+Ad group status,Ad group,Status,Status reasons,Currency code,Target CPA,Conversions,Currency code,Cost / conv.,Ad group type,Clicks,Impr.,CTR,Avg. CPC,Cost,Conv. rate
+Enabled,South Korea eSIM,Eligible,,AUD, --,0.00,AUD,0.00,Standard,0,0, --,0,0.00,0.00%
+Enabled,Thailand eSIM,Eligible,unknown,AUD, --,0.00,AUD,0.00,Standard,35,162,21.60%,6.27,219.58,0.00%
+Enabled,Indonesia eSIM,Eligible,,AUD, --,0.00,AUD,0.00,Standard,0,0, --,0,0.00,0.00%
+Enabled,Japan eSIM,Eligible,unknown,AUD, --,0.00,AUD,0.00,Standard,20,209,9.57%,6.20,123.96,0.00%
+Enabled,Malaysia eSIM,Eligible,,AUD, --,0.00,AUD,0.00,Standard,0,0, --,0,0.00,0.00%
+Enabled,Vietnam eSIM,Eligible,,AUD, --,0.00,AUD,0.00,Standard,0,0, --,0,0.00,0.00%
+Enabled,Singapore eSIM,Eligible,,AUD, --,0.00,AUD,0.00,Standard,0,0, --,0,0.00,0.00%
+Paused,Europe eSIM,Paused,ad group paused; unknown,AUD, --,0.00,AUD,0.00,Standard,3,97,3.09%,7.14,21.42,0.00%
+Paused,Asia eSIM,Paused,ad group paused; unknown,AUD, --,0.00,AUD,0.00,Standard,44,552,7.97%,5.72,251.56,0.00%
+Paused,USA eSIM,Paused,ad group paused; unknown,AUD, --,0.00,AUD,0.00,Standard,0,35,0.00%,0,0.00,0.00%
+Enabled,Travel eSIM - General,Eligible,unknown,AUD, --,3.00,AUD,200.35,Standard,133,"2,655",5.01%,4.52,601.06,2.26%
+Total: Ad groups,,,,,,3.00,AUD,405.86,,235,"3,710",6.33%,5.18,1217.58,1.28%
+Total: Campaign,,,,,,3.00,AUD,405.86,,235,"3,710",6.33%,5.18,1217.58,1.28%

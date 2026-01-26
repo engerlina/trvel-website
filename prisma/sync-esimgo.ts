@@ -46,7 +46,12 @@ const prisma = new PrismaClient();
 // eSIM-Go API configuration
 const ESIMGO_API_BASE = 'https://api.esim-go.com/v2.5';
 const ESIMGO_API_TOKEN = process.env.ESIMGO_API_TOKEN;
-const BUNDLE_GROUP = 'Standard Unlimited Essential';
+
+// Bundle groups to fetch - both unlimited and fixed data tiers
+const BUNDLE_GROUPS = [
+  'Standard Unlimited Essential',  // Unlimited data plans (1d, 3d)
+  'Standard Fixed',                // Fixed data plans (1GB/7d, 2GB/15d, etc.)
+];
 
 // Pricing constants
 const MINIMUM_MARGIN_MULTIPLIER = 1.5; // 50% minimum margin over wholesale
@@ -63,6 +68,8 @@ const PREFERRED_DEFAULTS = [5, 7, 15];
 const USD_EXCHANGE_RATES: Record<string, number> = {
   'USD': 1.0,
   'AUD': 1.55,
+  'CAD': 1.36,  // Canadian Dollar
+  'NZD': 1.68,  // New Zealand Dollar
   'SGD': 1.34,
   'GBP': 0.79,
   'MYR': 4.47,
@@ -269,6 +276,8 @@ const DESTINATION_TO_ISO: Record<string, string> = {
 // Locale to currency mapping
 const LOCALE_CURRENCIES: Record<string, string> = {
   'en-au': 'AUD',
+  'en-ca': 'CAD',  // Canada
+  'en-nz': 'NZD',  // New Zealand
   'en-sg': 'SGD',
   'en-gb': 'GBP',
   'en-us': 'USD',
@@ -279,9 +288,11 @@ const LOCALE_CURRENCIES: Record<string, string> = {
 // Competitor/incumbent info by currency (not locale)
 const COMPETITORS: Record<string, { name: string; dailyRate: number }> = {
   'AUD': { name: 'Telstra', dailyRate: 10 },
+  'CAD': { name: 'Rogers', dailyRate: 18 },    // Canada - highest roaming pain
+  'NZD': { name: 'Spark', dailyRate: 2.14 },   // NZ - $30/14 days = ~$2.14/day
   'SGD': { name: 'Singtel', dailyRate: 15 },
   'GBP': { name: 'EE', dailyRate: 3.54 },
-  'USD': { name: 'T-Mobile', dailyRate: 15 },
+  'USD': { name: 'Verizon', dailyRate: 12 },   // Changed from T-Mobile (they have free roaming)
   'MYR': { name: 'Maxis', dailyRate: 35 },
   'IDR': { name: 'Telkomsel', dailyRate: 100000 },
 };
@@ -310,6 +321,9 @@ interface EsimGoBundle {
   }>;
 }
 
+// Data tier type for pricing display
+type DataTier = 'unlimited' | '1gb' | '2gb' | '3gb' | '5gb' | '10gb';
+
 // Duration option stored in Plan.durations JSON array
 interface DurationOption {
   duration: number;        // Days (1, 3, 5, 7, 10, 15, 30)
@@ -317,6 +331,26 @@ interface DurationOption {
   retail_price: number;    // Retail price in local currency
   bundle_name: string;     // eSIM-Go bundle identifier for fulfillment
   daily_rate: number;      // Calculated: retail_price / duration
+  data_type: DataTier;     // Data tier: 'unlimited', '1gb', '2gb', etc.
+  data_amount_mb?: number; // Data amount in MB (null/undefined for unlimited)
+}
+
+// Helper to determine data tier from bundle
+function getDataTier(bundle: EsimGoBundle): { tier: DataTier; amountMb?: number } {
+  const dataAllowance = bundle.allowances?.find(a => a.type === 'DATA' && a.service === 'STANDARD');
+
+  if (bundle.unlimited || dataAllowance?.unlimited) {
+    return { tier: 'unlimited' };
+  }
+
+  const amountMb = dataAllowance?.amount || 0;
+  const amountGb = amountMb / 1000;
+
+  if (amountGb <= 1) return { tier: '1gb', amountMb };
+  if (amountGb <= 2) return { tier: '2gb', amountMb };
+  if (amountGb <= 3) return { tier: '3gb', amountMb };
+  if (amountGb <= 5) return { tier: '5gb', amountMb };
+  return { tier: '10gb', amountMb };
 }
 
 async function fetchCatalog(): Promise<EsimGoBundle[]> {
@@ -325,55 +359,61 @@ async function fetchCatalog(): Promise<EsimGoBundle[]> {
   }
 
   console.log('Fetching eSIM-Go catalog...');
-  console.log(`Group filter: ${BUNDLE_GROUP}`);
+  console.log(`Groups to fetch: ${BUNDLE_GROUPS.join(', ')}`);
 
   const allBundles: EsimGoBundle[] = [];
-  let page = 1;
-  let hasMore = true;
 
-  while (hasMore && page <= 50) {
-    const url = new URL(`${ESIMGO_API_BASE}/catalogue`);
-    url.searchParams.set('group', BUNDLE_GROUP);
-    url.searchParams.set('page', page.toString());
-    url.searchParams.set('perPage', '100');
+  // Fetch from each bundle group
+  for (const bundleGroup of BUNDLE_GROUPS) {
+    console.log(`\n  Fetching group: ${bundleGroup}`);
+    let page = 1;
+    let hasMore = true;
+    let groupTotal = 0;
 
-    console.log(`  Fetching page ${page}...`);
+    while (hasMore && page <= 50) {
+      const url = new URL(`${ESIMGO_API_BASE}/catalogue`);
+      url.searchParams.set('group', bundleGroup);
+      url.searchParams.set('page', page.toString());
+      url.searchParams.set('perPage', '100');
 
-    const response = await fetch(url.toString(), {
-      method: 'GET',
-      headers: {
-        'X-API-Key': ESIMGO_API_TOKEN,
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-    });
+      const response = await fetch(url.toString(), {
+        method: 'GET',
+        headers: {
+          'X-API-Key': ESIMGO_API_TOKEN,
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+      });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`eSIM-Go API error (${response.status}): ${errorText}`);
-    }
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`eSIM-Go API error (${response.status}): ${errorText}`);
+      }
 
-    const data = await response.json();
+      const data = await response.json();
 
-    // API returns { bundles: [...], pageCount, rows, pageSize }
-    const bundles = data.bundles || [];
+      // API returns { bundles: [...], pageCount, rows, pageSize }
+      const bundles = data.bundles || [];
 
-    if (bundles.length > 0) {
-      allBundles.push(...bundles);
-      console.log(`    Found ${bundles.length} bundles on page ${page}`);
+      if (bundles.length > 0) {
+        allBundles.push(...bundles);
+        groupTotal += bundles.length;
 
-      // Continue if we got a full page (might be more)
-      if (bundles.length >= 100) {
-        page++;
+        // Continue if we got a full page (might be more)
+        if (bundles.length >= 100) {
+          page++;
+        } else {
+          hasMore = false;
+        }
       } else {
         hasMore = false;
       }
-    } else {
-      hasMore = false;
     }
+
+    console.log(`    Total from ${bundleGroup}: ${groupTotal} bundles`);
   }
 
-  console.log(`Total bundles fetched: ${allBundles.length}`);
+  console.log(`\nTotal bundles fetched across all groups: ${allBundles.length}`);
   return allBundles;
 }
 
@@ -442,9 +482,12 @@ async function syncBundles(bundles: EsimGoBundle[]): Promise<void> {
       // API returns price in dollars as a float, convert to cents for storage
       const priceInCents = Math.round(bundle.price * 100);
 
+      // Get the group from the bundle (first group in array)
+      const bundleGroupName = bundle.groups?.[0] || 'Unknown';
+
       const bundleData = {
         description: bundle.description?.slice(0, 2000) || null, // Truncate if too long
-        group: BUNDLE_GROUP,
+        group: bundleGroupName,
         country_iso: primaryCountry.iso,
         country_name: primaryCountry.name,
         region: primaryCountry.region || null,
@@ -482,23 +525,38 @@ async function syncBundles(bundles: EsimGoBundle[]): Promise<void> {
 }
 
 /**
- * Find ALL available unlimited bundles for a country
- * Returns a Map of duration -> bundle (cheapest unlimited at each duration)
+ * Bundle with data tier info for pricing
  */
-function findAllBundlesForCountry(bundles: EsimGoBundle[], countryIso: string): Map<number, EsimGoBundle> {
+interface BundleWithTier {
+  bundle: EsimGoBundle;
+  dataTier: DataTier;
+  dataAmountMb?: number;
+}
+
+/**
+ * Find ALL available bundles for a country (both unlimited and fixed data)
+ * Returns an array of bundles with tier info, keyed by a composite key (duration-dataTier)
+ */
+function findAllBundlesForCountry(bundles: EsimGoBundle[], countryIso: string): Map<string, BundleWithTier> {
+  // Filter bundles for this country
   const countryBundles = bundles.filter(b =>
-    b.countries.some(c => c.iso === countryIso) &&
-    (b.unlimited || b.allowances?.some(a => a.unlimited))
+    b.countries.some(c => c.iso === countryIso)
   );
 
-  const bundleMap = new Map<number, EsimGoBundle>();
+  const bundleMap = new Map<string, BundleWithTier>();
 
-  for (const duration of ALL_DURATIONS) {
-    const matches = countryBundles.filter(b => b.duration === duration);
-    if (matches.length > 0) {
-      // Pick the cheapest unlimited bundle at this duration
-      const cheapest = matches.sort((a, b) => a.price - b.price)[0];
-      bundleMap.set(duration, cheapest);
+  for (const bundle of countryBundles) {
+    const { tier, amountMb } = getDataTier(bundle);
+    const key = `${bundle.duration}-${tier}`;
+
+    // Keep the cheapest bundle for each duration-tier combination
+    const existing = bundleMap.get(key);
+    if (!existing || bundle.price < existing.bundle.price) {
+      bundleMap.set(key, {
+        bundle,
+        dataTier: tier,
+        dataAmountMb: amountMb,
+      });
     }
   }
 
@@ -603,9 +661,9 @@ function calculateRetailPrice(
 }
 
 async function syncPlans(bundles: EsimGoBundle[]): Promise<void> {
-  console.log('\nSyncing plans with flexible durations...');
+  console.log('\nSyncing plans with tiered pricing (unlimited + fixed data)...');
   console.log('Pricing: 60% markup default, 10% under competitor cap, 50% min margin');
-  console.log('Supporting durations: 1, 3, 5, 7, 10, 15, 30 days\n');
+  console.log('Data tiers: unlimited, 1gb, 2gb, 3gb, 5gb, 10gb\n');
 
   const locales = Object.keys(LOCALE_CURRENCIES);
   const destinations = Object.keys(DESTINATION_TO_ISO);
@@ -625,23 +683,41 @@ async function syncPlans(bundles: EsimGoBundle[]): Promise<void> {
       continue;
     }
 
-    const availableDurations = Array.from(bundleMap.keys()).sort((a, b) => a - b);
-    const defaultDurations = chooseDefaultDurations(availableDurations);
+    // Extract available products (composite keys like "7-1gb", "3-unlimited")
+    const availableKeys = Array.from(bundleMap.keys());
+    const availableDurations = [...new Set(availableKeys.map(k => parseInt(k.split('-')[0])))].sort((a, b) => a - b);
+    const availableTiers = [...new Set(availableKeys.map(k => k.split('-')[1]))];
+
+    // Choose default durations based on unlimited options first, then fixed
+    const unlimitedDurations = availableKeys
+      .filter(k => k.endsWith('-unlimited'))
+      .map(k => parseInt(k.split('-')[0]))
+      .sort((a, b) => a - b);
+
+    const fixedDurations = availableKeys
+      .filter(k => !k.endsWith('-unlimited'))
+      .map(k => parseInt(k.split('-')[0]))
+      .sort((a, b) => a - b);
+
+    // Default to showing: 1 fixed budget option + 2 unlimited options (or best available)
+    const defaultDurations = chooseDefaultDurations([...unlimitedDurations, ...fixedDurations]);
 
     console.log(`  ✓ ${destination} (${countryIso}):`);
-    console.log(`      Available: [${availableDurations.join(', ')}] days`);
-    console.log(`      Defaults:  [${defaultDurations.join(', ')}] days`);
+    console.log(`      Tiers: [${availableTiers.join(', ')}]`);
+    console.log(`      Durations: [${availableDurations.join(', ')}] days`);
 
     for (const locale of locales) {
       const currency = LOCALE_CURRENCIES[locale];
       const competitor = COMPETITORS[currency];
       const competitorDailyRate = competitor?.dailyRate || 10;
 
-      // Build durations array with all pricing info
+      // Build durations array with all pricing info (including tier info)
       const durations: DurationOption[] = [];
       let bestDailyRate = Infinity;
 
-      for (const [duration, bundle] of bundleMap) {
+      for (const [key, bundleWithTier] of bundleMap) {
+        const { bundle, dataTier, dataAmountMb } = bundleWithTier;
+        const duration = bundle.duration;
         const wholesaleCents = Math.round(bundle.price * 100);
         const retailPrice = calculateRetailPrice(wholesaleCents, currency, competitorDailyRate, duration);
         const dailyRate = retailPrice / duration;
@@ -651,7 +727,9 @@ async function syncPlans(bundles: EsimGoBundle[]): Promise<void> {
           wholesale_cents: wholesaleCents,
           retail_price: retailPrice,
           bundle_name: bundle.name,
-          daily_rate: Math.round(dailyRate * 100) / 100, // Round to 2 decimal places
+          daily_rate: Math.round(dailyRate * 100) / 100,
+          data_type: dataTier,
+          data_amount_mb: dataAmountMb,
         });
 
         if (dailyRate < bestDailyRate) {
@@ -659,8 +737,14 @@ async function syncPlans(bundles: EsimGoBundle[]): Promise<void> {
         }
       }
 
-      // Sort durations by duration ascending
-      durations.sort((a, b) => a.duration - b.duration);
+      // Sort durations by: data_type (fixed first for budget), then duration
+      durations.sort((a, b) => {
+        // Unlimited comes after fixed data
+        if (a.data_type === 'unlimited' && b.data_type !== 'unlimited') return 1;
+        if (a.data_type !== 'unlimited' && b.data_type === 'unlimited') return -1;
+        // Then sort by duration
+        return a.duration - b.duration;
+      });
 
       // Round best daily rate
       const finalBestDailyRate = Math.round(bestDailyRate * 100) / 100;
@@ -702,16 +786,15 @@ async function syncPlans(bundles: EsimGoBundle[]): Promise<void> {
     // Show example retail prices for AUD
     const audCompetitor = COMPETITORS['AUD'];
     const audRate = audCompetitor?.dailyRate || 10;
-    const sampleDurations = defaultDurations.slice(0, 3);
-    const audPrices = sampleDurations.map(d => {
-      const bundle = bundleMap.get(d);
-      if (!bundle) return null;
+    const audPrices: string[] = [];
+    for (const [key, bundleWithTier] of bundleMap) {
+      const { bundle, dataTier } = bundleWithTier;
       const wholesaleCents = Math.round(bundle.price * 100);
-      const price = calculateRetailPrice(wholesaleCents, 'AUD', audRate, d);
-      return `${d}d=$${price}`;
-    }).filter(Boolean);
+      const price = calculateRetailPrice(wholesaleCents, 'AUD', audRate, bundle.duration);
+      audPrices.push(`${bundle.duration}d/${dataTier}=$${price}`);
+    }
     if (audPrices.length > 0) {
-      console.log(`      Retail (AUD): ${audPrices.join(', ')}`);
+      console.log(`      Retail (AUD): ${audPrices.slice(0, 5).join(', ')}`);
     }
   }
 

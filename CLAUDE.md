@@ -192,3 +192,181 @@ GA4_API_SECRET="your_ga4_api_secret"
    - Go to GA4 Admin > Data Streams > Your Stream
    - Click "Measurement Protocol API secrets"
    - Create a new secret
+
+---
+
+## Google Ads Marketing Strategy
+
+### Current Campaign Status (Jan 2026)
+
+**Account ID**: 866-912-6474 (managed under 269-656-6360)
+
+**Performance Summary** (Dec 27, 2025 - Jan 25, 2026):
+- Spend: A$1,217.58
+- Conversions: 3
+- CPA: A$405.86 (target: <A$30)
+- ROAS: 11.8% (target: >300%)
+
+**Key Finding**: High CTR (21% Thailand, 9.5% Japan) but 0 conversions on destination-specific ads = pricing/landing page problem, not keyword problem.
+
+### Campaign Structure
+
+```
+Account: 866-912-6474
+└── Campaign: Search - Travel eSIM - AU
+    ├── Ad Group: Travel eSIM - General (CONVERTING - keep)
+    ├── Ad Group: Japan eSIM (paused - restructure)
+    ├── Ad Group: Thailand eSIM (paused - restructure)
+    ├── Ad Group: Indonesia eSIM (paused - restructure)
+    ├── Ad Group: Asia eSIM (paused)
+    └── Ad Group: Europe eSIM (paused)
+```
+
+### eSIM-Go Bundle Structure
+
+The supplier (eSIM-Go) offers these bundle types:
+
+| Group | Description | Durations | Use Case |
+|-------|-------------|-----------|----------|
+| Standard Fixed | Data-capped (1GB, 2GB) | 7d, 15d | Budget tier |
+| Standard Unlimited Lite | Basic unlimited | 1d only | Short trips |
+| Standard Unlimited Essential | Better unlimited | 1d, 3d | Current default |
+| Standard Unlimited Plus | Premium unlimited | 1d only | Premium tier |
+
+**Key Insight**: No pre-packaged 7-day or 15-day unlimited bundles. Must either:
+1. Multiply 1-day prices for longer durations
+2. Offer data-capped plans as budget option
+
+### Pricing Strategy
+
+**Current**: Single unlimited tier (from sync of "Standard Unlimited Essential")
+
+**Recommended**: Tiered pricing
+
+| Tier | Data | Wholesale (USD) | Retail (AUD) | Target Customer |
+|------|------|-----------------|--------------|-----------------|
+| Light | 1GB/7d | $2.08 | A$6.99 | Budget/light users |
+| Standard | 2GB/15d | $3.37 | A$9.99 | Moderate users |
+| Unlimited/7d | 7× daily | ~$18.83 | A$34.99 | Heavy users |
+
+### Key Marketing Files
+
+```
+marketing/
+├── googleSEM/
+│   ├── MARKETING_PLAN_2026.md      # Comprehensive strategy document
+│   ├── CUSTOMER_REVIEWS.md         # 10 testimonial templates
+│   ├── CHANGELOG.md                # Decision tracking
+│   ├── Ad group report.csv         # Raw performance data
+│   └── Time_series_chart*.csv      # Daily metrics
+├── google-ads-complete.md          # Ad copy templates
+├── google-ads-keywords.csv         # Keyword lists
+└── google-ads-negative-keywords.csv # Negative keywords
+```
+
+### Ad Copy Guidelines
+
+**Headlines that work** (emphasize these):
+- "From A$6.99" (entry price)
+- "Australian Owned Support"
+- "Money-Back Guarantee"
+- "4.9★ Rated"
+
+**Headlines to avoid** (competitors say same thing):
+- "Instant QR Code" (everyone says this)
+- "No SIM Swap" (expected feature)
+
+### Keyword Strategy
+
+**High-intent (prioritize)**:
+- `[buy japan esim]`
+- `[order thailand sim]`
+- `[australia to japan esim]`
+
+**Origin-specific (unique advantage)**:
+- `[telstra roaming alternative japan]`
+- `[optus roaming thailand cheaper]`
+
+**Avoid**:
+- `[what is esim]` (research intent)
+- `[esim vs sim]` (comparison, not buying)
+
+### Budget Allocation
+
+| Phase | Monthly Budget | Focus |
+|-------|---------------|-------|
+| Month 1 | A$2,000 | Japan + Thailand only |
+| Month 2 | A$2,500 | Add Bali |
+| Month 3+ | A$3,000-4,000 | Scale winners |
+
+### Scripts & Automation
+
+**Sync eSIM-Go catalog**:
+```bash
+npx tsx prisma/sync-esimgo.ts
+```
+
+This script:
+1. Fetches bundles from eSIM-Go API
+2. Updates `EsimBundle` table with wholesale prices
+3. Calculates retail prices using pricing rules
+4. Updates `Plan` table with durations and prices
+
+**Pricing Rules** (in `lib/pricing.ts`):
+- 60% markup over wholesale (base)
+- Cap at 10% under competitor (Telstra A$10/day)
+- Minimum 50% margin floor
+- Round to .99 or .49 endings
+
+---
+
+## eSIM-Go Integration
+
+### API Configuration
+
+- **Base URL**: `https://api.esim-go.com/v2.5`
+- **Auth**: `X-API-Key` header with `ESIMGO_API_TOKEN`
+- **Catalog endpoint**: `/catalogue?group={group}&perPage=100`
+- **Order endpoint**: `/orders` (POST)
+
+### Bundle Naming Convention
+
+```
+esim_{DATA}_{DURATION}_{COUNTRY}_{VERSION}
+
+Examples:
+- esim_1GB_7D_JP_V2      → 1GB, 7 days, Japan
+- esim_UL_1D_TH_V2       → Unlimited Lite, 1 day, Thailand
+- esim_ULE_3D_JP_V2      → Unlimited Essential, 3 days, Japan
+- esim_ULP_1D_KR_V2      → Unlimited Plus, 1 day, Korea
+```
+
+### Available Bundles by Destination (Jan 2026)
+
+| Destination | Fixed Data | Unlimited |
+|-------------|------------|-----------|
+| Japan (JP) | 1GB/7d, 2GB/15d | 1d, 3d |
+| Thailand (TH) | 1GB/7d | 1d, 3d |
+| Indonesia (ID) | 1GB/7d, 2GB/15d | 1d, 3d |
+| Korea (KR) | 1GB/7d, 2GB/15d | 1d, 3d |
+| Singapore (SG) | 1GB/7d | 1d, 3d |
+| Vietnam (VN) | 1GB/7d | 1d, 3d |
+| Malaysia (MY) | 1GB/7d, 2GB/15d | 1d, 3d |
+
+### Order Flow
+
+```
+1. Customer selects destination + duration + tier
+2. /api/checkout looks up Plan → gets bundle_name
+3. Stripe Checkout session created
+4. Payment succeeds → webhook fires
+5. createEsimOrder(bundle_name, orderRef) called
+6. eSIM-Go returns QR code data
+7. Customer receives email with QR code
+```
+
+---
+
+## Decision Log
+
+Track all marketing and pricing decisions in `marketing/googleSEM/CHANGELOG.md`

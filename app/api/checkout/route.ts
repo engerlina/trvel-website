@@ -2,7 +2,18 @@ import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { stripe, isTestMode } from '@/lib/stripe';
 import { prisma } from '@/lib/db';
-import { DurationOption } from '@/types';
+import { DurationOption, DataTier } from '@/types';
+
+// Get data label for display
+function getDataLabel(dataType?: DataTier, dataAmountMb?: number): string {
+  if (!dataType || dataType === 'unlimited') {
+    return 'unlimited data';
+  }
+  if (dataAmountMb && dataAmountMb >= 1000) {
+    return `${dataAmountMb / 1000}GB data`;
+  }
+  return `${dataType.toUpperCase()} data`;
+}
 
 // Plan names for display based on duration
 function getPlanName(days: number): string {
@@ -19,7 +30,7 @@ function getPlanName(days: number): string {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { destination, duration, locale, promoCode, gclid } = body;
+    const { destination, duration, locale, promoCode, gclid, dataType } = body;
 
     // Validate required fields
     if (!destination || !duration || !locale) {
@@ -66,7 +77,12 @@ export async function POST(request: NextRequest) {
 
     // Get the price and bundle from durations array
     const durations = plan.durations as unknown as DurationOption[];
-    const selectedDuration = durations.find(d => d.duration === duration);
+    // If dataType is provided, match on both duration and data_type
+    // Otherwise, prefer unlimited for backwards compatibility
+    const selectedDuration = dataType
+      ? durations.find(d => d.duration === duration && d.data_type === dataType)
+      : durations.find(d => d.duration === duration && d.data_type === 'unlimited')
+        || durations.find(d => d.duration === duration);
 
     if (!selectedDuration) {
       console.error('Duration not available for this destination', {
@@ -103,8 +119,9 @@ export async function POST(request: NextRequest) {
     // Build product name for Stripe
     const destinationName = destinationData?.name || destination.replace(/-/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase());
     const planName = getPlanName(duration);
+    const dataLabel = getDataLabel(selectedDuration.data_type, selectedDuration.data_amount_mb);
     const productName = `${destinationName} eSIM - ${planName}`;
-    const productDescription = `${duration}-day unlimited data eSIM for ${destinationName}`;
+    const productDescription = `${duration}-day ${dataLabel} eSIM for ${destinationName}`;
 
     console.log(`Creating checkout session (${isTestMode ? 'TEST' : 'LIVE'} mode):`, {
       destination,
@@ -155,6 +172,8 @@ export async function POST(request: NextRequest) {
         bundle_name: bundleName || '',
         price_paid: price.toString(),
         currency: plan.currency,
+        data_type: selectedDuration.data_type || 'unlimited',
+        data_amount_mb: selectedDuration.data_amount_mb?.toString() || '',
       },
     };
 

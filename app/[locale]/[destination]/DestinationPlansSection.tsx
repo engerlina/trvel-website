@@ -3,9 +3,20 @@
 import { useState } from 'react';
 import { ChevronDown, ChevronUp, Clock, TrendingUp, ArrowRight, Check } from 'lucide-react';
 import { DestinationPlanCard } from './DestinationPlanCard';
-import { DurationOption } from '@/types';
+import { DurationOption, DataTier } from '@/types';
 import { Link } from '@/i18n/routing';
 import { getGclid } from '@/hooks/useGclid';
+
+// Get human-readable data label based on tier
+function getDataLabel(dataType?: DataTier, dataAmountMb?: number): string {
+  if (!dataType || dataType === 'unlimited') {
+    return 'Unlimited';
+  }
+  if (dataAmountMb && dataAmountMb >= 1000) {
+    return `${dataAmountMb / 1000}GB`;
+  }
+  return dataType.toUpperCase();
+}
 
 // Compact plan card for additional plans
 function CompactPlanCard({
@@ -15,7 +26,7 @@ function CompactPlanCard({
   destination,
   locale,
 }: {
-  plan: { name: string; duration: number; price: string; perDay: string };
+  plan: { name: string; duration: number; price: string; perDay: string; dataType?: DataTier; dataAmountMb?: number };
   isBestValue: boolean;
   currencySymbol: string;
   destination: string;
@@ -38,6 +49,7 @@ function CompactPlanCard({
           duration: plan.duration,
           locale,
           ...(gclid && { gclid }),
+          ...(plan.dataType && { dataType: plan.dataType }),
         }),
       });
       const data = await response.json();
@@ -64,6 +76,15 @@ function CompactPlanCard({
         <h3 className="text-base font-semibold text-navy-500 mb-1">
           {plan.name}
         </h3>
+
+        {/* Data tier badge */}
+        <span className={`inline-block px-2 py-0.5 text-xs font-medium rounded-full mb-2 ${
+          plan.dataType === 'unlimited' || !plan.dataType
+            ? 'bg-brand-100 text-brand-700'
+            : 'bg-cream-200 text-navy-600'
+        }`}>
+          {getDataLabel(plan.dataType, plan.dataAmountMb)}
+        </span>
 
         <div className="mb-2">
           <span className="text-2xl font-bold text-navy-500">
@@ -102,6 +123,8 @@ interface Plan {
   price: string;
   perDay: string;
   popular: boolean;
+  dataType?: DataTier;
+  dataAmountMb?: number;
 }
 
 interface DestinationPlansSectionProps {
@@ -176,6 +199,8 @@ export function DestinationPlansSection({
       price: formatPrice(d.retail_price, currency),
       perDay: formatPrice(d.daily_rate, currency),
       popular: index === 1 && defaultPlans.length >= 3,
+      dataType: d.data_type,
+      dataAmountMb: d.data_amount_mb,
     };
   });
 
@@ -189,6 +214,8 @@ export function DestinationPlansSection({
       price: formatPrice(d.retail_price, currency),
       perDay: formatPrice(d.daily_rate, currency),
       popular: false,
+      dataType: d.data_type,
+      dataAmountMb: d.data_amount_mb,
     };
   });
 
@@ -228,7 +255,7 @@ export function DestinationPlansSection({
       }`}>
         {plans.map((plan) => (
           <DestinationPlanCard
-            key={plan.duration}
+            key={`${plan.duration}-${plan.dataType || 'unlimited'}`}
             name={plan.name}
             subtext={plan.subtext}
             price={plan.price}
@@ -238,6 +265,8 @@ export function DestinationPlansSection({
             destination={destination}
             duration={plan.duration}
             locale={locale}
+            dataType={plan.dataType}
+            dataAmountMb={plan.dataAmountMb}
           />
         ))}
       </div>
@@ -265,11 +294,11 @@ export function DestinationPlansSection({
           'grid-cols-2 md:grid-cols-4'
         }`}>
           {additionalPlanCards.map((plan) => {
-            const isBestValue = bestDailyDuration?.duration === plan.duration;
-            const durationData = additionalPlans.find(d => d.duration === plan.duration);
+            const isBestValue = bestDailyDuration?.duration === plan.duration &&
+                               bestDailyDuration?.data_type === plan.dataType;
             return (
               <CompactPlanCard
-                key={plan.duration}
+                key={`${plan.duration}-${plan.dataType || 'unlimited'}`}
                 plan={plan}
                 isBestValue={isBestValue}
                 currencySymbol={currencySymbol}

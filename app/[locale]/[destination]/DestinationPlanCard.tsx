@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Check, ArrowRight } from 'lucide-react';
 import { Link } from '@/i18n/routing';
 import { getGclid } from '@/hooks/useGclid';
+import { DataTier } from '@/types';
 
 interface DestinationPlanCardProps {
   name: string;
@@ -15,6 +16,21 @@ interface DestinationPlanCardProps {
   destination: string;
   duration: number;
   locale: string;
+  dataType?: DataTier;
+  dataAmountMb?: number;
+}
+
+// Get human-readable data label based on tier
+function getDataLabel(dataType?: DataTier, dataAmountMb?: number): string {
+  if (!dataType || dataType === 'unlimited') {
+    return 'Unlimited data';
+  }
+  // Convert MB to GB for display
+  if (dataAmountMb && dataAmountMb >= 1000) {
+    return `${dataAmountMb / 1000}GB data`;
+  }
+  // Fallback to tier name
+  return dataType.toUpperCase() + ' data';
 }
 
 export function DestinationPlanCard({
@@ -27,8 +43,11 @@ export function DestinationPlanCard({
   destination,
   duration,
   locale,
+  dataType,
+  dataAmountMb,
 }: DestinationPlanCardProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const dataLabel = getDataLabel(dataType, dataAmountMb);
 
   const handleCheckout = async () => {
     setIsLoading(true);
@@ -47,6 +66,7 @@ export function DestinationPlanCard({
           duration,
           locale,
           ...(gclid && { gclid }),
+          ...(dataType && { dataType }),
         }),
       });
 
@@ -107,7 +127,7 @@ export function DestinationPlanCard({
         <ul className={`space-y-3 mb-6 text-left ${popular ? 'text-brand-100' : 'text-navy-400'}`}>
           <li className="flex items-center gap-2">
             <Check className={`w-4 h-4 ${popular ? 'text-brand-200' : 'text-brand-500'}`} />
-            Unlimited data
+            {dataLabel}
           </li>
           <li className="flex items-center gap-2">
             <Check className={`w-4 h-4 ${popular ? 'text-brand-200' : 'text-brand-500'}`} />
