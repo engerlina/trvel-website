@@ -47,9 +47,12 @@ const locales: { code: string; label: string; Flag: FlagComponent; currency: str
 
 export function Footer() {
   return (
-    <footer className="bg-navy-500 text-cream-300 no-decoration">
+    <footer
+      className="relative z-10 bg-navy-500 text-cream-300 no-decoration overflow-hidden"
+      style={{ backgroundColor: '#010326', backgroundImage: 'none', isolation: 'isolate' }}
+    >
       {/* Trust Bar */}
-      <div className="border-b border-navy-400">
+      <div className="border-b border-solid border-navy-400">
         <div className="container-wide py-8">
           <div className="flex flex-wrap items-center justify-center gap-8 md:gap-16">
             <div className="flex items-center gap-3">
@@ -84,8 +87,8 @@ export function Footer() {
       </div>
 
       {/* Main Footer */}
-      <div className="container-wide py-16">
-        <div className="grid grid-cols-2 md:grid-cols-6 gap-8 lg:gap-12">
+      <div className="container-wide py-16" style={{ backgroundColor: '#010326' }}>
+        <div className="grid grid-cols-2 md:grid-cols-6 gap-8 lg:gap-12" style={{ backgroundColor: '#010326' }}>
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
             <Link href="/" className="flex items-center gap-2 mb-4">
@@ -216,7 +219,7 @@ export function Footer() {
                     locale={locale.code}
                     className="flex items-center gap-2 text-body-sm text-cream-400 hover:text-brand-400 transition-colors"
                   >
-                    <locale.Flag className="w-5 h-auto rounded-sm" />
+                    <locale.Flag className="w-5 h-auto" />
                     <span>{locale.currency}</span>
                   </Link>
                 </li>
@@ -227,7 +230,7 @@ export function Footer() {
       </div>
 
       {/* Bottom Bar */}
-      <div className="border-t border-navy-400">
+      <div className="border-t border-solid border-navy-400">
         <div className="container-wide py-6">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <p className="text-body-sm text-cream-500">

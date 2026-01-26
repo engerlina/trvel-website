@@ -92,12 +92,64 @@
     text-decoration: none !important;
     text-decoration-line: none !important;
     text-decoration-style: solid !important;
-    border-style: solid !important;
   }
 
+  /* Remove any stroke-dasharray which can cause dotted appearance */
   .no-decoration svg,
-  .no-decoration svg * {
+  .no-decoration svg *,
+  footer svg,
+  footer svg * {
     stroke-dasharray: none !important;
+    stroke-linecap: round !important;
+    stroke-linejoin: round !important;
+  }
+
+  /* Remove any DaisyUI pseudo-element borders */
+  footer::after,
+  footer *::before,
+  footer *::after {
+    border-style: solid !important;
+    border-image: none !important;
+  }
+
+  /* Ensure borders are solid, not dotted */
+  footer,
+  footer * {
+    border-style: solid !important;
+    outline: none !important;
+    outline-style: none !important;
+    text-decoration: none !important;
+    box-decoration-break: clone !important;
+  }
+
+  /* Remove any background patterns from footer */
+  footer {
+    background-image: none !important;
+    background-repeat: no-repeat !important;
+    position: relative !important;
+    /* Force GPU rendering to eliminate subpixel artifacts */
+    transform: translateZ(0) !important;
+    backface-visibility: hidden !important;
+    -webkit-font-smoothing: antialiased !important;
+  }
+
+  /* Solid background overlay to mask any artifacts */
+  footer::before {
+    content: '' !important;
+    position: absolute !important;
+    top: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    background-color: #010326 !important;
+    z-index: 0 !important;
+    pointer-events: none !important;
+  }
+
+  /* Ensure footer content is above the pseudo-element */
+  footer > * {
+    position: relative !important;
+    z-index: 1 !important;
   }
 
   .animate-delay-100 {
