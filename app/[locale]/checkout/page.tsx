@@ -185,10 +185,46 @@ export default async function CheckoutPage({ params, searchParams }: Props) {
           promoCode={promo}
         />
 
-        {/* Security Note */}
-        <p className="text-center text-xs text-navy-200 mt-6">
-          Secure checkout powered by Stripe. Your payment info is never stored on our servers.
-        </p>
+        {/* Payment Methods */}
+        <div className="mt-6 flex flex-col items-center gap-4">
+          <div className="flex items-center gap-3">
+            {/* Visa */}
+            <div className="w-12 h-8 bg-white rounded border border-cream-200 flex items-center justify-center">
+              <svg viewBox="0 0 48 32" className="w-8 h-5">
+                <path fill="#1434CB" d="M19.5 23.5h-3.9l2.4-15h3.9l-2.4 15zm16.1-14.6c-.8-.3-2-.6-3.5-.6-3.9 0-6.6 2.1-6.6 5 0 2.2 2 3.4 3.5 4.1 1.5.7 2 1.2 2 1.9 0 1-.6 1.5-1.8 1.5-1.2 0-1.8-.2-2.8-.6l-.4-.2-.4 2.6c.7.3 2 .6 3.3.6 4.1 0 6.8-2 6.8-5.2 0-1.7-1-3-3.3-4.1-1.4-.7-2.2-1.2-2.2-1.9 0-.6.7-1.3 2.2-1.3 1.3 0 2.2.3 2.9.6l.4.2.4-2.6zm5.9-.4h-3c-.9 0-1.6.3-2 1.2l-5.7 13.8h4l.8-2.2h4.9l.5 2.2h3.5l-3-15zm-4.7 9.7l1.5-4.2.4-1.2.2 1.2.9 4.2h-3zm-23.3-9.7l-3.8 10.2-.4-2.1c-.7-2.4-2.9-5-5.4-6.3l3.5 13.2h4.1l6.1-15h-4.1z"/>
+              </svg>
+            </div>
+            {/* Mastercard */}
+            <div className="w-12 h-8 bg-white rounded border border-cream-200 flex items-center justify-center">
+              <svg viewBox="0 0 48 32" className="w-8 h-5">
+                <circle fill="#EB001B" cx="16" cy="16" r="10"/>
+                <circle fill="#F79E1B" cx="32" cy="16" r="10"/>
+                <path fill="#FF5F00" d="M24 8c2.4 1.8 4 4.7 4 8s-1.6 6.2-4 8c-2.4-1.8-4-4.7-4-8s1.6-6.2 4-8z"/>
+              </svg>
+            </div>
+            {/* Apple Pay */}
+            <div className="w-12 h-8 bg-white rounded border border-cream-200 flex items-center justify-center">
+              <svg viewBox="0 0 48 32" className="w-8 h-5">
+                <path fill="#000" d="M16.5 9.5c-.8.9-2 1.6-3.2 1.5-.2-1.2.4-2.5 1.1-3.3.8-.9 2.1-1.5 3.2-1.5.1 1.3-.4 2.5-1.1 3.3zm1.1 1.7c-1.8-.1-3.3 1-4.1 1s-2.2-1-3.6-1c-1.8 0-3.5 1.1-4.5 2.7-1.9 3.3-.5 8.2 1.4 10.9.9 1.3 2 2.8 3.5 2.7 1.4-.1 1.9-.9 3.6-.9s2.2.9 3.6.9c1.5 0 2.4-1.3 3.3-2.6 1-1.5 1.4-3 1.5-3.1-.1 0-2.8-1.1-2.8-4.3 0-2.7 2.2-4 2.3-4.1-1.3-1.9-3.2-2.1-3.9-2.2h-.3z"/>
+                <path fill="#000" d="M30.4 7.1c1.4 0 2.9 1 3.8 2.7-.1.1-2.1 1.2-2.1 3.7 0 2.9 2.5 3.9 2.6 3.9 0 .1-.4 1.4-1.3 2.8-.8 1.2-1.7 2.4-3 2.4-1.3 0-1.7-.8-3.2-.8-1.5 0-2 .8-3.2.8-1.3 0-2.2-1.3-3-2.5-1.8-2.7-3.2-7.6-1.3-10.9.9-1.6 2.5-2.7 4.3-2.7 1.3 0 2.4.9 3.2.9.8 0 2.3-1.1 3.9-1 .3 0 1.5.1 2.3.8z"/>
+              </svg>
+            </div>
+            {/* Google Pay */}
+            <div className="w-12 h-8 bg-white rounded border border-cream-200 flex items-center justify-center">
+              <svg viewBox="0 0 48 32" className="w-8 h-5">
+                <path fill="#4285F4" d="M24 14.4v4.3h6.1c-.3 1.5-1 2.7-2.1 3.5l3.4 2.6c2-1.8 3.1-4.5 3.1-7.7 0-.7-.1-1.4-.2-2.1H24z"/>
+                <path fill="#34A853" d="M16.5 18.6l-.8.6-2.7 2.1c1.7 3.4 5.2 5.7 9.2 5.7 2.8 0 5.1-.9 6.8-2.5l-3.4-2.6c-.9.6-2.1 1-3.4 1-2.6 0-4.8-1.8-5.6-4.2l-.1-.1z"/>
+                <path fill="#FBBC05" d="M10.9 14.2c-.3.9-.5 1.9-.5 2.9s.2 2 .5 2.9l3.5-2.7c-.2-.6-.3-1.3-.3-2s.1-1.4.3-2l-3.5-1.1z"/>
+                <path fill="#EA4335" d="M22.2 11.8c1.5 0 2.8.5 3.9 1.5l2.9-2.9c-1.8-1.6-4.1-2.7-6.8-2.7-4 0-7.5 2.3-9.2 5.7l3.5 2.7c.8-2.3 3-4.3 5.7-4.3z"/>
+              </svg>
+            </div>
+          </div>
+
+          {/* Security Note */}
+          <p className="text-xs text-navy-200 text-center">
+            Secure checkout powered by Stripe. Your payment info is never stored on our servers.
+          </p>
+        </div>
       </div>
     </main>
   );

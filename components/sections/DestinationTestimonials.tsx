@@ -151,12 +151,18 @@ export function DestinationTestimonials({ destinationSlug, destinationName }: De
   }
 
   if (selectedTestimonials.length < 3) {
-    // Fill with others, shuffled for variety
+    // Fill with others using deterministic selection based on destination slug
+    // This ensures consistent results between server and client (no hydration mismatch)
     const remaining = 3 - selectedTestimonials.length;
-    const shuffled = [...otherTestimonials].sort(() => Math.random() - 0.5);
+    const hashCode = destinationSlug.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    const startIndex = hashCode % otherTestimonials.length;
+    const deterministicOthers = [
+      ...otherTestimonials.slice(startIndex),
+      ...otherTestimonials.slice(0, startIndex),
+    ];
     selectedTestimonials = [
       ...selectedTestimonials,
-      ...shuffled.slice(0, remaining),
+      ...deterministicOthers.slice(0, remaining),
     ];
   }
 

@@ -17,6 +17,7 @@ import {
   ArrowRight,
   Star,
   MapPin,
+  ChevronDown,
 } from 'lucide-react';
 import { DestinationPlansSection } from './DestinationPlansSection';
 import { DestinationTestimonials } from '@/components/sections/DestinationTestimonials';
@@ -255,16 +256,39 @@ export default async function DestinationPage({ params }: DestinationPageProps) 
                 </div>
               </div>
 
-              {/* Starting price - show best daily rate */}
-              {planData?.best_daily_rate && (
-                <div className="inline-flex items-baseline gap-2 px-6 py-3 bg-white rounded-2xl shadow-soft-lg">
-                  <span className="text-navy-400">Starting from</span>
-                  <span className="text-heading-xl font-bold text-navy-500">
-                    {currencySymbol}{formatPrice(Number(planData.best_daily_rate), currency)}
-                  </span>
-                  <span className="text-navy-400">/day</span>
+              {/* Pricing and CTA - prominent above the fold */}
+              <div className="space-y-6">
+                {planData?.best_daily_rate && (
+                  <div className="inline-flex flex-col items-center gap-2 px-8 py-5 bg-white rounded-2xl shadow-soft-lg border-2 border-brand-200">
+                    <span className="text-sm text-navy-400 uppercase tracking-wide">Starting from</span>
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-display font-bold text-brand-600">
+                        {currencySymbol}{formatPrice(Number(planData.best_daily_rate), currency)}
+                      </span>
+                      <span className="text-lg text-navy-400">/day</span>
+                    </div>
+                    {competitorData && (
+                      <span className="text-sm text-success-600 font-medium">
+                        Save vs {competitorData.name} at {currencySymbol}{formatPrice(competitorData.daily_rate, currency)}/day
+                      </span>
+                    )}
+                  </div>
+                )}
+
+                {/* Primary CTA */}
+                <div>
+                  <Link
+                    href="#plans"
+                    className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-brand-500 to-brand-600 text-white font-semibold rounded-xl hover:shadow-lg hover:shadow-brand-500/25 transition-all text-lg"
+                  >
+                    View Plans & Pricing
+                    <ArrowRight className="w-5 h-5" />
+                  </Link>
+                  <p className="mt-3 text-sm text-navy-400">
+                    Instant delivery • No hidden fees • 24/7 support
+                  </p>
                 </div>
-              )}
+              </div>
             </div>
           </div>
 
@@ -362,6 +386,86 @@ export default async function DestinationPage({ params }: DestinationPageProps) 
                   <p className="text-navy-400">{feature.description}</p>
                 </div>
               ))}
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ Section */}
+        <section className="py-16 bg-cream-50">
+          <div className="container-wide">
+            <div className="max-w-3xl mx-auto">
+              <div className="text-center mb-10">
+                <h2 className="text-heading-xl font-bold text-navy-500 mb-3">
+                  Common Questions About {destinationData.name} eSIM
+                </h2>
+              </div>
+
+              <div className="space-y-4">
+                <details className="group bg-white rounded-2xl border border-cream-200 overflow-hidden">
+                  <summary className="flex items-center justify-between gap-4 p-5 cursor-pointer list-none">
+                    <span className="text-lg font-semibold text-navy-500">Will this eSIM work with my phone?</span>
+                    <ChevronDown className="w-5 h-5 text-navy-400 group-open:rotate-180 transition-transform" />
+                  </summary>
+                  <div className="px-5 pb-5 pt-0">
+                    <p className="text-navy-400 leading-relaxed">
+                      Yes, if your phone supports eSIM! This includes iPhone XS and newer, Samsung Galaxy S20+, Google Pixel 3+, and most phones from 2020 onwards.
+                      Check our <Link href={`/${locale}/compatibility`} className="text-brand-500 hover:underline">compatibility page</Link> to confirm your device.
+                    </p>
+                  </div>
+                </details>
+
+                <details className="group bg-white rounded-2xl border border-cream-200 overflow-hidden">
+                  <summary className="flex items-center justify-between gap-4 p-5 cursor-pointer list-none">
+                    <span className="text-lg font-semibold text-navy-500">What if the eSIM doesn&apos;t work?</span>
+                    <ChevronDown className="w-5 h-5 text-navy-400 group-open:rotate-180 transition-transform" />
+                  </summary>
+                  <div className="px-5 pb-5 pt-0">
+                    <p className="text-navy-400 leading-relaxed">
+                      We offer a <strong>10-minute connection guarantee</strong>. If you can&apos;t get online within 10 minutes of landing in {destinationData.name}, we&apos;ll refund you in full - no questions asked.
+                      Plus, our 24/7 support team is always available to help troubleshoot.
+                    </p>
+                  </div>
+                </details>
+
+                <details className="group bg-white rounded-2xl border border-cream-200 overflow-hidden">
+                  <summary className="flex items-center justify-between gap-4 p-5 cursor-pointer list-none">
+                    <span className="text-lg font-semibold text-navy-500">Can I keep my Australian phone number?</span>
+                    <ChevronDown className="w-5 h-5 text-navy-400 group-open:rotate-180 transition-transform" />
+                  </summary>
+                  <div className="px-5 pb-5 pt-0">
+                    <p className="text-navy-400 leading-relaxed">
+                      Absolutely! Your eSIM works alongside your existing SIM card. Keep your Aussie number for calls and texts while using Trvel for data.
+                      Just disable data roaming on your home SIM to avoid extra charges.
+                    </p>
+                  </div>
+                </details>
+
+                <details className="group bg-white rounded-2xl border border-cream-200 overflow-hidden">
+                  <summary className="flex items-center justify-between gap-4 p-5 cursor-pointer list-none">
+                    <span className="text-lg font-semibold text-navy-500">When should I install the eSIM?</span>
+                    <ChevronDown className="w-5 h-5 text-navy-400 group-open:rotate-180 transition-transform" />
+                  </summary>
+                  <div className="px-5 pb-5 pt-0">
+                    <p className="text-navy-400 leading-relaxed">
+                      Install before you leave home! We recommend 24-48 hours before your trip while you still have WiFi.
+                      The eSIM won&apos;t activate until you enable it in {destinationData.name}, so there&apos;s no rush - just have it ready to go.
+                    </p>
+                  </div>
+                </details>
+
+                <details className="group bg-white rounded-2xl border border-cream-200 overflow-hidden">
+                  <summary className="flex items-center justify-between gap-4 p-5 cursor-pointer list-none">
+                    <span className="text-lg font-semibold text-navy-500">How fast is the internet in {destinationData.name}?</span>
+                    <ChevronDown className="w-5 h-5 text-navy-400 group-open:rotate-180 transition-transform" />
+                  </summary>
+                  <div className="px-5 pb-5 pt-0">
+                    <p className="text-navy-400 leading-relaxed">
+                      You&apos;ll get full 4G/5G speeds on tier-1 local networks - the same towers used by locals.
+                      Typical speeds are 20-100 Mbps, perfect for streaming, video calls, Google Maps, and social media.
+                    </p>
+                  </div>
+                </details>
+              </div>
             </div>
           </div>
         </section>

@@ -274,6 +274,24 @@ export function DestinationPlansSection({
 
   return (
     <>
+      {/* Subtle Social Proof / Activity Indicator */}
+      <div className="flex items-center justify-center gap-2 mb-6">
+        <div className="flex -space-x-1.5">
+          <div className="w-6 h-6 rounded-full bg-brand-200 border-2 border-white flex items-center justify-center">
+            <span className="text-xs text-brand-700">👤</span>
+          </div>
+          <div className="w-6 h-6 rounded-full bg-success-200 border-2 border-white flex items-center justify-center">
+            <span className="text-xs text-success-700">👤</span>
+          </div>
+          <div className="w-6 h-6 rounded-full bg-accent-200 border-2 border-white flex items-center justify-center">
+            <span className="text-xs text-accent-700">👤</span>
+          </div>
+        </div>
+        <span className="text-sm text-navy-400">
+          <span className="font-medium text-navy-500">12 travellers</span> bought {destinationName} eSIM today
+        </span>
+      </div>
+
       {/* Plan Type Legend - only show if we have both types */}
       {hasMixedTypes && (
         <div className="flex flex-wrap items-center justify-center gap-4 mb-8">
