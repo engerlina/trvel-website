@@ -6,11 +6,13 @@ import { Link } from '@/i18n/routing';
 import Image from 'next/image';
 import { Menu, X, Globe, Phone } from 'lucide-react';
 import { Button } from '@/components/ui';
-import { AU, SG, GB, US, MY, ID } from 'country-flag-icons/react/3x2';
+import { AU, SG, GB, US, MY, ID, CA, NZ } from 'country-flag-icons/react/3x2';
 
 const locales = [
   { code: 'en-au', label: 'Australia', Flag: AU, currency: 'AUD', phone: '+61 3 4052 7555' },
+  { code: 'en-nz', label: 'New Zealand', Flag: NZ, currency: 'NZD', phone: null },
   { code: 'en-us', label: 'United States', Flag: US, currency: 'USD', phone: null },
+  { code: 'en-ca', label: 'Canada', Flag: CA, currency: 'CAD', phone: null },
   { code: 'en-sg', label: 'Singapore', Flag: SG, currency: 'SGD', phone: null },
   { code: 'en-gb', label: 'United Kingdom', Flag: GB, currency: 'GBP', phone: null },
   { code: 'ms-my', label: 'Malaysia', Flag: MY, currency: 'MYR', phone: null },
