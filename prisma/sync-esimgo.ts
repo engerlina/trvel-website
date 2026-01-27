@@ -525,6 +525,97 @@ async function syncBundles(bundles: EsimGoBundle[]): Promise<void> {
 }
 
 /**
+ * Generate a display name from slug (e.g., "united-kingdom" -> "United Kingdom")
+ */
+function slugToName(slug: string): string {
+  return slug
+    .split('-')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+}
+
+/**
+ * Sync Destination records for all locales
+ * Creates destinations from the DESTINATION_TO_ISO mapping with data from bundles
+ */
+async function syncDestinations(bundles: EsimGoBundle[]): Promise<void> {
+  console.log('\nSyncing destinations...');
+
+  const locales = Object.keys(LOCALE_CURRENCIES);
+  const destinations = Object.keys(DESTINATION_TO_ISO);
+
+  let created = 0;
+  let updated = 0;
+  let skipped = 0;
+
+  for (const destinationSlug of destinations) {
+    const countryIso = DESTINATION_TO_ISO[destinationSlug];
+
+    // Find a bundle for this country to get region info
+    const countryBundle = bundles.find(b =>
+      b.countries.some(c => c.iso === countryIso)
+    );
+
+    if (!countryBundle) {
+      skipped++;
+      continue;
+    }
+
+    const countryInfo = countryBundle.countries.find(c => c.iso === countryIso);
+    const region = countryInfo?.region || null;
+    const countryName = countryInfo?.name || slugToName(destinationSlug);
+
+    // Create destination for each locale
+    for (const locale of locales) {
+      try {
+        const existing = await prisma.destination.findUnique({
+          where: {
+            slug_locale: {
+              slug: destinationSlug,
+              locale,
+            },
+          },
+        });
+
+        const destinationData = {
+          name: countryName,
+          tagline: `Stay connected in ${countryName} with reliable mobile data`,
+          country_iso: countryIso,
+          region,
+        };
+
+        if (existing) {
+          // Only update if missing data (preserve manual edits)
+          if (!existing.country_iso || !existing.region) {
+            await prisma.destination.update({
+              where: { id: existing.id },
+              data: {
+                country_iso: existing.country_iso || countryIso,
+                region: existing.region || region,
+              },
+            });
+            updated++;
+          }
+        } else {
+          await prisma.destination.create({
+            data: {
+              slug: destinationSlug,
+              locale,
+              ...destinationData,
+            },
+          });
+          created++;
+        }
+      } catch (error) {
+        console.error(`  Error syncing destination ${destinationSlug} (${locale}):`, (error as Error).message);
+      }
+    }
+  }
+
+  console.log(`  Created: ${created}, Updated: ${updated}, Skipped (no bundle): ${skipped}`);
+}
+
+/**
  * Bundle with data tier info for pricing
  */
 interface BundleWithTier {
@@ -829,7 +920,10 @@ async function main() {
     // Step 4: Sync bundles to database
     await syncBundles(bundles);
 
-    // Step 5: Update plans with retail prices (flexible durations)
+    // Step 5: Sync destinations (create missing ones)
+    await syncDestinations(bundles);
+
+    // Step 6: Update plans with retail prices (flexible durations)
     await syncPlans(bundles);
 
     console.log('\n' + '='.repeat(60));

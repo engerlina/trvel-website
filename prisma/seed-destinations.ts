@@ -10,6 +10,8 @@ const localeCurrencies: Record<string, string> = {
   'en-us': 'USD',
   'ms-my': 'MYR',
   'id-id': 'IDR',
+  'en-ca': 'CAD',
+  'en-nz': 'NZD',
 };
 
 // Exchange rates from USD
@@ -20,6 +22,8 @@ const USD_EXCHANGE_RATES: Record<string, number> = {
   'GBP': 0.79,
   'MYR': 4.47,
   'IDR': 15800,
+  'CAD': 1.36,
+  'NZD': 1.68,
 };
 
 // Competitor daily roaming rates by currency
@@ -30,6 +34,8 @@ const COMPETITORS: Record<string, { name: string; dailyRate: number }> = {
   'USD': { name: 'AT&T', dailyRate: 12 },
   'MYR': { name: 'Maxis', dailyRate: 35 },
   'IDR': { name: 'Telkomsel', dailyRate: 100000 },
+  'CAD': { name: 'Rogers', dailyRate: 18 },
+  'NZD': { name: 'Spark', dailyRate: 2.14 },
 };
 
 // Pricing constants
@@ -127,7 +133,7 @@ const destinationsData = [
 const AVAILABLE_DURATIONS = [5, 7, 15];
 const DEFAULT_DURATIONS = [5, 7, 15];
 
-const locales = ['en-au', 'en-sg', 'en-gb', 'en-us', 'ms-my', 'id-id'];
+const locales = ['en-au', 'en-sg', 'en-gb', 'en-us', 'ms-my', 'id-id', 'en-ca', 'en-nz'];
 
 // Localized destination names
 const localizedNames: Record<string, Record<string, { name: string; tagline: string }>> = {
