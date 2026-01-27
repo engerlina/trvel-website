@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
-import { Link } from '@/i18n/routing';
+import { Link, usePathname } from '@/i18n/routing';
+import type { Locale } from '@/types';
 import Image from 'next/image';
 import { Menu, X, Globe, Phone } from 'lucide-react';
 import { Button } from '@/components/ui';
@@ -22,7 +23,16 @@ const locales = [
 export function Header() {
   const t = useTranslations('common.nav');
   const locale = useLocale();
+  const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Handle locale switch by constructing the full URL
+  const switchLocale = (newLocale: Locale) => {
+    // pathname from next-intl is without locale prefix, so we add the new locale
+    // Use window.location for hard navigation to bypass Next.js locale middleware
+    const newPath = `/${newLocale}${pathname === '/' ? '' : pathname}`;
+    window.location.href = newPath;
+  };
 
   // Find the current locale config
   const currentLocale = locales.find(l => l.code === locale) || locales[0];
@@ -85,17 +95,16 @@ export function Header() {
                 <li className="menu-title px-3 py-2 text-xs text-navy-400 uppercase tracking-wide">Select Region</li>
                 {locales.map((loc) => (
                   <li key={loc.code}>
-                    <Link
-                      href="/"
-                      locale={loc.code}
-                      className={`flex items-center gap-3 px-3 py-2.5 rounded-lg ${
+                    <button
+                      onClick={() => switchLocale(loc.code as Locale)}
+                      className={`flex items-center gap-3 px-3 py-2.5 rounded-lg w-full text-left ${
                         locale === loc.code ? 'bg-brand-50 text-brand-600' : 'hover:bg-cream-50'
                       }`}
                     >
                       <loc.Flag className="w-6 h-4 rounded-sm shadow-sm" />
                       <span className="flex-1 font-medium">{loc.label}</span>
                       <span className={`text-sm ${locale === loc.code ? 'text-brand-500' : 'text-navy-400'}`}>{loc.currency}</span>
-                    </Link>
+                    </button>
                   </li>
                 ))}
               </ul>
@@ -122,17 +131,16 @@ export function Header() {
                 <li className="menu-title px-3 py-2 text-xs text-navy-400 uppercase tracking-wide">Select Region</li>
                 {locales.map((loc) => (
                   <li key={loc.code}>
-                    <Link
-                      href="/"
-                      locale={loc.code}
-                      className={`flex items-center gap-3 px-3 py-2.5 rounded-lg ${
+                    <button
+                      onClick={() => switchLocale(loc.code as Locale)}
+                      className={`flex items-center gap-3 px-3 py-2.5 rounded-lg w-full text-left ${
                         locale === loc.code ? 'bg-brand-50 text-brand-600' : 'hover:bg-cream-50'
                       }`}
                     >
                       <loc.Flag className="w-6 h-4 rounded-sm shadow-sm" />
                       <span className="flex-1 font-medium">{loc.label}</span>
                       <span className={`text-sm ${locale === loc.code ? 'text-brand-500' : 'text-navy-400'}`}>{loc.currency}</span>
-                    </Link>
+                    </button>
                   </li>
                 ))}
               </ul>
@@ -194,12 +202,13 @@ export function Header() {
             </div>
             <div className="grid grid-cols-2 gap-2">
               {locales.map((loc) => (
-                <Link
+                <button
                   key={loc.code}
-                  href="/"
-                  locale={loc.code}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`flex items-center gap-2 p-3 rounded-lg border transition-colors ${
+                  onClick={() => {
+                    switchLocale(loc.code as Locale);
+                    setMobileMenuOpen(false);
+                  }}
+                  className={`flex items-center gap-2 p-3 rounded-lg border transition-colors text-left ${
                     locale === loc.code
                       ? 'border-brand-500 bg-brand-50'
                       : 'border-cream-200 hover:border-brand-300'
@@ -210,7 +219,7 @@ export function Header() {
                     <span className="text-sm font-medium text-navy-600 block truncate">{loc.label}</span>
                     <span className="text-xs text-navy-400">{loc.currency}</span>
                   </div>
-                </Link>
+                </button>
               ))}
             </div>
           </div>

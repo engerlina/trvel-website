@@ -1,7 +1,10 @@
-import { Link } from '@/i18n/routing';
+'use client';
+
+import { Link, usePathname } from '@/i18n/routing';
 import Image from 'next/image';
 import { Shield, Lock, MessageCircle, Mail, ChevronRight, Phone } from 'lucide-react';
-import { AU, SG, GB, US, MY, ID, type FlagComponent } from 'country-flag-icons/react/3x2';
+import { AU, SG, GB, US, MY, ID, CA, NZ, type FlagComponent } from 'country-flag-icons/react/3x2';
+import type { Locale } from '@/types';
 
 
 const destinations = [
@@ -38,7 +41,9 @@ const legal = [
 
 const locales: { code: string; label: string; Flag: FlagComponent; currency: string }[] = [
   { code: 'en-au', label: 'Australia', Flag: AU, currency: 'AUD' },
+  { code: 'en-nz', label: 'New Zealand', Flag: NZ, currency: 'NZD' },
   { code: 'en-us', label: 'United States', Flag: US, currency: 'USD' },
+  { code: 'en-ca', label: 'Canada', Flag: CA, currency: 'CAD' },
   { code: 'en-sg', label: 'Singapore', Flag: SG, currency: 'SGD' },
   { code: 'en-gb', label: 'United Kingdom', Flag: GB, currency: 'GBP' },
   { code: 'ms-my', label: 'Malaysia', Flag: MY, currency: 'MYR' },
@@ -46,6 +51,15 @@ const locales: { code: string; label: string; Flag: FlagComponent; currency: str
 ];
 
 export function Footer() {
+  const pathname = usePathname();
+
+  // Handle locale switch by constructing the full URL
+  const switchLocale = (newLocale: Locale) => {
+    // Use window.location for hard navigation to bypass Next.js locale middleware
+    const newPath = `/${newLocale}${pathname === '/' ? '' : pathname}`;
+    window.location.href = newPath;
+  };
+
   return (
     <footer
       className="relative z-10 bg-navy-500 text-cream-300 no-decoration overflow-hidden"
@@ -212,16 +226,15 @@ export function Footer() {
           <div>
             <h4 className="text-body font-semibold text-cream-100 mb-4">Region</h4>
             <ul className="space-y-3">
-              {locales.map((locale) => (
-                <li key={locale.code}>
-                  <Link
-                    href="/"
-                    locale={locale.code}
+              {locales.map((loc) => (
+                <li key={loc.code}>
+                  <button
+                    onClick={() => switchLocale(loc.code as Locale)}
                     className="flex items-center gap-2 text-body-sm text-cream-400 hover:text-brand-400 transition-colors"
                   >
-                    <locale.Flag className="w-5 h-auto" />
-                    <span>{locale.currency}</span>
-                  </Link>
+                    <loc.Flag className="w-5 h-auto" />
+                    <span>{loc.currency}</span>
+                  </button>
                 </li>
               ))}
             </ul>
