@@ -44,8 +44,8 @@ export function Header() {
         </div>
 
         {/* Desktop Navigation */}
-        <div className="navbar-center hidden md:flex">
-          <ul className="menu menu-horizontal px-1 gap-1 lg:gap-2">
+        <div className="navbar-center hidden lg:flex">
+          <ul className="menu menu-horizontal px-1 gap-1">
             <li><Link href="/destinations" className="text-body">{t('destinations')}</Link></li>
             <li><Link href="/compatibility" className="text-body">Check Device</Link></li>
             <li><Link href="/how-it-works" className="text-body">How It Works</Link></li>
@@ -54,43 +54,93 @@ export function Header() {
         </div>
 
         {/* Desktop Actions */}
-        <div className="navbar-end gap-4 lg:gap-6">
-          {/* Phone Number - Only shown if locale has one */}
-          {currentLocale.phone && (
-            <a
-              href={`tel:${currentLocale.phone.replace(/\s/g, '')}`}
-              className="hidden lg:flex items-center gap-2 text-sm text-navy-500 hover:text-brand-600 transition-colors"
-            >
-              <Phone className="w-4 h-4" />
-              <span>{currentLocale.phone}</span>
-            </a>
-          )}
+        <div className="navbar-end">
+          <div className="hidden lg:flex items-center">
+            {/* Phone Number - Clean pill style */}
+            {currentLocale.phone && (
+              <a
+                href={`tel:${currentLocale.phone.replace(/\s/g, '')}`}
+                className="hidden 2xl:flex items-center gap-2 px-3 py-1.5 text-sm text-navy-500 hover:text-brand-600 hover:bg-brand-50 rounded-lg transition-colors mr-2"
+              >
+                <Phone className="w-4 h-4" />
+                <span className="whitespace-nowrap">{currentLocale.phone}</span>
+              </a>
+            )}
 
-          {/* Locale Switcher - DaisyUI Dropdown */}
-          <div className="dropdown dropdown-end hidden md:block">
-            <div tabIndex={0} role="button" className="btn btn-ghost btn-sm gap-2">
-              <Globe className="w-4 h-4" />
-              <CurrentFlag className="w-5 h-auto rounded-sm" />
-              <span>{currentLocale.currency}</span>
+            {/* Divider */}
+            <div className="h-6 w-px bg-cream-300 mx-3" />
+
+            {/* Locale Switcher - Cleaner style */}
+            <div className="dropdown dropdown-end">
+              <div tabIndex={0} role="button" className="flex items-center gap-2 px-3 py-1.5 hover:bg-cream-100 rounded-lg transition-colors cursor-pointer">
+                <CurrentFlag className="w-5 h-3.5 rounded-sm shadow-sm" />
+                <span className="text-sm font-medium text-navy-500">{currentLocale.currency}</span>
+                <svg className="w-3.5 h-3.5 text-navy-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+              <ul tabIndex={0} className="dropdown-content menu bg-base-100 rounded-xl z-[1] w-56 p-2 shadow-lg border border-cream-200 mt-3">
+                <li className="menu-title px-3 py-2 text-xs text-navy-400 uppercase tracking-wide">Select Region</li>
+                {locales.map((loc) => (
+                  <li key={loc.code}>
+                    <Link
+                      href="/"
+                      locale={loc.code}
+                      className={`flex items-center gap-3 px-3 py-2.5 rounded-lg ${
+                        locale === loc.code ? 'bg-brand-50 text-brand-600' : 'hover:bg-cream-50'
+                      }`}
+                    >
+                      <loc.Flag className="w-6 h-4 rounded-sm shadow-sm" />
+                      <span className="flex-1 font-medium">{loc.label}</span>
+                      <span className={`text-sm ${locale === loc.code ? 'text-brand-500' : 'text-navy-400'}`}>{loc.currency}</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
             </div>
-            <ul tabIndex={0} className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow-soft-lg border border-base-200 mt-2">
-              {locales.map((locale) => (
-                <li key={locale.code}>
-                  <Link href="/" locale={locale.code} className="flex items-center gap-3">
-                    <locale.Flag className="w-5 h-auto rounded-sm" />
-                    <span>{locale.label}</span>
-                    <span className="ml-auto text-base-content/50 text-sm">{locale.currency}</span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
+
+            {/* CTA Button */}
+            <Link href="/get-started" className="ml-4 flex-shrink-0">
+              <Button variant="primary" size="sm" className="whitespace-nowrap">
+                Get Started
+              </Button>
+            </Link>
           </div>
 
-          <Link href="/get-started" className="hidden md:flex">
-            <Button variant="primary" size="sm">
-              Get Started
-            </Button>
-          </Link>
+          {/* Tablet: Simplified actions */}
+          <div className="hidden md:flex lg:hidden items-center gap-3">
+            <div className="dropdown dropdown-end">
+              <div tabIndex={0} role="button" className="flex items-center gap-1.5 px-2 py-1.5 hover:bg-cream-100 rounded-lg transition-colors cursor-pointer">
+                <CurrentFlag className="w-5 h-3.5 rounded-sm shadow-sm" />
+                <svg className="w-3 h-3 text-navy-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+              <ul tabIndex={0} className="dropdown-content menu bg-base-100 rounded-xl z-[1] w-56 p-2 shadow-lg border border-cream-200 mt-3">
+                <li className="menu-title px-3 py-2 text-xs text-navy-400 uppercase tracking-wide">Select Region</li>
+                {locales.map((loc) => (
+                  <li key={loc.code}>
+                    <Link
+                      href="/"
+                      locale={loc.code}
+                      className={`flex items-center gap-3 px-3 py-2.5 rounded-lg ${
+                        locale === loc.code ? 'bg-brand-50 text-brand-600' : 'hover:bg-cream-50'
+                      }`}
+                    >
+                      <loc.Flag className="w-6 h-4 rounded-sm shadow-sm" />
+                      <span className="flex-1 font-medium">{loc.label}</span>
+                      <span className={`text-sm ${locale === loc.code ? 'text-brand-500' : 'text-navy-400'}`}>{loc.currency}</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <Link href="/get-started" className="flex-shrink-0">
+              <Button variant="primary" size="sm" className="whitespace-nowrap">
+                Get Started
+              </Button>
+            </Link>
+          </div>
 
           {/* Mobile Menu Button */}
           <button

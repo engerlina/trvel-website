@@ -17,10 +17,12 @@ import {
   Info,
   Search,
   Clock,
+  Database,
+  Infinity,
 } from 'lucide-react';
 import * as Flags from 'country-flag-icons/react/3x2';
 import { isDestinationExcluded } from '@/lib/utils';
-import { DurationOption } from '@/types';
+import { DurationOption, DataTier } from '@/types';
 import { getGclid } from '@/hooks/useGclid';
 
 interface Destination {
@@ -70,6 +72,7 @@ export default function GetStartedPage() {
   const locale = useLocale();
   const [selectedDestination, setSelectedDestination] = useState<string | null>(null);
   const [selectedDuration, setSelectedDuration] = useState<number>(7);
+  const [selectedTier, setSelectedTier] = useState<DataTier>('1gb');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [plansMap, setPlansMap] = useState<Record<string, Plan>>({});
@@ -157,6 +160,19 @@ export default function GetStartedPage() {
   const currencySymbol = getCurrencySymbol(currency);
   const SelectedFlag = selectedDest ? getFlagComponent(selectedDest.country_iso) : null;
 
+  // Check which tiers are available for the selected destination
+  const availableTiers = useMemo(() => {
+    if (!currentPlan?.durations) return { unlimited: false, '1gb': false };
+    const hasUnlimited = currentPlan.durations.some(d => d.data_type === 'unlimited');
+    const has1gb = currentPlan.durations.some(d => d.data_type === '1gb');
+    return { unlimited: hasUnlimited, '1gb': has1gb };
+  }, [currentPlan]);
+
+  // Style helpers based on selected tier
+  const isUnlimited = selectedTier === 'unlimited';
+  const tierColor = isUnlimited ? 'brand' : 'amber';
+  const TierIcon = isUnlimited ? Infinity : Database;
+
   const handleCheckout = async () => {
     if (!selectedDestination) return;
 
@@ -173,6 +189,7 @@ export default function GetStartedPage() {
           destination: selectedDestination,
           duration: selectedDuration,
           locale,
+          dataType: selectedTier,
           ...(gclid && { gclid }),
         }),
       });
@@ -188,7 +205,7 @@ export default function GetStartedPage() {
       }
     } catch (error) {
       console.error('Checkout error:', error);
-      window.location.href = `/${locale}/checkout?destination=${selectedDestination}&duration=${selectedDuration}`;
+      window.location.href = `/${locale}/checkout?destination=${selectedDestination}&duration=${selectedDuration}&dataType=${selectedTier}`;
     }
   };
 
@@ -313,14 +330,85 @@ export default function GetStartedPage() {
                 </div>
               </div>
 
-              {/* Step 2: Plan Duration */}
+              {/* Step 2: Data Tier */}
               <div className="mb-8">
                 <label className="block text-sm font-semibold text-navy-500 mb-3">
-                  2. How long is your trip?
+                  2. Choose your data plan
+                </label>
+                <div className="grid grid-cols-2 gap-3">
+                  {/* Unlimited Option */}
+                  <button
+                    type="button"
+                    onClick={() => setSelectedTier('unlimited')}
+                    disabled={selectedDestination ? !availableTiers.unlimited : false}
+                    className={`relative p-4 rounded-xl border-2 transition-all text-left ${
+                      selectedTier === 'unlimited'
+                        ? 'border-brand-500 bg-brand-50'
+                        : 'border-cream-200 bg-cream-50 hover:border-brand-300'
+                    } ${selectedDestination && !availableTiers.unlimited ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  >
+                    <div className="absolute -top-2 left-3">
+                      <span className="px-2 py-0.5 bg-brand-500 text-white text-xs font-medium rounded-full">
+                        Recommended
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-3 mt-1">
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                        selectedTier === 'unlimited' ? 'bg-brand-100' : 'bg-cream-100'
+                      }`}>
+                        <Infinity className={`w-5 h-5 ${selectedTier === 'unlimited' ? 'text-brand-600' : 'text-navy-400'}`} />
+                      </div>
+                      <div>
+                        <p className={`font-semibold ${selectedTier === 'unlimited' ? 'text-brand-600' : 'text-navy-500'}`}>
+                          Unlimited
+                        </p>
+                        <p className="text-xs text-navy-400">Heavy data users</p>
+                      </div>
+                    </div>
+                  </button>
+
+                  {/* 1GB Option */}
+                  <button
+                    type="button"
+                    onClick={() => setSelectedTier('1gb')}
+                    disabled={selectedDestination ? !availableTiers['1gb'] : false}
+                    className={`relative p-4 rounded-xl border-2 transition-all text-left ${
+                      selectedTier === '1gb'
+                        ? 'border-amber-500 bg-amber-50'
+                        : 'border-cream-200 bg-cream-50 hover:border-amber-300'
+                    } ${selectedDestination && !availableTiers['1gb'] ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  >
+                    <div className="absolute -top-2 left-3">
+                      <span className="px-2 py-0.5 bg-amber-500 text-white text-xs font-medium rounded-full">
+                        Budget
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-3 mt-1">
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                        selectedTier === '1gb' ? 'bg-amber-100' : 'bg-cream-100'
+                      }`}>
+                        <Database className={`w-5 h-5 ${selectedTier === '1gb' ? 'text-amber-600' : 'text-navy-400'}`} />
+                      </div>
+                      <div>
+                        <p className={`font-semibold ${selectedTier === '1gb' ? 'text-amber-600' : 'text-navy-500'}`}>
+                          1GB Data
+                        </p>
+                        <p className="text-xs text-navy-400">Light data users</p>
+                      </div>
+                    </div>
+                  </button>
+                </div>
+              </div>
+
+              {/* Step 3: Plan Duration */}
+              <div className="mb-8">
+                <label className="block text-sm font-semibold text-navy-500 mb-3">
+                  3. How long is your trip?
                 </label>
                 {(() => {
-                  // Get available durations for selected destination
-                  const availableDurations = currentPlan?.durations || [];
+                  // Get available durations for selected destination filtered by tier
+                  const allDurations = currentPlan?.durations || [];
+                  const availableDurations = allDurations.filter(d => d.data_type === selectedTier);
                   const defaultDurations = currentPlan?.default_durations || [];
 
                   // Sort all durations
@@ -349,19 +437,19 @@ export default function GetStartedPage() {
                               onClick={() => setSelectedDuration(plan.days)}
                               className={`relative p-4 rounded-xl border-2 transition-all text-center ${
                                 isSelected
-                                  ? 'border-brand-500 bg-brand-50'
-                                  : 'border-cream-200 bg-cream-50 hover:border-brand-300'
+                                  ? isUnlimited ? 'border-brand-500 bg-brand-50' : 'border-amber-500 bg-amber-50'
+                                  : isUnlimited ? 'border-cream-200 bg-cream-50 hover:border-brand-300' : 'border-cream-200 bg-cream-50 hover:border-amber-300'
                               }`}
                             >
                               {plan.popular && (
                                 <div className="absolute -top-2 left-1/2 -translate-x-1/2">
-                                  <span className="px-2 py-0.5 bg-brand-500 text-white text-xs font-medium rounded-full">
+                                  <span className={`px-2 py-0.5 text-white text-xs font-medium rounded-full ${isUnlimited ? 'bg-brand-500' : 'bg-amber-500'}`}>
                                     Popular
                                   </span>
                                 </div>
                               )}
-                              <Icon className={`w-5 h-5 mx-auto mb-2 ${isSelected ? 'text-brand-600' : 'text-navy-400'}`} />
-                              <p className={`font-semibold ${isSelected ? 'text-brand-600' : 'text-navy-500'}`}>
+                              <Icon className={`w-5 h-5 mx-auto mb-2 ${isSelected ? (isUnlimited ? 'text-brand-600' : 'text-amber-600') : 'text-navy-400'}`} />
+                              <p className={`font-semibold ${isSelected ? (isUnlimited ? 'text-brand-600' : 'text-amber-600') : 'text-navy-500'}`}>
                                 {plan.label}
                               </p>
                               <p className="text-sm text-gray-400 mt-1">—</p>
@@ -388,19 +476,19 @@ export default function GetStartedPage() {
                               onClick={() => setSelectedDuration(durationOption.duration)}
                               className={`relative p-4 rounded-xl border-2 transition-all text-center ${
                                 isSelected
-                                  ? 'border-brand-500 bg-brand-50'
-                                  : 'border-cream-200 bg-cream-50 hover:border-brand-300'
+                                  ? isUnlimited ? 'border-brand-500 bg-brand-50' : 'border-amber-500 bg-amber-50'
+                                  : isUnlimited ? 'border-cream-200 bg-cream-50 hover:border-brand-300' : 'border-cream-200 bg-cream-50 hover:border-amber-300'
                               }`}
                             >
                               {isPopular && (
                                 <div className="absolute -top-2 left-1/2 -translate-x-1/2">
-                                  <span className="px-2 py-0.5 bg-brand-500 text-white text-xs font-medium rounded-full">
+                                  <span className={`px-2 py-0.5 text-white text-xs font-medium rounded-full ${isUnlimited ? 'bg-brand-500' : 'bg-amber-500'}`}>
                                     Popular
                                   </span>
                                 </div>
                               )}
-                              <Icon className={`w-5 h-5 mx-auto mb-2 ${isSelected ? 'text-brand-600' : 'text-navy-400'}`} />
-                              <p className={`font-semibold ${isSelected ? 'text-brand-600' : 'text-navy-500'}`}>
+                              <Icon className={`w-5 h-5 mx-auto mb-2 ${isSelected ? (isUnlimited ? 'text-brand-600' : 'text-amber-600') : 'text-navy-400'}`} />
+                              <p className={`font-semibold ${isSelected ? (isUnlimited ? 'text-brand-600' : 'text-amber-600') : 'text-navy-500'}`}>
                                 {durationOption.duration} Days
                               </p>
                               {plansLoading ? (
@@ -420,7 +508,11 @@ export default function GetStartedPage() {
                         <button
                           type="button"
                           onClick={() => setShowAllDurations(!showAllDurations)}
-                          className="w-full mt-3 flex items-center justify-center gap-2 py-2.5 px-4 text-sm font-medium text-brand-600 hover:text-brand-700 transition-colors border border-dashed border-brand-300 hover:border-brand-400 rounded-xl bg-brand-50/50 hover:bg-brand-50"
+                          className={`w-full mt-3 flex items-center justify-center gap-2 py-2.5 px-4 text-sm font-medium transition-colors border border-dashed rounded-xl ${
+                            isUnlimited
+                              ? 'text-brand-600 hover:text-brand-700 border-brand-300 hover:border-brand-400 bg-brand-50/50 hover:bg-brand-50'
+                              : 'text-amber-600 hover:text-amber-700 border-amber-300 hover:border-amber-400 bg-amber-50/50 hover:bg-amber-50'
+                          }`}
                         >
                           <Clock className="w-4 h-4" />
                           {showAllDurations ? 'Show fewer options' : `${additionalDurations.length} more option${additionalDurations.length > 1 ? 's' : ''}`}
@@ -444,11 +536,11 @@ export default function GetStartedPage() {
                                 onClick={() => setSelectedDuration(durationOption.duration)}
                                 className={`p-3 rounded-xl border-2 transition-all text-center ${
                                   isSelected
-                                    ? 'border-brand-500 bg-brand-50'
-                                    : 'border-cream-200 bg-cream-50 hover:border-brand-300'
+                                    ? isUnlimited ? 'border-brand-500 bg-brand-50' : 'border-amber-500 bg-amber-50'
+                                    : isUnlimited ? 'border-cream-200 bg-cream-50 hover:border-brand-300' : 'border-cream-200 bg-cream-50 hover:border-amber-300'
                                 }`}
                               >
-                                <p className={`font-semibold text-sm ${isSelected ? 'text-brand-600' : 'text-navy-500'}`}>
+                                <p className={`font-semibold text-sm ${isSelected ? (isUnlimited ? 'text-brand-600' : 'text-amber-600') : 'text-navy-500'}`}>
                                   {durationOption.duration} Days
                                 </p>
                                 {plansLoading ? (
@@ -470,13 +562,24 @@ export default function GetStartedPage() {
 
               {/* Plan Summary */}
               {selectedDestination && currentPlan && (() => {
-                const selectedDurationOption = currentPlan.durations?.find(d => d.duration === selectedDuration);
+                // Find the plan for the selected duration and tier
+                const selectedDurationOption = currentPlan.durations?.find(
+                  d => d.duration === selectedDuration && d.data_type === selectedTier
+                );
                 const totalPrice = selectedDurationOption?.retail_price || null;
                 const dailyRate = selectedDurationOption?.daily_rate || null;
                 return (
-                  <div className="bg-cream-50 rounded-xl p-4 mb-6 border border-cream-200">
+                  <div className={`rounded-xl p-4 mb-6 border ${isUnlimited ? 'bg-brand-50 border-brand-200' : 'bg-amber-50 border-amber-200'}`}>
                     <div className="flex items-center justify-between mb-3">
-                      <span className="text-navy-400 text-sm">Your Plan</span>
+                      <div className="flex items-center gap-2">
+                        <span className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-semibold ${
+                          isUnlimited ? 'bg-brand-100 text-brand-700' : 'bg-amber-100 text-amber-700'
+                        }`}>
+                          <TierIcon className="w-3 h-3" />
+                          {isUnlimited ? 'Unlimited' : '1GB'}
+                        </span>
+                        <span className="text-navy-400 text-sm">Your Plan</span>
+                      </div>
                       <span className="font-semibold text-navy-500">
                         {selectedDest?.name} - {selectedDuration} Days
                       </span>
@@ -484,7 +587,7 @@ export default function GetStartedPage() {
                     <div className="flex items-center justify-between">
                       <span className="text-navy-400 text-sm">Total</span>
                       <div className="text-right">
-                        <span className="text-xl font-bold text-brand-600">
+                        <span className={`text-xl font-bold ${isUnlimited ? 'text-brand-600' : 'text-amber-600'}`}>
                           {currencySymbol}{formatPrice(totalPrice, currency)}
                           <span className="text-sm font-normal text-navy-400 ml-1">{currency}</span>
                         </span>
@@ -536,26 +639,37 @@ export default function GetStartedPage() {
               </div>
             </div>
 
-            {/* Plan Features */}
-            <div className="mt-8 bg-white rounded-2xl p-6 border border-cream-200">
+            {/* Plan Features - Dynamic based on tier */}
+            <div className={`mt-8 bg-white rounded-2xl p-6 border ${isUnlimited ? 'border-brand-200' : 'border-amber-200'}`}>
               <h3 className="font-semibold text-navy-500 mb-4 flex items-center gap-2">
-                <Info className="w-5 h-5 text-brand-600" />
-                All Plans Include
+                <TierIcon className={`w-5 h-5 ${isUnlimited ? 'text-brand-600' : 'text-amber-600'}`} />
+                {isUnlimited ? 'Unlimited Plans Include' : '1GB Data Plans Include'}
               </h3>
               <ul className="space-y-3">
-                {[
-                  '1GB high-speed data per day (5G where available)',
-                  'Unlimited data after at 1.25 Mbps',
+                {(isUnlimited ? [
+                  'Unlimited high-speed data (5G/4G LTE)',
+                  'No data caps or throttling',
+                  'Premium local network coverage',
+                  'Instant eSIM delivery via email',
+                  '24/7 live chat & phone support',
+                ] : [
+                  '1GB high-speed data (5G/4G LTE)',
+                  'Premium local network coverage',
                   'Instant eSIM delivery via email',
                   '24/7 live chat & phone support',
                   '10-minute connection guarantee',
-                ].map((feature, i) => (
+                ]).map((feature, i) => (
                   <li key={i} className="flex items-start gap-3 text-navy-400">
-                    <Check className="w-5 h-5 text-success-500 flex-shrink-0 mt-0.5" />
+                    <Check className={`w-5 h-5 flex-shrink-0 mt-0.5 ${isUnlimited ? 'text-brand-500' : 'text-amber-500'}`} />
                     {feature}
                   </li>
                 ))}
               </ul>
+              {!isUnlimited && (
+                <p className="mt-4 text-sm text-amber-600 font-medium flex items-center gap-2">
+                  💰 Budget-friendly option for light data users
+                </p>
+              )}
             </div>
           </div>
         </div>
