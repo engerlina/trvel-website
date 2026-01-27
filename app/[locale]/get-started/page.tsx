@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { useLocale } from 'next-intl';
+import Image from 'next/image';
 import { Header, Footer } from '@/components/layout';
 import { Button } from '@/components/ui';
 import {
@@ -224,9 +225,32 @@ export default function GetStartedPage() {
               <h1 className="text-display md:text-display-lg font-bold text-navy-500 mb-3">
                 Get Started
               </h1>
-              <p className="text-body-lg text-navy-300">
+              <p className="text-body-lg text-navy-300 mb-6">
                 Select your destination and plan to continue
               </p>
+
+              {/* Trust Pill */}
+              <div className="inline-flex items-center gap-4 sm:gap-6 px-5 py-2.5 bg-white rounded-full border border-cream-200 shadow-soft">
+                <div className="flex items-center gap-2">
+                  <div className="flex -space-x-2">
+                    <div className="w-7 h-7 rounded-full border-2 border-white overflow-hidden">
+                      <Image src="/profilepics/picture_woman_11.png" alt="" width={28} height={28} className="object-cover" />
+                    </div>
+                    <div className="w-7 h-7 rounded-full border-2 border-white overflow-hidden">
+                      <Image src="/profilepics/picture_man_11.png" alt="" width={28} height={28} className="object-cover" />
+                    </div>
+                    <div className="w-7 h-7 rounded-full border-2 border-white overflow-hidden">
+                      <Image src="/profilepics/picture_woman_12.png" alt="" width={28} height={28} className="object-cover" />
+                    </div>
+                  </div>
+                  <span className="text-sm font-medium text-navy-500">50,000+ happy travellers</span>
+                </div>
+                <div className="h-4 w-px bg-cream-200" />
+                <div className="flex items-center gap-1">
+                  <Star className="w-4 h-4 fill-accent-500 text-accent-500" />
+                  <span className="text-sm font-medium text-navy-500">4.9/5 rating</span>
+                </div>
+              </div>
             </div>
 
             {/* Form Card */}

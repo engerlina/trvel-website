@@ -2,7 +2,8 @@
 
 import { useRef, useMemo, useEffect, useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
-import { ChevronDown, Shield, Check, Info, Globe, Search } from 'lucide-react';
+import Image from 'next/image';
+import { ChevronDown, Shield, Check, Info, Globe, Search, Star } from 'lucide-react';
 import { Badge } from '@/components/ui';
 import * as Flags from 'country-flag-icons/react/3x2';
 import { useDestination } from '@/contexts/DestinationContext';
@@ -217,8 +218,33 @@ export function Hero() {
             )}
           </div>
 
+          {/* Trust Pill */}
+          <div className="animate-fade-up animate-delay-400 flex justify-center mb-6">
+            <div className="inline-flex items-center gap-4 sm:gap-6 px-5 py-2.5 bg-white rounded-full border border-cream-200 shadow-soft">
+              <div className="flex items-center gap-2">
+                <div className="flex -space-x-2">
+                  <div className="w-7 h-7 rounded-full border-2 border-white overflow-hidden">
+                    <Image src="/profilepics/picture_woman_09.png" alt="" width={28} height={28} className="object-cover" />
+                  </div>
+                  <div className="w-7 h-7 rounded-full border-2 border-white overflow-hidden">
+                    <Image src="/profilepics/picture_man_10.png" alt="" width={28} height={28} className="object-cover" />
+                  </div>
+                  <div className="w-7 h-7 rounded-full border-2 border-white overflow-hidden">
+                    <Image src="/profilepics/picture_woman_10.png" alt="" width={28} height={28} className="object-cover" />
+                  </div>
+                </div>
+                <span className="text-sm font-medium text-navy-500">50,000+ happy travellers</span>
+              </div>
+              <div className="h-4 w-px bg-cream-200" />
+              <div className="flex items-center gap-1">
+                <Star className="w-4 h-4 fill-accent-500 text-accent-500" />
+                <span className="text-sm font-medium text-navy-500">4.9/5 rating</span>
+              </div>
+            </div>
+          </div>
+
           {/* Helper Text */}
-          <div className="animate-fade-up animate-delay-400">
+          <div className="animate-fade-up animate-delay-500">
             <p className="text-body-sm text-navy-200">{t('ctaSubtext')}</p>
           </div>
         </div>

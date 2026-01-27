@@ -19,6 +19,7 @@ import {
   MapPin,
 } from 'lucide-react';
 import { DestinationPlansSection } from './DestinationPlansSection';
+import { DestinationTestimonials } from '@/components/sections/DestinationTestimonials';
 import {
   JP, TH, KR, SG, ID, MY, VN, PH, GB, FR, IT, US,
   type FlagComponent,
@@ -364,6 +365,12 @@ export default async function DestinationPage({ params }: DestinationPageProps) 
             </div>
           </div>
         </section>
+
+        {/* Testimonials */}
+        <DestinationTestimonials
+          destinationSlug={destination}
+          destinationName={destinationData.name}
+        />
 
         {/* How It Works */}
         <section className="py-20 bg-white">

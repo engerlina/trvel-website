@@ -1,4 +1,5 @@
 import { useTranslations } from 'next-intl';
+import Image from 'next/image';
 import { Star, Quote } from 'lucide-react';
 
 const testimonials = [
@@ -7,24 +8,28 @@ const testimonials = [
     rating: 5,
     location: 'Melbourne',
     destination: 'Tokyo',
+    image: '/profilepics/picture_woman_07.png',
   },
   {
     id: 'james',
     rating: 5,
     location: 'Sydney',
     destination: 'Bangkok',
+    image: '/profilepics/picture_man_08.png',
   },
   {
     id: 'emma',
     rating: 5,
     location: 'Brisbane',
     destination: 'Seoul',
+    image: '/profilepics/picture_woman_08.png',
   },
   {
     id: 'michael',
     rating: 5,
     location: 'Perth',
     destination: 'Singapore',
+    image: '/profilepics/picture_man_09.png',
   },
 ];
 
@@ -67,13 +72,24 @@ export function Testimonials() {
                 </blockquote>
 
                 {/* Author */}
-                <div className="pt-4 border-t border-gray-100 mt-auto">
-                  <p className="text-body font-semibold text-navy-500">
-                    {t(`${testimonial.id}.name`)}
-                  </p>
-                  <p className="text-body-sm text-gray-500">
-                    {testimonial.location} → {testimonial.destination}
-                  </p>
+                <div className="flex items-center gap-3 pt-4 border-t border-gray-100 mt-auto">
+                  <div className="relative w-10 h-10 rounded-full overflow-hidden bg-gray-100 flex-shrink-0">
+                    <Image
+                      src={testimonial.image}
+                      alt={t(`${testimonial.id}.name`)}
+                      fill
+                      className="object-cover"
+                      sizes="40px"
+                    />
+                  </div>
+                  <div>
+                    <p className="text-body font-semibold text-navy-500">
+                      {t(`${testimonial.id}.name`)}
+                    </p>
+                    <p className="text-body-sm text-gray-500">
+                      {testimonial.location} → {testimonial.destination}
+                    </p>
+                  </div>
                 </div>
               </div>
             </article>

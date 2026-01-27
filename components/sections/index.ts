@@ -4,5 +4,6 @@ export { WhyTrvel } from './WhyTrvel';
 export { Comparison } from './Comparison';
 export { HowItWorks } from './HowItWorks';
 export { Testimonials } from './Testimonials';
+export { DestinationTestimonials } from './DestinationTestimonials';
 export { Destinations } from './Destinations';
 export { FloatingDestinationSelector } from './FloatingDestinationSelector';
