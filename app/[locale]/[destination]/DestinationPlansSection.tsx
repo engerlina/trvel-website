@@ -272,6 +272,11 @@ export function DestinationPlansSection({
   const hasMixedTypes = sortedDurations.some(d => isUnlimitedPlan(d.data_type)) &&
                         sortedDurations.some(d => !isUnlimitedPlan(d.data_type));
 
+  // Generate a deterministic "random" number based on destination (8-24 range)
+  // This ensures consistent results between server and client (no hydration mismatch)
+  const destinationHash = destination.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  const travellerCount = 8 + (destinationHash % 17); // Range: 8-24
+
   return (
     <>
       {/* Subtle Social Proof / Activity Indicator */}
@@ -288,7 +293,7 @@ export function DestinationPlansSection({
           </div>
         </div>
         <span className="text-sm text-navy-400">
-          <span className="font-medium text-navy-500">12 travellers</span> bought {destinationName} eSIM today
+          <span className="font-medium text-navy-500">{travellerCount} travellers</span> bought {destinationName} eSIM today
         </span>
       </div>
 
