@@ -9,7 +9,7 @@ module.exports = withNextIntl({
     workerThreads: false,
     cpus: 1,
     // Tree-shake lucide-react and other barrel imports to reduce unused JS (Lighthouse)
-    optimizePackageImports: ['lucide-react'],
+    optimizePackageImports: ['lucide-react', 'country-flag-icons'],
   },
   // Increase timeout for static page generation to handle database queries
   // Longer timeout to account for queued operations due to semaphore

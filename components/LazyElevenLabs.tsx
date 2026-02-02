@@ -11,26 +11,38 @@ export function LazyElevenLabs() {
   const [shouldLoad, setShouldLoad] = useState(false);
 
   useEffect(() => {
-    // Load after 5 seconds or on first user interaction
-    const timeout = setTimeout(() => setShouldLoad(true), 5000);
+    // Load when main thread is idle (reduces TBT) or after 6s / first interaction
+    const fallback = setTimeout(() => setShouldLoad(true), 6000);
+    let idleId = 0;
 
     const handleInteraction = () => {
       setShouldLoad(true);
-      cleanup();
-    };
-
-    const cleanup = () => {
-      clearTimeout(timeout);
+      clearTimeout(fallback);
+      if (idleId && typeof window.cancelIdleCallback === 'function') {
+        window.cancelIdleCallback(idleId);
+      }
       window.removeEventListener('scroll', handleInteraction);
       window.removeEventListener('click', handleInteraction);
       window.removeEventListener('touchstart', handleInteraction);
     };
 
+    if (typeof window.requestIdleCallback !== 'undefined') {
+      idleId = window.requestIdleCallback(() => setShouldLoad(true), { timeout: 5500 });
+    }
+
     window.addEventListener('scroll', handleInteraction, { once: true, passive: true });
     window.addEventListener('click', handleInteraction, { once: true });
     window.addEventListener('touchstart', handleInteraction, { once: true, passive: true });
 
-    return cleanup;
+    return () => {
+      clearTimeout(fallback);
+      if (idleId && typeof window.cancelIdleCallback === 'function') {
+        window.cancelIdleCallback(idleId);
+      }
+      window.removeEventListener('scroll', handleInteraction);
+      window.removeEventListener('click', handleInteraction);
+      window.removeEventListener('touchstart', handleInteraction);
+    };
   }, []);
 
   if (!shouldLoad) return null;

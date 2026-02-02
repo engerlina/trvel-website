@@ -4,6 +4,25 @@ This file tracks all marketing strategy decisions, changes, and rationale.
 
 ---
 
+## 2026-02-02 - Lighthouse Performance (en-au, Post-Optimization)
+
+### Report summary (lighthousereview02_post.json)
+- **Performance**: 91%
+- **FCP**: 1.2s (0.99) | **LCP**: 2.6s (0.86) | **Speed Index**: 1.7s (1) | **TBT**: 272ms (0.82) | **CLS**: 0.007 (1)
+- **Accessibility**: 92%
+
+### Changes made (this session)
+1. **Browserslist** (package.json): Target modern browsers only to reduce legacy polyfills (~11 KiB, LCP ~150ms). Chunk 117 had Array.at, flat, flatMap, Object.fromEntries, Object.hasOwn.
+2. **optimizePackageImports**: Added `country-flag-icons` alongside `lucide-react` for better tree-shaking of flag imports.
+3. **ElevenLabs widget**: Defer load using `requestIdleCallback` (timeout 5.5s) with 6s fallback and first interaction; reduces main-thread competition.
+
+### Remaining opportunities (not implemented)
+- **Render-blocking CSS**: Main app CSS (~23KB) blocks ~210ms (FCP/LCP). Next.js App Router does not support deferring/inlining primary CSS without custom setup; accept for now.
+- **Bootup / main-thread**: Heaviest scripts: chunk 117 (~970ms), main doc (~1.3s), gtag (~259ms), ElevenLabs (~101ms). GA kept `afterInteractive` for conversion tracking; further deferral would need product trade-off.
+- **Unused JS**: ~201 KiB estimated savings; dynamic imports and optimizePackageImports already applied; further gains need dependency-level tree-shake or route-level code-split.
+
+---
+
 ## 2026-01-26 - Initial Marketing Strategy Review
 
 ### Context
