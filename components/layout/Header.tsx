@@ -50,6 +50,7 @@ export function Header() {
               width={28}
               height={40}
               className="w-7 h-10"
+              priority
             />
             <span className="text-xl font-bold text-navy-500">Trvel</span>
           </Link>

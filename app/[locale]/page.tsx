@@ -1,18 +1,18 @@
 import { Metadata } from 'next';
+import dynamic from 'next/dynamic';
 import { getTranslations } from 'next-intl/server';
 import { Header, Footer } from '@/components/layout';
-import {
-  Hero,
-  Plans,
-  WhyTrvel,
-  Comparison,
-  HowItWorks,
-  Testimonials,
-  Destinations,
-  FloatingDestinationSelector,
-} from '@/components/sections';
+import { Hero, FloatingDestinationSelector } from '@/components/sections';
 import { DestinationProvider } from '@/contexts/DestinationContext';
 import { JsonLd } from '@/components/seo';
+
+// Below-the-fold sections: load after main content to reduce initial JS and TBT
+const DynamicPlans = dynamic(() => import('@/components/sections').then((m) => ({ default: m.Plans })), { ssr: true });
+const DynamicWhyTrvel = dynamic(() => import('@/components/sections').then((m) => ({ default: m.WhyTrvel })), { ssr: true });
+const DynamicComparison = dynamic(() => import('@/components/sections').then((m) => ({ default: m.Comparison })), { ssr: true });
+const DynamicHowItWorks = dynamic(() => import('@/components/sections').then((m) => ({ default: m.HowItWorks })), { ssr: true });
+const DynamicTestimonials = dynamic(() => import('@/components/sections').then((m) => ({ default: m.Testimonials })), { ssr: true });
+const DynamicDestinations = dynamic(() => import('@/components/sections').then((m) => ({ default: m.Destinations })), { ssr: true });
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.trvel.co';
 
@@ -87,12 +87,12 @@ export default async function HomePage() {
       <FloatingDestinationSelector />
       <main className="pt-16 md:pt-18">
         <Hero />
-        <Plans />
-        <WhyTrvel />
-        <Comparison />
-        <HowItWorks />
-        <Testimonials />
-        <Destinations />
+        <DynamicPlans />
+        <DynamicWhyTrvel />
+        <DynamicComparison />
+        <DynamicHowItWorks />
+        <DynamicTestimonials />
+        <DynamicDestinations />
       </main>
       <Footer />
     </DestinationProvider>

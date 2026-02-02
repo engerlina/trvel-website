@@ -59,32 +59,46 @@ export function FloatingDestinationSelector() {
     return sortedGroups;
   }, [filteredDestinations]);
 
+  // Use IntersectionObserver instead of scroll + getBoundingClientRect to avoid forced reflow (Lighthouse)
   useEffect(() => {
     const heroDropdown = document.getElementById('hero-destination-selector');
     const plansSection = document.getElementById('plans');
     if (!heroDropdown || !plansSection) return;
 
-    const handleScroll = () => {
-      const heroRect = heroDropdown.getBoundingClientRect();
-      const plansRect = plansSection.getBoundingClientRect();
-      const headerHeight = 64; // 16 * 4 = 64px header
+    const headerHeight = 64;
+    const rootMarginTop = `-${headerHeight}px 0px 0px 0px`;
+    const rootMarginPlans = `-${headerHeight + 100}px 0px 0px 0px`;
 
-      // Show sticky when hero dropdown scrolls above header AND plans section is still visible
-      const heroScrolledPast = heroRect.bottom < headerHeight;
-      const plansStillVisible = plansRect.bottom > headerHeight + 100;
+    let heroAboveHeader = false;
+    let plansVisible = true;
 
-      setIsSticky(heroScrolledPast && plansStillVisible);
+    const heroObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          heroAboveHeader = !entry.isIntersecting;
+          setIsSticky(heroAboveHeader && plansVisible);
+        });
+      },
+      { rootMargin: rootMarginTop, threshold: 0 }
+    );
 
-      // Close dropdown when scrolling away from plans
-      if (!plansStillVisible) {
-        setIsDropdownOpen(false);
-      }
+    const plansObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          plansVisible = entry.isIntersecting;
+          setIsSticky(heroAboveHeader && plansVisible);
+          if (!plansVisible) setIsDropdownOpen(false);
+        });
+      },
+      { rootMargin: rootMarginPlans, threshold: 0 }
+    );
+
+    heroObserver.observe(heroDropdown);
+    plansObserver.observe(plansSection);
+    return () => {
+      heroObserver.disconnect();
+      plansObserver.disconnect();
     };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll(); // Check initial state
-
-    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   // Close dropdown when clicking outside

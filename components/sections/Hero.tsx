@@ -32,33 +32,11 @@ const POPULAR_DESTINATIONS = ['Japan', 'Thailand', 'South Korea', 'Singapore', '
 export function Hero() {
   const t = useTranslations('home.hero');
   const locale = useLocale();
-  const { selectedDestination, setSelectedDestination, setDestinationName, setCyclingIndex, highlightPlansDropdown } = useDestination();
+  const { selectedDestination, setSelectedDestination, setDestinationName, setCyclingIndex, highlightPlansDropdown, destinations, destinationsLoading: isLoading } = useDestination();
   const modalRef = useRef<HTMLDialogElement>(null);
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Dynamic destinations from API
-  const [destinations, setDestinations] = useState<Destination[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  // Fetch destinations on mount
-  useEffect(() => {
-    async function fetchDestinations() {
-      try {
-        const response = await fetch(`/api/destinations?locale=${locale}`);
-        if (response.ok) {
-          const data = await response.json();
-          setDestinations(data);
-        }
-      } catch (error) {
-        console.error('Failed to fetch destinations:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    fetchDestinations();
-  }, [locale]);
-
-  // Filter out the user's home country destination
+  // Filter out the user's home country destination (destinations from context - single source of truth)
   const availableDestinations = useMemo(
     () => destinations.filter(d => !isDestinationExcluded(d.slug, locale)),
     [destinations, locale]
@@ -224,13 +202,13 @@ export function Hero() {
               <div className="flex items-center gap-2">
                 <div className="flex -space-x-2">
                   <div className="w-7 h-7 rounded-full border-2 border-white overflow-hidden">
-                    <Image src="/profilepics/picture_woman_09.png" alt="" width={28} height={28} className="object-cover" />
+                    <Image src="/profilepics/picture_woman_09.png" alt="" width={28} height={28} className="object-cover" priority />
                   </div>
                   <div className="w-7 h-7 rounded-full border-2 border-white overflow-hidden">
-                    <Image src="/profilepics/picture_man_10.png" alt="" width={28} height={28} className="object-cover" />
+                    <Image src="/profilepics/picture_man_10.png" alt="" width={28} height={28} className="object-cover" fetchPriority="high" />
                   </div>
                   <div className="w-7 h-7 rounded-full border-2 border-white overflow-hidden">
-                    <Image src="/profilepics/picture_woman_10.png" alt="" width={28} height={28} className="object-cover" />
+                    <Image src="/profilepics/picture_woman_10.png" alt="" width={28} height={28} className="object-cover" fetchPriority="high" />
                   </div>
                 </div>
                 <span className="text-sm font-medium text-navy-500">50,000+ happy travellers</span>

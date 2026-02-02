@@ -8,6 +8,8 @@ module.exports = withNextIntl({
     // Reduce parallelism during build to prevent connection pool exhaustion
     workerThreads: false,
     cpus: 1,
+    // Tree-shake lucide-react and other barrel imports to reduce unused JS (Lighthouse)
+    optimizePackageImports: ['lucide-react'],
   },
   // Increase timeout for static page generation to handle database queries
   // Longer timeout to account for queued operations due to semaphore
