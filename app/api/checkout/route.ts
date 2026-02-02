@@ -30,7 +30,7 @@ function getPlanName(days: number): string {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { destination, duration, locale, promoCode, gclid, dataType } = body;
+    const { destination, duration, locale, promoCode, gclid, dataType, embedded } = body;
 
     // Validate required fields
     if (!destination || !duration || !locale) {
@@ -140,7 +140,6 @@ export async function POST(request: NextRequest) {
     // This approach doesn't require pre-created Stripe Products/Prices
     const sessionOptions: Stripe.Checkout.SessionCreateParams = {
       mode: 'payment',
-      payment_method_types: ['card'],
       // Pass gclid as client_reference_id for Google Ads conversion tracking
       // This allows the webhook to attribute the conversion back to Google Ads
       ...(gclid && { client_reference_id: gclid }),
@@ -162,8 +161,6 @@ export async function POST(request: NextRequest) {
           quantity: 1,
         },
       ],
-      success_url: `${origin}/${locale}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${origin}/${locale}/checkout/cancel`,
       metadata: {
         destination_slug: destination,
         destination_name: destinationName,
@@ -176,6 +173,15 @@ export async function POST(request: NextRequest) {
         data_amount_mb: selectedDuration.data_amount_mb?.toString() || '',
       },
     };
+
+    // Configure for embedded or redirect mode
+    if (embedded) {
+      sessionOptions.ui_mode = 'embedded';
+      sessionOptions.return_url = `${origin}/${locale}/checkout/success?session_id={CHECKOUT_SESSION_ID}`;
+    } else {
+      sessionOptions.success_url = `${origin}/${locale}/checkout/success?session_id={CHECKOUT_SESSION_ID}`;
+      sessionOptions.cancel_url = `${origin}/${locale}/checkout/cancel`;
+    }
 
     // If a promo code is provided, look it up and apply it
     // Otherwise, allow customers to enter promotion codes manually
@@ -208,6 +214,10 @@ export async function POST(request: NextRequest) {
     // Create Stripe Checkout session
     const session = await stripe.checkout.sessions.create(sessionOptions);
 
+    // Return client_secret for embedded mode, URL for redirect mode
+    if (embedded) {
+      return NextResponse.json({ clientSecret: session.client_secret });
+    }
     return NextResponse.json({ url: session.url });
   } catch (error) {
     console.error('Checkout session error:', error);
