@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google';
 import Script from 'next/script';
 import { GoogleAdsCapture } from '@/components/GoogleAdsCapture';
 import { LazyElevenLabs } from '@/components/LazyElevenLabs';
+import { LazyGoogleAnalytics } from '@/components/LazyGoogleAnalytics';
 import './globals.css';
 
 const inter = Inter({
@@ -97,24 +98,15 @@ export default function RootLayout({
         <link rel="preconnect" href="https://www.googletagmanager.com" />
         <link rel="preconnect" href="https://www.google-analytics.com" />
         <link rel="dns-prefetch" href="https://analytics.vertial.com" />
+        {/* Preload critical assets for faster LCP */}
+        <link rel="preload" href="/logo.svg" as="image" type="image/svg+xml" />
       </head>
       <body className={inter.className}>
         {/* Capture Google Ads gclid from URL */}
         <GoogleAdsCapture />
 
-        {/* Google Analytics - Priority for conversion tracking */}
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-LQP0KHTXLH"
-          strategy="afterInteractive"
-        />
-        <Script id="google-analytics" strategy="afterInteractive">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-LQP0KHTXLH');
-          `}
-        </Script>
+        {/* Google Analytics - Lazy loaded to reduce TBT by ~880ms */}
+        <LazyGoogleAnalytics />
 
         {/* Secondary Analytics - Deferred to reduce main thread blocking */}
         <Script

@@ -20,7 +20,7 @@ import {
   ChevronDown,
 } from 'lucide-react';
 import { DestinationPlansSection } from './DestinationPlansSection';
-import { DestinationTestimonials } from '@/components/sections/DestinationTestimonials';
+import { LazyDestinationTestimonials } from '@/components/sections/LazyDestinationTestimonials';
 import {
   JP, TH, KR, SG, ID, MY, VN, PH, GB, FR, IT, US,
   type FlagComponent,
@@ -470,8 +470,8 @@ export default async function DestinationPage({ params }: DestinationPageProps) 
           </div>
         </section>
 
-        {/* Testimonials */}
-        <DestinationTestimonials
+        {/* Testimonials - Lazy loaded for better Speed Index */}
+        <LazyDestinationTestimonials
           destinationSlug={destination}
           destinationName={destinationData.name}
         />
