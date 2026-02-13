@@ -4,6 +4,184 @@ This file tracks all marketing strategy decisions, changes, and rationale.
 
 ---
 
+## 2026-02-14 - Landing Page: Reduce Plan Cards from 5 to 3 (Choice Overload Fix)
+
+### Context
+
+- Landing pages showed 5 plan cards by default + 4-5 hidden behind a toggle (9-10 total options)
+- Classic "paradox of choice" problem — research shows 3 options converts best
+- Two "1 Week" cards side-by-side (1GB $4.99 vs Unlimited $34.99) created confusion
+- Grid layout was awkward: 5 cards in a 3-column grid = 3 top row + 2 bottom row
+
+### Change Made
+
+Replaced database-driven `default_durations` plan selection with a smart 3-plan algorithm:
+
+| Position | Card Type | Example (Japan) | Psychology |
+|----------|-----------|-----------------|------------|
+| Left | Budget (cheapest fixed) | 1GB / 7 days - $4.99 | Low anchor, captures price-sensitive |
+| **Center** | **Unlimited hero** | **Unlimited / 7 days - $34.99** | **"Most Popular" badge, the one we want them to buy** |
+| Right | Value (best daily rate fixed) | 2GB / 15 days - $7.99 | Long-trip budget option |
+
+All remaining plans moved behind the "more plans available" toggle.
+
+### Algorithm (`selectHeroPlans`)
+
+1. **Budget**: Cheapest fixed-data plan by retail price
+2. **Hero**: 7-day unlimited (preferred), fallback to 5-day, then middle unlimited
+3. **Value**: Best daily-rate fixed plan that's different from budget
+
+Falls back gracefully if destination has only unlimited or only fixed plans.
+
+### Files Modified
+
+- `app/[locale]/[destination]/DestinationPlansSection.tsx` — Added `selectHeroPlans()`, replaced `defaultDurations` filtering
+
+### Expected Impact
+
+- Reduce decision fatigue → higher conversion rate
+- Unlimited plan prominently in center with "Most Popular" → higher AOV
+- Clean 3-column grid that displays correctly on all screen sizes
+- All plans still accessible via toggle for users who want more options
+
+---
+
+## 2026-02-14 - Pause Non-Converting Ad Groups & Performance Review
+
+### Context
+- Review of Feb 7-13, 2026 performance (7-day window)
+- CPA still well above A$30 target
+- 4 of 8 ad groups producing zero conversions
+
+### Performance Snapshot (Feb 7-13, 2026)
+
+**Campaign Level:**
+
+| Metric | Value | Change vs Jan 26 baseline |
+|--------|-------|--------------------------|
+| Cost | A$780.34 | — (7-day period) |
+| Impressions | 1,174 | — |
+| Clicks | 163 | — |
+| CTR | 13.88% | Up from 6.33% |
+| Avg. CPC | A$4.79 | — |
+| Conversions | 5 | — |
+| Conv. Rate | 3.07% | Up from 1.28% |
+| Conv. Value | A$220.95 | — |
+| CPA | A$156.07 | Down from A$405.86 |
+| ROAS | 28.3% | Up from 11.8% |
+
+**Ad Group Breakdown:**
+
+| Ad Group | Clicks | Impr | CTR | Avg CPC | Cost | Conv | CPA | Conv Rate |
+|----------|--------|------|-----|---------|------|------|-----|-----------|
+| Indonesia eSIM | 27 | 212 | 12.74% | A$4.88 | A$131.69 | 1 | A$131.69 | 3.70% |
+| Singapore eSIM | 26 | 181 | 14.36% | A$3.52 | A$91.39 | 1 | A$91.39 | 3.85% |
+| Japan eSIM | 24 | 158 | 15.19% | A$8.17 | A$196.09 | 2 | A$98.05 | 8.33% |
+| Malaysia eSIM | 23 | 181 | 12.71% | A$5.41 | A$124.43 | 0 | — | 0.00% |
+| Vietnam eSIM | 21 | 99 | 21.21% | A$3.64 | A$76.47 | 0 | — | 0.00% |
+| Thailand eSIM | 18 | 118 | 15.25% | A$4.04 | A$72.63 | 0 | — | 0.00% |
+| South Korea eSIM | 14 | 131 | 10.69% | A$3.24 | A$45.37 | 1 | A$45.37 | 7.14% |
+| Travel eSIM - General | 10 | 94 | 10.64% | A$4.23 | A$42.27 | 0 | — | 0.00% |
+
+### Key Observations
+
+1. **Trend is improving**: CPA dropped from A$405 → A$156, conv rate up from 1.28% → 3.07%, CTR up from 6.33% → 13.88%
+2. **Still losing money on every sale**: Avg order value ~A$44 vs A$156 CPA
+3. **40% of budget wasted**: A$315.80/week spent on 4 ad groups with zero conversions
+4. **Best performers**: South Korea (A$45 CPA, 7.14% conv rate), Japan (8.33% conv rate but A$8.17 CPC)
+5. **CTR is exceptional** — the ads work, the problem remains post-click (pricing/landing page)
+
+### Actions Taken
+
+- [x] **Paused Malaysia eSIM** — A$124.43 spent, 0 conversions
+- [x] **Paused Vietnam eSIM** — A$76.47 spent, 0 conversions
+- [x] **Paused Thailand eSIM** — A$72.63 spent, 0 conversions
+- [x] **Paused Travel eSIM - General** — A$42.27 spent, 0 conversions
+
+**Remaining active ad groups (4):**
+- Japan eSIM (best conv rate: 8.33%)
+- South Korea eSIM (best CPA: A$45.37)
+- Singapore eSIM (converting, 3.85%)
+- Indonesia eSIM (converting, 3.70%)
+
+### Rationale
+
+Concentrating the A$99/day budget across 4 converting ad groups instead of 8 should:
+- Eliminate ~A$315/week in wasted spend
+- Give more budget/impressions to ad groups that actually convert
+- Improve overall CPA from A$156 toward target of A$30
+
+### Outstanding Issues
+
+- CPA still 5x above A$30 target — even best performer (South Korea A$45) is above target
+- Need to investigate landing page conversion rate and checkout friction
+- Tiered pricing (Decision 1 from Jan 26) implementation status needs review
+- Budget may still be too high at A$99/day — consider reducing to A$50-60/day
+
+---
+
+## 2026-02-02 - Google Ads Campaign Restructure & Budget Increase
+
+### Context
+- Changes recommended by Google Ads platform suggestions
+- Budget increased to accommodate expanded ad group structure
+- Optimization score at 89.3% after applying changes
+
+### Actions Taken
+
+- [x] **Increased daily budget from ~A$66/day to A$75/day** (later raised to A$99/day)
+- [x] **Re-enabled destination-specific ad groups** — Japan, Thailand, Indonesia, Malaysia, Vietnam, Singapore, South Korea all set to active
+- [x] **Applied Google-recommended campaign changes** — accepted platform suggestions for ad group structure and targeting
+- [x] **Travel eSIM - General** kept active alongside destination-specific groups
+
+### Ad Group Structure (post-change)
+
+| Ad Group | Status |
+|----------|--------|
+| Indonesia eSIM | Enabled |
+| Singapore eSIM | Enabled |
+| Japan eSIM | Enabled |
+| Malaysia eSIM | Enabled |
+| Vietnam eSIM | Enabled |
+| Thailand eSIM | Enabled |
+| South Korea eSIM | Enabled |
+| Travel eSIM - General | Enabled |
+
+### Notes
+
+- This reversed Decision 2 from Jan 26 (which paused destination ad groups)
+- Rationale: Test whether tiered pricing implementation + Google's suggestions improve destination-specific conversion rates
+
+### Results (Feb 2-13, full 12-day period)
+
+**Campaign Totals:**
+
+| Metric | Value |
+|--------|-------|
+| Impressions | 2,126 (up 939) |
+| Cost | A$1,245.09 (up A$663.97) |
+| Conversions | 8.00 (up 6.00) |
+| CPA | A$155.64 |
+
+**Ad Group Performance:**
+
+| Ad Group | Status | Clicks | Impr | CTR | Avg CPC | Cost | Conv | CPA | Conv Rate |
+|----------|--------|--------|------|-----|---------|------|------|-----|-----------|
+| Japan eSIM | Eligible | 49 | 364 | 13.46% | A$6.83 | A$334.64 | 3 | A$111.55 | 6.12% |
+| Indonesia eSIM | Eligible | 48 | 344 | 13.95% | A$4.83 | A$231.60 | 2 | A$115.80 | 4.17% |
+| Singapore eSIM | Eligible | 34 | 231 | 14.72% | A$3.73 | A$126.69 | 2 | A$63.35 | 5.88% |
+| Vietnam eSIM | Paused | 34 | 249 | 13.65% | A$3.60 | A$122.27 | 0 | — | 0.00% |
+| Thailand eSIM | Paused | 33 | 210 | 15.71% | A$4.29 | A$141.60 | 0 | — | 0.00% |
+| Malaysia eSIM | Paused | 29 | 245 | 11.84% | A$4.96 | A$143.84 | 0 | — | 0.00% |
+
+**Outcome:** 8 conversions total, but 3 of the visible ad groups produced zero conversions despite significant spend (A$407.71 combined, 33% of total budget). Led to Feb 14 re-pause of non-converters.
+
+**Best performer by CPA:** Singapore eSIM (A$63.35)
+**Best performer by conv rate:** Japan eSIM (6.12%)
+**Most expensive CPC:** Japan eSIM (A$6.83)
+
+---
+
 ## 2026-02-02 - Lighthouse Performance (en-au, Post-Optimization)
 
 ### Report summary (lighthousereview02_post.json)
@@ -253,12 +431,12 @@ Hypothesis: Price is too high compared to competitors seen during research.
 
 ### Weekly KPIs
 
-| Metric | Current | Week 4 Target | Week 8 Target |
-|--------|---------|---------------|---------------|
-| CPA | A$405 | A$80 | A$30 |
-| ROAS | 12% | 150% | 350% |
-| Conv Rate | 1.28% | 2.5% | 4% |
-| CTR | 6.33% | 8% | 10% |
+| Metric | Jan 26 Baseline | Feb 14 Current | Target |
+|--------|-----------------|----------------|--------|
+| CPA | A$405 | A$156 | <A$30 |
+| ROAS | 12% | 28% | >300% |
+| Conv Rate | 1.28% | 3.07% | >4% |
+| CTR | 6.33% | 13.88% | >10% |
 
 ### Monthly Review Checklist
 
@@ -388,4 +566,4 @@ Hypothesis: Price is too high compared to competitors seen during research.
 
 ---
 
-*Last updated: 2026-01-26*
+*Last updated: 2026-02-14*

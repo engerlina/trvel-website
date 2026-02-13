@@ -23,6 +23,54 @@ function isUnlimitedPlan(dataType?: DataTier): boolean {
   return !dataType || dataType === 'unlimited';
 }
 
+// Smart 3-plan selection for optimal conversion (Good / Better / Best)
+// Order: Budget entry → Unlimited hero (gets "Most Popular" at index 1) → Value/long-stay
+function selectHeroPlans(sortedDurations: DurationOption[]): {
+  hero: DurationOption[];
+  additional: DurationOption[];
+} {
+  if (sortedDurations.length <= 3) {
+    return { hero: sortedDurations, additional: [] };
+  }
+
+  const unlimited = sortedDurations.filter(d => isUnlimitedPlan(d.data_type));
+  const fixed = sortedDurations.filter(d => !isUnlimitedPlan(d.data_type));
+  const selected: DurationOption[] = [];
+
+  // Position 0 (Left): Budget entry — cheapest fixed-data plan
+  const budgetPlan = fixed.length > 0
+    ? fixed.reduce((prev, curr) => curr.retail_price < prev.retail_price ? curr : prev)
+    : null;
+
+  // Position 1 (Center → gets "Most Popular"): Unlimited hero — prefer 7-day, then 5-day
+  const heroPlan = unlimited.find(d => d.duration === 7)
+    || unlimited.find(d => d.duration === 5)
+    || (unlimited.length > 0 ? unlimited[Math.floor(unlimited.length / 2)] : null);
+
+  // Position 2 (Right): Value — best daily-rate fixed plan different from budget
+  const valuePlan = fixed
+    .filter(d => d !== budgetPlan)
+    .sort((a, b) => a.daily_rate - b.daily_rate)[0]
+    || unlimited
+      .filter(d => d !== heroPlan)
+      .sort((a, b) => a.daily_rate - b.daily_rate)[0]
+    || null;
+
+  if (budgetPlan) selected.push(budgetPlan);
+  if (heroPlan) selected.push(heroPlan);
+  if (valuePlan && !selected.includes(valuePlan)) selected.push(valuePlan);
+
+  // Fallback: fill to 3 from remaining sorted durations
+  for (const d of sortedDurations) {
+    if (selected.length >= 3) break;
+    if (!selected.includes(d)) selected.push(d);
+  }
+
+  const hero = selected.slice(0, 3);
+  const additional = sortedDurations.filter(d => !hero.includes(d));
+  return { hero, additional };
+}
+
 // Compact plan card for additional plans
 function CompactPlanCard({
   plan,
@@ -198,14 +246,8 @@ export function DestinationPlansSection({
   // Sort durations by duration
   const sortedDurations = [...durations].sort((a, b) => a.duration - b.duration);
 
-  // Separate default and additional plans
-  const defaultPlans = defaultDurations.length > 0
-    ? sortedDurations.filter(d => defaultDurations.includes(d.duration))
-    : sortedDurations.slice(0, 3);
-
-  const additionalPlans = defaultDurations.length > 0
-    ? sortedDurations.filter(d => !defaultDurations.includes(d.duration))
-    : sortedDurations.slice(3);
+  // Smart 3-plan selection: Budget → Unlimited (Popular) → Value
+  const { hero: defaultPlans, additional: additionalPlans } = selectHeroPlans(sortedDurations);
 
   // Find best daily rate duration
   const bestDailyDuration = sortedDurations.length > 0
