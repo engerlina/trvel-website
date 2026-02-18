@@ -268,7 +268,7 @@ export function DestinationPlanCard({
         {/* Budget label for fixed data plans */}
         {!popular && !isUnlimited && (
           <p className="text-center text-sm text-amber-600 mt-3 font-medium">
-            💰 Budget-friendly option
+            Great for maps, messaging & social media
           </p>
         )}
 

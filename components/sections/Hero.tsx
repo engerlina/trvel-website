@@ -9,6 +9,22 @@ import * as Flags from 'country-flag-icons/react/3x2';
 import { useDestination } from '@/contexts/DestinationContext';
 import { useTypewriter } from '@/hooks/useTypewriter';
 import { cn, isDestinationExcluded } from '@/lib/utils';
+import { DurationOption } from '@/types';
+
+// Format price for hero display
+function formatHeroPrice(price: number, currency: string): string {
+  if (currency === 'IDR') return Math.round(price).toLocaleString('id-ID');
+  return price.toFixed(2);
+}
+
+// Get currency symbol
+function getCurrencySymbol(currency: string): string {
+  if (currency === 'IDR') return 'Rp';
+  if (currency === 'GBP') return '\u00A3';
+  if (currency === 'SGD') return 'S$';
+  if (currency === 'MYR') return 'RM';
+  return '$';
+}
 
 interface Destination {
   id: string;
@@ -32,7 +48,7 @@ const POPULAR_DESTINATIONS = ['Japan', 'Thailand', 'South Korea', 'Singapore', '
 export function Hero() {
   const t = useTranslations('home.hero');
   const locale = useLocale();
-  const { selectedDestination, setSelectedDestination, setDestinationName, setCyclingIndex, highlightPlansDropdown, destinations, destinationsLoading: isLoading } = useDestination();
+  const { selectedDestination, setSelectedDestination, setDestinationName, setCyclingIndex, highlightPlansDropdown, destinations, destinationsLoading: isLoading, plansMap } = useDestination();
   const modalRef = useRef<HTMLDialogElement>(null);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -116,6 +132,22 @@ export function Hero() {
     }, 150);
   };
 
+  // Compute cheapest price for the current destination (for price anchor)
+  const currentDestSlug = selectedDestination || destinations[wordIndex]?.slug;
+  const cheapestPrice = useMemo(() => {
+    if (!currentDestSlug || !plansMap[currentDestSlug]) return null;
+    const plan = plansMap[currentDestSlug];
+    const durations = plan.durations as DurationOption[];
+    if (durations.length === 0) return null;
+    const cheapest = durations.reduce((prev, curr) =>
+      curr.retail_price < prev.retail_price ? curr : prev
+    );
+    return {
+      total: formatHeroPrice(cheapest.retail_price, plan.currency),
+      symbol: getCurrencySymbol(plan.currency),
+    };
+  }, [currentDestSlug, plansMap]);
+
   const selected = destinations.find(d => d.slug === selectedDestination);
   const SelectedFlag = selected ? getFlagComponent(selected.country_iso) : null;
 
@@ -155,9 +187,21 @@ export function Hero() {
           </h1>
 
           {/* Subheadline */}
-          <p className="animate-fade-up animate-delay-200 text-body-lg md:text-heading text-navy-300 mb-10 max-w-2xl mx-auto text-balance">
+          <p className="animate-fade-up animate-delay-200 text-body-lg md:text-heading text-navy-300 mb-6 max-w-2xl mx-auto text-balance">
             {t('subheadline')}
           </p>
+
+          {/* Price Anchor */}
+          {cheapestPrice && (
+            <div className="animate-fade-up animate-delay-250 mb-10">
+              <span className="inline-flex items-center gap-2 px-5 py-2.5 bg-brand-50 border border-brand-200 rounded-full">
+                <span className="text-base font-bold text-brand-700">
+                  Plans from {cheapestPrice.symbol}{cheapestPrice.total}
+                </span>
+              </span>
+            </div>
+          )}
+          {!cheapestPrice && <div className="mb-4" />}
 
           {/* Destination Selector */}
           <div id="hero-destination-selector" className="animate-fade-up animate-delay-300 max-w-md mx-auto mb-8 relative">

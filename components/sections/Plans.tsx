@@ -440,7 +440,7 @@ export function Plans() {
                     {/* Budget label for fixed data plans */}
                     {!tierInfo.isUnlimited && (
                       <p className="text-center text-body-sm text-amber-600 mt-3 font-medium">
-                        💰 Budget-friendly option
+                        Great for maps, messaging & social media
                       </p>
                     )}
                   </div>

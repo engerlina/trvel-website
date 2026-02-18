@@ -91,11 +91,15 @@ export async function generateMetadata({ params }: DestinationPageProps): Promis
     })
   );
 
-  // Use best_daily_rate for display
-  const dailyRate = planData?.best_daily_rate ? Number(planData.best_daily_rate).toFixed(2) : '';
+  // Find cheapest total price for display
+  const metaDurations = (planData?.durations || []) as unknown as DurationOption[];
+  const cheapestMeta = metaDurations.length > 0
+    ? metaDurations.reduce((prev, curr) => curr.retail_price < prev.retail_price ? curr : prev)
+    : null;
   const currencySymbol = planData?.currency === 'IDR' ? 'Rp' : planData?.currency === 'GBP' ? '£' : '$';
-  const title = dailyRate
-    ? `${destinationData.name} eSIM | From ${currencySymbol}${dailyRate}/day`
+  const cheapestPrice = cheapestMeta ? formatPrice(cheapestMeta.retail_price, planData?.currency || 'AUD') : '';
+  const title = cheapestPrice
+    ? `${destinationData.name} eSIM | From ${currencySymbol}${cheapestPrice}`
     : `${destinationData.name} eSIM | Unlimited Data`;
   const description = destinationData.tagline || `Get unlimited data eSIM for ${destinationData.name}. Instant activation, premium networks, 24/7 support.`;
 
@@ -197,6 +201,11 @@ export default async function DestinationPage({ params }: DestinationPageProps) 
 
   const currencySymbol = currency === 'IDR' ? 'Rp' : currency === 'GBP' ? '£' : '$';
 
+  // Find cheapest total plan price for hero display
+  const cheapestPlan = durations.length > 0
+    ? durations.reduce((prev, curr) => curr.retail_price < prev.retail_price ? curr : prev)
+    : null;
+
   return (
     <>
       <Header />
@@ -258,15 +267,17 @@ export default async function DestinationPage({ params }: DestinationPageProps) 
 
               {/* Pricing and CTA - prominent above the fold */}
               <div className="space-y-6">
-                {planData?.best_daily_rate && (
+                {cheapestPlan && (
                   <div className="inline-flex flex-col items-center gap-2 px-8 py-5 bg-white rounded-2xl shadow-soft-lg border-2 border-brand-200">
-                    <span className="text-sm text-navy-400 uppercase tracking-wide">Starting from</span>
+                    <span className="text-sm text-navy-400 uppercase tracking-wide">Plans from</span>
                     <div className="flex items-baseline gap-1">
                       <span className="text-display font-bold text-brand-600">
-                        {currencySymbol}{formatPrice(Number(planData.best_daily_rate), currency)}
+                        {currencySymbol}{formatPrice(cheapestPlan.retail_price, currency)}
                       </span>
-                      <span className="text-lg text-navy-400">/day</span>
                     </div>
+                    <span className="text-sm text-navy-400">
+                      That&apos;s just {currencySymbol}{formatPrice(cheapestPlan.daily_rate, currency)}/day
+                    </span>
                     {competitorData && (
                       <span className="text-sm text-success-600 font-medium">
                         Save vs {competitorData.name} at {currencySymbol}{formatPrice(competitorData.daily_rate, currency)}/day
