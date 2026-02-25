@@ -23,8 +23,9 @@ function isUnlimitedPlan(dataType?: DataTier): boolean {
   return !dataType || dataType === 'unlimited';
 }
 
-// Smart 3-plan selection for optimal conversion (Good / Better / Best)
-// Order: Budget entry → Unlimited hero (gets "Most Popular" at index 1) → Value/long-stay
+// Smart 3-plan selection biased toward higher AOV (Good / Better / Best)
+// Order: 7d unlimited (entry) → 15d unlimited ("Most Popular" at index 1) → 30d unlimited (anchor)
+// Budget/fixed plans move to "more options" section
 function selectHeroPlans(sortedDurations: DurationOption[]): {
   hero: DurationOption[];
   additional: DurationOption[];
@@ -34,31 +35,28 @@ function selectHeroPlans(sortedDurations: DurationOption[]): {
   }
 
   const unlimited = sortedDurations.filter(d => isUnlimitedPlan(d.data_type));
-  const fixed = sortedDurations.filter(d => !isUnlimitedPlan(d.data_type));
   const selected: DurationOption[] = [];
 
-  // Position 0 (Left): Budget entry — cheapest fixed-data plan
-  const budgetPlan = fixed.length > 0
-    ? fixed.reduce((prev, curr) => curr.retail_price < prev.retail_price ? curr : prev)
-    : null;
-
-  // Position 1 (Center → gets "Most Popular"): Unlimited hero — prefer 7-day, then 5-day
-  const heroPlan = unlimited.find(d => d.duration === 7)
+  // Position 0 (Left): Entry unlimited — prefer 7d, then 5d, then 3d
+  const entryPlan = unlimited.find(d => d.duration === 7)
     || unlimited.find(d => d.duration === 5)
-    || (unlimited.length > 0 ? unlimited[Math.floor(unlimited.length / 2)] : null);
+    || unlimited.find(d => d.duration === 3)
+    || unlimited[0];
 
-  // Position 2 (Right): Value — best daily-rate fixed plan different from budget
-  const valuePlan = fixed
-    .filter(d => d !== budgetPlan)
-    .sort((a, b) => a.daily_rate - b.daily_rate)[0]
-    || unlimited
-      .filter(d => d !== heroPlan)
-      .sort((a, b) => a.daily_rate - b.daily_rate)[0]
-    || null;
+  // Position 1 (Center, "Most Popular"): 15-day unlimited — AOV target
+  const popularPlan = unlimited.find(d => d.duration === 15)
+    || unlimited.find(d => d.duration === 10)
+    || unlimited.find(d => d.duration === 7 && d !== entryPlan)
+    || unlimited.find(d => d !== entryPlan);
 
-  if (budgetPlan) selected.push(budgetPlan);
-  if (heroPlan) selected.push(heroPlan);
-  if (valuePlan && !selected.includes(valuePlan)) selected.push(valuePlan);
+  // Position 2 (Right): Premium anchor — 30d makes 15d feel reasonable
+  const premiumPlan = unlimited.find(d => d.duration === 30)
+    || unlimited.filter(d => d !== entryPlan && d !== popularPlan)
+      .sort((a, b) => b.duration - a.duration)[0];
+
+  if (entryPlan) selected.push(entryPlan);
+  if (popularPlan && !selected.includes(popularPlan)) selected.push(popularPlan);
+  if (premiumPlan && !selected.includes(premiumPlan)) selected.push(premiumPlan);
 
   // Fallback: fill to 3 from remaining sorted durations
   for (const d of sortedDurations) {

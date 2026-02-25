@@ -156,16 +156,14 @@ export function Plans() {
   const currentDest = destinations.find(d => d.slug === currentDestSlug);
   const FlagIcon = currentDest ? getFlagComponent(currentDest.country_iso) : null;
 
-  // Get durations to display
+  // Smart plan selection: pick 3 unlimited plans biased toward higher AOV
+  // Good/Better/Best: 7d unlimited → 15d unlimited (Popular) → 30d unlimited
   const { defaultPlans, additionalPlans, bestDailyDuration } = useMemo(() => {
     if (!currentPlan?.durations || currentPlan.durations.length === 0) {
       return { defaultPlans: [], additionalPlans: [], bestDailyDuration: null };
     }
 
     const durations = currentPlan.durations as DurationOption[];
-    const defaultDurations = currentPlan.default_durations || [];
-
-    // Sort by duration for display
     const sortedDurations = [...durations].sort((a, b) => a.duration - b.duration);
 
     // Find duration with best daily rate
@@ -173,12 +171,47 @@ export function Plans() {
       curr.daily_rate < prev.daily_rate ? curr : prev
     , sortedDurations[0]);
 
-    // Separate into default and additional
-    const defaults = sortedDurations.filter(d => defaultDurations.includes(d.duration));
-    const additional = sortedDurations.filter(d => !defaultDurations.includes(d.duration));
+    // If 3 or fewer plans, show them all
+    if (sortedDurations.length <= 3) {
+      return { defaultPlans: sortedDurations, additionalPlans: [], bestDailyDuration: best };
+    }
+
+    // Separate unlimited and fixed plans
+    const unlimited = sortedDurations.filter(d => isUnlimitedPlan(d.data_type));
+    const selected: DurationOption[] = [];
+
+    // Position 0 (Left, entry): 7-day unlimited, fallback to 5d or 3d
+    const entryPlan = unlimited.find(d => d.duration === 7)
+      || unlimited.find(d => d.duration === 5)
+      || unlimited.find(d => d.duration === 3)
+      || unlimited[0];
+
+    // Position 1 (Center, "Most Popular"): 15-day unlimited — AOV target
+    const popularPlan = unlimited.find(d => d.duration === 15)
+      || unlimited.find(d => d.duration === 10)
+      || unlimited.find(d => d.duration === 7 && d !== entryPlan)
+      || unlimited.find(d => d !== entryPlan);
+
+    // Position 2 (Right, premium anchor): 30-day unlimited — makes 15d feel reasonable
+    const premiumPlan = unlimited.find(d => d.duration === 30)
+      || unlimited.filter(d => d !== entryPlan && d !== popularPlan)
+        .sort((a, b) => b.duration - a.duration)[0];
+
+    if (entryPlan) selected.push(entryPlan);
+    if (popularPlan && !selected.includes(popularPlan)) selected.push(popularPlan);
+    if (premiumPlan && !selected.includes(premiumPlan)) selected.push(premiumPlan);
+
+    // Fallback: fill to 3 from remaining durations
+    for (const d of sortedDurations) {
+      if (selected.length >= 3) break;
+      if (!selected.includes(d)) selected.push(d);
+    }
+
+    const hero = selected.slice(0, 3);
+    const additional = sortedDurations.filter(d => !hero.includes(d));
 
     return {
-      defaultPlans: defaults,
+      defaultPlans: hero,
       additionalPlans: additional,
       bestDailyDuration: best
     };

@@ -61,8 +61,8 @@ const COMPETITOR_DISCOUNT = 0.90; // Target 10% under competitor
 // All supported durations
 const ALL_DURATIONS = [1, 3, 5, 7, 10, 15, 30];
 
-// Preferred default durations (in order of preference)
-const PREFERRED_DEFAULTS = [5, 7, 15];
+// Preferred default durations — biased toward higher AOV (Good/Better/Best anchoring)
+const PREFERRED_DEFAULTS = [7, 15, 30];
 
 // Currency exchange rates from USD (approximate, update regularly)
 const USD_EXCHANGE_RATES: Record<string, number> = {
@@ -656,7 +656,7 @@ function findAllBundlesForCountry(bundles: EsimGoBundle[], countryIso: string): 
 
 /**
  * Choose default durations to display
- * Prefer [5, 7, 15], but fall back to alternatives if not all available
+ * Prefer [7, 15, 30] for higher AOV, fall back to alternatives if not all available
  */
 function chooseDefaultDurations(availableDurations: number[]): number[] {
   // If we have all preferred durations, use them
@@ -665,9 +665,9 @@ function chooseDefaultDurations(availableDurations: number[]): number[] {
     return PREFERRED_DEFAULTS;
   }
 
-  // Otherwise, pick up to 3 durations, favoring mid-range options
-  // Priority: 7, 5, 15, 10, 3, 30, 1
-  const priorityOrder = [7, 5, 15, 10, 3, 30, 1];
+  // Otherwise, pick up to 3 durations, favoring longer durations for higher AOV
+  // Priority: 15, 7, 30, 10, 5, 3, 1
+  const priorityOrder = [15, 7, 30, 10, 5, 3, 1];
   const defaults: number[] = [];
 
   for (const duration of priorityOrder) {

@@ -4,6 +4,94 @@ This file tracks all marketing strategy decisions, changes, and rationale.
 
 ---
 
+## 2026-02-19 - Pricing Display Reframe (Total Price Anchoring)
+
+### Context
+
+- Feb 4-17 performance: 291 clicks, 2.4K impressions, 9 conversions (A$4.61 CPC)
+- Post Feb 14 landing page change (5→3 cards), conversion velocity improved ~6x (9 in 14 days vs 3 in 30 days)
+- CPA dropped from A$405 → ~A$149, but still well above A$30 target
+- Competitor analysis showed Airalo leads with "From $4.50" (total price) while Trvel showed "From $2.49/day" (per-day framing)
+- Per-day framing forces mental math and is harder to compare against competitors
+
+### Problem Identified
+
+**Price framing mismatch**: Competitors show low total prices ("From $4.50"), Trvel showed per-day rates requiring calculation. Customers bounce because they can't instantly compare.
+
+### Changes Made
+
+**1. Destination page hero — total price as primary (was per-day)**
+
+| Before | After |
+|--------|-------|
+| `Starting from $2.49/day` | `Plans from $6.99` |
+| — | `That's just $1.00/day` (secondary) |
+
+Files: `app/[locale]/[destination]/page.tsx`
+
+**2. Homepage hero — added price anchor pill**
+
+Added a dynamic "Plans from $X.XX" pill badge below the subheadline. Computed from cheapest plan for the currently cycling/selected destination. Appears after plansMap loads from API.
+
+Files: `components/sections/Hero.tsx`
+
+**3. Meta title updated — total price instead of per-day**
+
+| Before | After |
+|--------|-------|
+| `Japan eSIM \| From $2.49/day` | `Japan eSIM \| From $6.99` |
+
+Affects Google search results and ad landing page titles.
+
+Files: `app/[locale]/[destination]/page.tsx` (generateMetadata)
+
+**4. Budget card label — benefit framing instead of "budget"**
+
+| Before | After |
+|--------|-------|
+| `💰 Budget-friendly option` | `Great for maps, messaging & social media` |
+
+Reframes fixed-data plans by what they enable rather than signaling "cheap = bad".
+
+Files: `app/[locale]/[destination]/DestinationPlanCard.tsx`, `components/sections/Plans.tsx`
+
+### Rationale
+
+1. **Total price is directly comparable** — "$6.99" vs Airalo's "$4.50" is an instant comparison; "$2.49/day" is not
+2. **Price anchor in hero catches ad traffic** — Google Ads visitors see pricing before scrolling
+3. **Per-day as secondary preserves value framing** — "That's just $1.00/day" adds perceived value without forcing calculation
+4. **Benefit copy > "budget" label** — "Great for maps & messaging" sells the use case, not the price tier
+
+### Expected Impact
+
+- Lower bounce rate on destination pages (instant price comparison)
+- Higher CTR from Google search results (total price in meta title)
+- Better conversion on budget tier (benefit framing reduces data anxiety)
+
+### Performance Snapshot (Feb 4-17, 2026)
+
+| Metric | Jan 26 Baseline | Feb 14 Current | Feb 17 Current |
+|--------|-----------------|----------------|----------------|
+| Conversions | 3 (30 days) | 5 (7 days) | 9 (14 days) |
+| CPA | A$405 | A$156 | ~A$149 |
+| Conv Rate | 1.28% | 3.07% | ~3.1% |
+| CTR | 6.33% | 13.88% | ~12.1% |
+| Avg CPC | — | A$4.79 | A$4.61 |
+
+### Competitive Price Comparison (Japan 7-day, AUD)
+
+| Provider | Budget Tier | Unlimited |
+|----------|------------|-----------|
+| **Trvel** | **~A$6.99** (1GB) | **~A$28** |
+| Airalo | ~A$6.98 (1GB) | ~A$35.65 |
+| Holafly | — | ~A$42.32 |
+| Simify | ~A$15-20 | ~A$44+ |
+| Telstra roaming | — | A$35-70 (2GB/day cap) |
+
+**Key insight**: Trvel's unlimited pricing is 20-34% cheaper than Airalo/Holafly. Budget tier matches Airalo. The issue was display framing, not actual price competitiveness.
+
+---
+
 ## 2026-02-14 - Landing Page: Reduce Plan Cards from 5 to 3 (Choice Overload Fix)
 
 ### Context
@@ -431,12 +519,13 @@ Hypothesis: Price is too high compared to competitors seen during research.
 
 ### Weekly KPIs
 
-| Metric | Jan 26 Baseline | Feb 14 Current | Target |
-|--------|-----------------|----------------|--------|
-| CPA | A$405 | A$156 | <A$30 |
-| ROAS | 12% | 28% | >300% |
-| Conv Rate | 1.28% | 3.07% | >4% |
-| CTR | 6.33% | 13.88% | >10% |
+| Metric | Jan 26 Baseline | Feb 14 | Feb 19 | Target |
+|--------|-----------------|--------|--------|--------|
+| CPA | A$405 | A$156 | ~A$149 | <A$30 |
+| ROAS | 12% | 28% | — | >300% |
+| Conv Rate | 1.28% | 3.07% | ~3.1% | >4% |
+| CTR | 6.33% | 13.88% | ~12.1% | >10% |
+| Conversions | 3 (30d) | 5 (7d) | 9 (14d) | — |
 
 ### Monthly Review Checklist
 
@@ -566,4 +655,4 @@ Hypothesis: Price is too high compared to competitors seen during research.
 
 ---
 
-*Last updated: 2026-02-14*
+*Last updated: 2026-02-19*
