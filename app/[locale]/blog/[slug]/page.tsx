@@ -7,6 +7,7 @@ import { BlogCard, MarkdownContent } from '@/components/blog';
 import { prisma, withRetry } from '@/lib/db';
 import { Link } from '@/i18n/routing';
 import { Clock, Calendar, ArrowLeft, Twitter, Linkedin, Facebook } from 'lucide-react';
+import { ArticleJsonLd } from '@/components/seo/ArticleJsonLd';
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.trvel.co';
 
@@ -134,6 +135,20 @@ export default async function BlogPostPage({ params }: PageProps) {
 
   return (
     <>
+      <ArticleJsonLd
+        title={post.title}
+        slug={slug}
+        locale={locale}
+        excerpt={post.excerpt}
+        content={post.content}
+        publishedAt={post.published_at}
+        updatedAt={post.updatedAt}
+        authorName={post.author?.name}
+        authorBio={post.author?.bio}
+        authorAvatarUrl={post.author?.avatar_url}
+        featuredImage={post.featured_image}
+        categoryName={post.category?.name}
+      />
       <Header />
       <main className="pt-16 md:pt-18">
         {/* Article Header */}

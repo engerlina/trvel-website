@@ -98,6 +98,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://www.googletagmanager.com" />
         <link rel="preconnect" href="https://www.google-analytics.com" />
         <link rel="dns-prefetch" href="https://analytics.vertial.com" />
+        <link rel="preconnect" href="https://trvel-s3.s3.ap-southeast-2.amazonaws.com" />
         {/* Preload critical assets for faster LCP */}
         <link rel="preload" href="/logo.svg" as="image" type="image/svg+xml" />
       </head>
