@@ -1,0 +1,67 @@
+# Trvel
+
+> Premium travel eSIMs for 190+ destinations. Australian-owned. Instant QR code delivery. 10-minute connection guarantee or full refund.
+
+Trvel provides unlimited data eSIM plans for international travellers. Plans start from A$4.99 with instant digital delivery via QR code. 24/7 multilingual support in English, Malay, and Indonesian. Trusted by 50,000+ travellers with a 4.9/5 rating.
+
+## Main Pages
+
+- [How It Works](https://www.trvel.co/en-au/how-it-works): Step-by-step eSIM purchase, installation, and activation guide
+- [All Destinations](https://www.trvel.co/en-au/destinations): Browse eSIM plans for 190+ countries
+- [Device Compatibility](https://www.trvel.co/en-au/compatibility): Check if your phone supports eSIM (iPhone, Samsung, Google Pixel, etc.)
+- [Customer Reviews](https://www.trvel.co/en-au/reviews): Verified customer testimonials and ratings
+- [Help Center](https://www.trvel.co/en-au/help): FAQs, troubleshooting, and support contact
+
+## Popular Destinations
+
+- [Japan eSIM](https://www.trvel.co/en-au/japan): Unlimited data on NTT Docomo network. Plans from A$4.99.
+- [Thailand eSIM](https://www.trvel.co/en-au/thailand): Unlimited data on AIS network. Plans from A$4.99.
+- [South Korea eSIM](https://www.trvel.co/en-au/south-korea): 4G/5G coverage nationwide on SK Telecom.
+- [Singapore eSIM](https://www.trvel.co/en-au/singapore): Premium carrier access across the island.
+- [Indonesia eSIM](https://www.trvel.co/en-au/indonesia): Coverage across Bali, Jakarta, and all major islands.
+- [Malaysia eSIM](https://www.trvel.co/en-au/malaysia): Unlimited data on Celcom/Maxis networks.
+- [Vietnam eSIM](https://www.trvel.co/en-au/vietnam): Nationwide 4G/5G coverage.
+- [France eSIM](https://www.trvel.co/en-au/france): Coverage across metropolitan France.
+- [Italy eSIM](https://www.trvel.co/en-au/italy): Nationwide coverage on premium networks.
+- [United Kingdom eSIM](https://www.trvel.co/en-au/united-kingdom): Full UK coverage including Scotland and Wales.
+
+## Plan Types
+
+Trvel offers three plan durations per destination:
+- **Short Trip** (5 days): Ideal for weekend getaways and short business trips
+- **Week Away** (7 days): Most popular option for standard holidays
+- **Extended Stay** (10-15 days): For longer holidays and multi-destination trips
+
+All plans include unlimited data with no throttling, instant QR code delivery, and 24/7 customer support.
+
+## Pricing
+
+- Prices vary by destination and duration
+- All prices include unlimited data
+- Supported currencies: AUD, SGD, GBP, USD, MYR, IDR, CAD, NZD
+- 10-minute connection guarantee: full refund if you can't connect within 10 minutes of arrival
+
+## Supported Locales
+
+- [Australia (AUD)](https://www.trvel.co/en-au)
+- [Singapore (SGD)](https://www.trvel.co/en-sg)
+- [United Kingdom (GBP)](https://www.trvel.co/en-gb)
+- [United States (USD)](https://www.trvel.co/en-us)
+- [Malaysia (MYR)](https://www.trvel.co/ms-my)
+- [Indonesia (IDR)](https://www.trvel.co/id-id)
+
+## Blog
+
+- [Blog Index](https://www.trvel.co/en-au/blog): Travel tips, eSIM guides, and destination content
+
+## Company
+
+- **Contact**: support@trvel.co | +61 3 4052 7555
+- **Social**: [@trvelco](https://twitter.com/trvelco) on Twitter, [Facebook](https://www.facebook.com/trvelco), [Instagram](https://www.instagram.com/trvelco)
+
+## Legal
+
+- [Terms of Service](https://www.trvel.co/en-au/terms)
+- [Privacy Policy](https://www.trvel.co/en-au/privacy)
+- [Fair Use Policy](https://www.trvel.co/en-au/fair-use)
+- [Refund Policy](https://www.trvel.co/en-au/refund-policy)

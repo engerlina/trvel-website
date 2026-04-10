@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { DestinationPlansSection } from './DestinationPlansSection';
 import { LazyDestinationTestimonials } from '@/components/sections/LazyDestinationTestimonials';
+import { DestinationJsonLd } from '@/components/seo/DestinationJsonLd';
 import {
   JP, TH, KR, SG, ID, MY, VN, PH, GB, FR, IT, US,
   type FlagComponent,
@@ -208,6 +209,14 @@ export default async function DestinationPage({ params }: DestinationPageProps) 
 
   return (
     <>
+      <DestinationJsonLd
+        destinationName={destinationData.name}
+        destinationSlug={destination}
+        locale={locale}
+        currency={currency}
+        durations={durations}
+        tagline={destinationData.tagline}
+      />
       <Header />
       <main className="pt-16 md:pt-18">
         {/* Hero Section */}

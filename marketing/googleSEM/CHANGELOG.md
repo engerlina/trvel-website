@@ -4,6 +4,85 @@ This file tracks all marketing strategy decisions, changes, and rationale.
 
 ---
 
+## 2026-02-26 - Default to Higher-AOV Plans (Good/Better/Best Anchoring)
+
+### Context
+
+- Feb 14-25 performance: 7 conversions, A$1,269.43 spend, A$235 revenue
+- CPA: A$181.35 | ROAS: 18.5%
+- Average order value: ~A$33.57 — too low for paid acquisition to work
+- Root cause: customers defaulting to cheapest/shortest plans (5-day, 7-day)
+- Even best CPA (Singapore A$94.96) is 2.8x the revenue per conversion
+
+### Performance Snapshot (Feb 14-25, 2026)
+
+| Ad Group | Clicks | Impr | CTR | Cost | Conv | CPA | Conv Rate |
+|----------|--------|------|-----|------|------|-----|-----------|
+| Japan eSIM | 70 | 592 | 11.82% | A$399.44 | 2 | A$199.72 | 2.86% |
+| Indonesia eSIM | 70 | 710 | 9.86% | A$355.14 | 1 | A$355.14 | 1.43% |
+| Singapore eSIM | 48 | 465 | 10.32% | A$284.88 | 3 | A$94.96 | 6.25% |
+| South Korea eSIM | 22 | 299 | 7.36% | A$111.25 | 1 | A$111.25 | 4.55% |
+| **Total** | **210** | **2,245** | **~9.4%** | **A$1,269.43** | **7** | **A$181.35** | **3.33%** |
+
+### Problem Identified
+
+**AOV too low for paid search economics.** At A$34 average order value with A$5-7 CPCs, even perfect conversion rates can't make paid search profitable. Reducing prices would make it worse (lower AOV × slightly higher conv rate = same or worse unit economics). The lever is increasing AOV.
+
+### Changes Made
+
+**1. Homepage plan selection — unlimited-only hero cards biased to longer durations**
+
+| Before (Budget/Hero/Value) | After (Good/Better/Best) |
+|---------------------------|--------------------------|
+| Cheapest fixed plan (left) | 7-day unlimited (entry) |
+| 7-day unlimited (center, Popular) | **15-day unlimited (center, Popular)** |
+| Best daily-rate fixed plan (right) | 30-day unlimited (premium anchor) |
+
+The **decoy effect**: 30-day price makes 15-day feel like a reasonable middle ground. Budget/fixed plans moved to "more options" expandable section.
+
+Files: `components/sections/Plans.tsx`
+
+**2. Destination page plan selection — same Good/Better/Best strategy**
+
+Updated `selectHeroPlans()` algorithm:
+- Position 0: 7-day unlimited (was cheapest fixed)
+- Position 1 (Popular): 15-day unlimited (was 7-day unlimited)
+- Position 2: 30-day unlimited (was best daily-rate fixed)
+
+Files: `app/[locale]/[destination]/DestinationPlansSection.tsx`
+
+**3. Sync script defaults — aligned for future syncs**
+
+- `PREFERRED_DEFAULTS`: `[5, 7, 15]` → `[7, 15, 30]`
+- Fallback priority: `[7, 5, 15, 10, 3, 30, 1]` → `[15, 7, 30, 10, 5, 3, 1]`
+
+Files: `prisma/sync-esimgo.ts`
+
+### Rationale
+
+1. **AOV is the critical lever** — doubling AOV from A$34 to A$68 would halve the effective CPA gap
+2. **Decoy pricing psychology** — 30-day premium card anchors high, making 15-day "Popular" card feel like the smart middle choice
+3. **Budget plans still accessible** — moved to "more options" toggle, not removed
+4. **15-day is natural for most trips** — 2-week vacation is the most common Australian holiday pattern
+5. **No price reduction** — lower prices would decrease margin without meaningfully increasing conversion rate
+
+### Expected Impact
+
+| Metric | Current | Target |
+|--------|---------|--------|
+| Average order value | A$33.57 | A$50-65 |
+| Break-even CPA | A$17 (50% margin) | A$25-33 |
+| ROAS | 18.5% | 40-55% |
+
+### Next Steps
+
+- Monitor AOV change over 7-14 days
+- If AOV reaches A$50+, test re-enabling paused ad groups at lower bids
+- Consider reducing Singapore CPC bids to A$2-3 (best converter)
+- Evaluate whether organic/SEO investment would be more cost-effective long-term
+
+---
+
 ## 2026-02-19 - Pricing Display Reframe (Total Price Anchoring)
 
 ### Context
@@ -519,13 +598,14 @@ Hypothesis: Price is too high compared to competitors seen during research.
 
 ### Weekly KPIs
 
-| Metric | Jan 26 Baseline | Feb 14 | Feb 19 | Target |
+| Metric | Jan 26 Baseline | Feb 14 | Feb 25 | Target |
 |--------|-----------------|--------|--------|--------|
-| CPA | A$405 | A$156 | ~A$149 | <A$30 |
-| ROAS | 12% | 28% | — | >300% |
-| Conv Rate | 1.28% | 3.07% | ~3.1% | >4% |
-| CTR | 6.33% | 13.88% | ~12.1% | >10% |
-| Conversions | 3 (30d) | 5 (7d) | 9 (14d) | — |
+| CPA | A$405 | A$156 | A$181 | <A$30 |
+| ROAS | 12% | 28% | 18.5% | >300% |
+| Conv Rate | 1.28% | 3.07% | 3.33% | >4% |
+| CTR | 6.33% | 13.88% | ~9.4% | >10% |
+| AOV | ~A$48 | ~A$44 | A$33.57 | >A$50 |
+| Conversions | 3 (30d) | 5 (7d) | 7 (12d) | — |
 
 ### Monthly Review Checklist
 
@@ -655,4 +735,4 @@ Hypothesis: Price is too high compared to competitors seen during research.
 
 ---
 
-*Last updated: 2026-02-19*
+*Last updated: 2026-02-26*
