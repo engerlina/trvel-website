@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { buildHreflangAlternates } from '@/lib/hreflang';
 import { Header, Footer } from '@/components/layout';
 import { Link } from '@/i18n/routing';
 import {
@@ -33,15 +34,7 @@ export async function generateMetadata({ params }: ReviewsPageProps): Promise<Me
     description,
     alternates: {
       canonical: `${BASE_URL}/${locale}/reviews`,
-      languages: {
-        'x-default': `${BASE_URL}/en-au/reviews`,
-        'en-AU': `${BASE_URL}/en-au/reviews`,
-        'en-SG': `${BASE_URL}/en-sg/reviews`,
-        'en-GB': `${BASE_URL}/en-gb/reviews`,
-        'en-US': `${BASE_URL}/en-us/reviews`,
-        'ms-MY': `${BASE_URL}/ms-my/reviews`,
-        'id-ID': `${BASE_URL}/id-id/reviews`,
-      },
+      languages: buildHreflangAlternates('/reviews'),
     },
     openGraph: {
       title,

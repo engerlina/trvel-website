@@ -39,6 +39,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     'en-us': 'en-US',
     'ms-my': 'ms-MY',
     'id-id': 'id-ID',
+    'en-ca': 'en-CA',
+    'en-nz': 'en-NZ',
   };
 
   const languages: Record<string, string> = {};

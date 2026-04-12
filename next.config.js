@@ -77,7 +77,7 @@ module.exports = withNextIntl({
         permanent: true,
       },
       {
-        source: '/:locale(en-au|en-sg|en-gb|en-us|ms-my|id-id)/about',
+        source: '/:locale(en-au|en-sg|en-gb|en-us|ms-my|id-id|en-ca|en-nz)/about',
         destination: '/:locale',
         permanent: true,
       },
@@ -87,7 +87,7 @@ module.exports = withNextIntl({
         permanent: true,
       },
       {
-        source: '/:locale(en-au|en-sg|en-gb|en-us|ms-my|id-id)/refunds',
+        source: '/:locale(en-au|en-sg|en-gb|en-us|ms-my|id-id|en-ca|en-nz)/refunds',
         destination: '/:locale/terms',
         permanent: true,
       },
@@ -104,7 +104,7 @@ module.exports = withNextIntl({
       },
       // Fix duplicate locale in URL
       {
-        source: '/:locale(en-au|en-sg|en-gb|en-us|ms-my|id-id)/:locale2(en-au|en-sg|en-gb|en-us|ms-my|id-id)/:path*',
+        source: '/:locale(en-au|en-sg|en-gb|en-us|ms-my|id-id|en-ca|en-nz)/:locale2(en-au|en-sg|en-gb|en-us|ms-my|id-id|en-ca|en-nz)/:path*',
         destination: '/:locale/:path*',
         permanent: true,
       },

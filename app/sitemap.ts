@@ -12,6 +12,8 @@ const LOCALE_CARRIERS: Record<string, string> = {
   'en-gb': 'ee',
   'ms-my': 'maxis',
   'id-id': 'telkomsel',
+  'en-ca': 'rogers',
+  'en-nz': 'spark',
 };
 
 const staticPages = [

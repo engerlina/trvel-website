@@ -1,8 +1,9 @@
 import { Metadata } from 'next';
 import { prisma, withRetry } from '@/lib/db';
 import { notFound } from 'next/navigation';
+import { buildHreflangAlternates } from '@/lib/hreflang';
 import { Header, Footer } from '@/components/layout';
-import { Link } from '@/i18n/routing';
+import { Link, routing } from '@/i18n/routing';
 import {
   Check,
   X,
@@ -41,15 +42,7 @@ export async function generateMetadata({ params }: BrandPageProps): Promise<Meta
     description,
     alternates: {
       canonical: `${BASE_URL}/${locale}/compatibility/${brand}`,
-      languages: {
-        'x-default': `${BASE_URL}/en-au/compatibility/${brand}`,
-        'en-AU': `${BASE_URL}/en-au/compatibility/${brand}`,
-        'en-SG': `${BASE_URL}/en-sg/compatibility/${brand}`,
-        'en-GB': `${BASE_URL}/en-gb/compatibility/${brand}`,
-        'en-US': `${BASE_URL}/en-us/compatibility/${brand}`,
-        'ms-MY': `${BASE_URL}/ms-my/compatibility/${brand}`,
-        'id-ID': `${BASE_URL}/id-id/compatibility/${brand}`,
-      },
+      languages: buildHreflangAlternates('/compatibility/' + brand),
     },
     openGraph: {
       title,
@@ -300,7 +293,7 @@ export async function generateStaticParams() {
       })
     );
 
-    const locales = ['en-au', 'en-sg', 'en-gb', 'en-us', 'ms-my', 'id-id'];
+    const locales = routing.locales;
     const params: { locale: string; brand: string }[] = [];
 
     for (const brand of brands) {

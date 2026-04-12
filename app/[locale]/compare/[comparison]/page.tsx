@@ -46,6 +46,8 @@ const CARRIER_NAMES: Record<string, string> = {
   ee: 'EE',
   maxis: 'Maxis',
   telkomsel: 'Telkomsel',
+  rogers: 'Rogers',
+  spark: 'Spark',
 };
 
 // Locale to carrier mapping
@@ -56,6 +58,8 @@ const LOCALE_CARRIERS: Record<string, string> = {
   'en-gb': 'ee',
   'ms-my': 'maxis',
   'id-id': 'telkomsel',
+  'en-ca': 'rogers',
+  'en-nz': 'spark',
 };
 
 interface ComparisonPageProps {

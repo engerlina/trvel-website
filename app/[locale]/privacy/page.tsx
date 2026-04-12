@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { buildHreflangAlternates } from '@/lib/hreflang';
 import { Header, Footer } from '@/components/layout';
 import { Link } from '@/i18n/routing';
 import { Shield, ArrowRight } from 'lucide-react';
@@ -23,15 +24,7 @@ export async function generateMetadata({ params }: PrivacyPageProps): Promise<Me
     description,
     alternates: {
       canonical: `${BASE_URL}/${locale}/privacy`,
-      languages: {
-        'x-default': `${BASE_URL}/en-au/privacy`,
-        'en-AU': `${BASE_URL}/en-au/privacy`,
-        'en-SG': `${BASE_URL}/en-sg/privacy`,
-        'en-GB': `${BASE_URL}/en-gb/privacy`,
-        'en-US': `${BASE_URL}/en-us/privacy`,
-        'ms-MY': `${BASE_URL}/ms-my/privacy`,
-        'id-ID': `${BASE_URL}/id-id/privacy`,
-      },
+      languages: buildHreflangAlternates('/privacy'),
     },
     openGraph: {
       title,

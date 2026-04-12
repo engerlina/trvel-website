@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { buildHreflangAlternates } from '@/lib/hreflang';
 import { Header, Footer } from '@/components/layout';
 import { Link } from '@/i18n/routing';
 import {
@@ -36,15 +37,7 @@ export async function generateMetadata({ params }: GuaranteePageProps): Promise<
     description,
     alternates: {
       canonical: `${BASE_URL}/${locale}/guarantee`,
-      languages: {
-        'x-default': `${BASE_URL}/en-au/guarantee`,
-        'en-AU': `${BASE_URL}/en-au/guarantee`,
-        'en-SG': `${BASE_URL}/en-sg/guarantee`,
-        'en-GB': `${BASE_URL}/en-gb/guarantee`,
-        'en-US': `${BASE_URL}/en-us/guarantee`,
-        'ms-MY': `${BASE_URL}/ms-my/guarantee`,
-        'id-ID': `${BASE_URL}/id-id/guarantee`,
-      },
+      languages: buildHreflangAlternates('/guarantee'),
     },
     openGraph: {
       title,

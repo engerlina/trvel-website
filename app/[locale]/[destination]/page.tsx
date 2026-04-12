@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import { prisma, withRetry } from '@/lib/db';
 import { notFound } from 'next/navigation';
+import { buildHreflangAlternates } from '@/lib/hreflang';
 import { Header, Footer } from '@/components/layout';
 import { Link } from '@/i18n/routing';
 import {
@@ -109,15 +110,7 @@ export async function generateMetadata({ params }: DestinationPageProps): Promis
     description,
     alternates: {
       canonical: `${BASE_URL}/${locale}/${destination}`,
-      languages: {
-        'x-default': `${BASE_URL}/en-au/${destination}`,
-        'en-AU': `${BASE_URL}/en-au/${destination}`,
-        'en-SG': `${BASE_URL}/en-sg/${destination}`,
-        'en-GB': `${BASE_URL}/en-gb/${destination}`,
-        'en-US': `${BASE_URL}/en-us/${destination}`,
-        'ms-MY': `${BASE_URL}/ms-my/${destination}`,
-        'id-ID': `${BASE_URL}/id-id/${destination}`,
-      },
+      languages: buildHreflangAlternates('/' + destination),
     },
     openGraph: {
       title,

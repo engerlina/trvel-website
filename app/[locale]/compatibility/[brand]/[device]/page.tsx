@@ -1,8 +1,9 @@
 import { Metadata } from 'next';
 import { prisma, withRetry } from '@/lib/db';
 import { notFound } from 'next/navigation';
+import { buildHreflangAlternates } from '@/lib/hreflang';
 import { Header, Footer } from '@/components/layout';
-import { Link } from '@/i18n/routing';
+import { Link, routing } from '@/i18n/routing';
 import {
   Check,
   X,
@@ -56,15 +57,7 @@ export async function generateMetadata({ params }: DevicePageProps): Promise<Met
     description,
     alternates: {
       canonical: `${BASE_URL}/${locale}/compatibility/${brand}/${device}`,
-      languages: {
-        'x-default': `${BASE_URL}/en-au/compatibility/${brand}/${device}`,
-        'en-AU': `${BASE_URL}/en-au/compatibility/${brand}/${device}`,
-        'en-SG': `${BASE_URL}/en-sg/compatibility/${brand}/${device}`,
-        'en-GB': `${BASE_URL}/en-gb/compatibility/${brand}/${device}`,
-        'en-US': `${BASE_URL}/en-us/compatibility/${brand}/${device}`,
-        'ms-MY': `${BASE_URL}/ms-my/compatibility/${brand}/${device}`,
-        'id-ID': `${BASE_URL}/id-id/compatibility/${brand}/${device}`,
-      },
+      languages: buildHreflangAlternates('/compatibility/' + brand + '/' + device),
     },
     openGraph: {
       title,
@@ -466,7 +459,7 @@ export async function generateStaticParams() {
       })
     );
 
-    const locales = ['en-au', 'en-sg', 'en-gb', 'en-us', 'ms-my', 'id-id'];
+    const locales = routing.locales;
     const params: { locale: string; brand: string; device: string }[] = [];
 
     for (const device of devices) {

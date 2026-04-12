@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { buildHreflangAlternates } from '@/lib/hreflang';
 import { Header, Footer } from '@/components/layout';
 import { Link } from '@/i18n/routing';
 import { Scale, ArrowRight, AlertCircle, CheckCircle, XCircle } from 'lucide-react';
@@ -23,15 +24,7 @@ export async function generateMetadata({ params }: FairUsePageProps): Promise<Me
     description,
     alternates: {
       canonical: `${BASE_URL}/${locale}/fair-use`,
-      languages: {
-        'x-default': `${BASE_URL}/en-au/fair-use`,
-        'en-AU': `${BASE_URL}/en-au/fair-use`,
-        'en-SG': `${BASE_URL}/en-sg/fair-use`,
-        'en-GB': `${BASE_URL}/en-gb/fair-use`,
-        'en-US': `${BASE_URL}/en-us/fair-use`,
-        'ms-MY': `${BASE_URL}/ms-my/fair-use`,
-        'id-ID': `${BASE_URL}/id-id/fair-use`,
-      },
+      languages: buildHreflangAlternates('/fair-use'),
     },
     openGraph: {
       title,

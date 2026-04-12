@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import { prisma, withRetry } from '@/lib/db';
+import { buildHreflangAlternates } from '@/lib/hreflang';
 import { Header, Footer } from '@/components/layout';
 import { Link } from '@/i18n/routing';
 import {
@@ -73,15 +74,7 @@ export async function generateMetadata({ params }: DestinationsPageProps): Promi
     description,
     alternates: {
       canonical: `${BASE_URL}/${locale}/destinations`,
-      languages: {
-        'x-default': `${BASE_URL}/en-au/destinations`,
-        'en-AU': `${BASE_URL}/en-au/destinations`,
-        'en-SG': `${BASE_URL}/en-sg/destinations`,
-        'en-GB': `${BASE_URL}/en-gb/destinations`,
-        'en-US': `${BASE_URL}/en-us/destinations`,
-        'ms-MY': `${BASE_URL}/ms-my/destinations`,
-        'id-ID': `${BASE_URL}/id-id/destinations`,
-      },
+      languages: buildHreflangAlternates('/destinations'),
     },
     openGraph: {
       title,

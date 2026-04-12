@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { prisma, withRetry } from '@/lib/db';
 import { notFound } from 'next/navigation';
+import { buildHreflangAlternates } from '@/lib/hreflang';
 import { Header, Footer } from '@/components/layout';
 import { Link } from '@/i18n/routing';
 import {
@@ -88,15 +89,7 @@ export async function generateMetadata({ params }: CityPageProps): Promise<Metad
     description,
     alternates: {
       canonical: `${BASE_URL}/${locale}/${destination}/${city}`,
-      languages: {
-        'x-default': `${BASE_URL}/en-au/${destination}/${city}`,
-        'en-AU': `${BASE_URL}/en-au/${destination}/${city}`,
-        'en-SG': `${BASE_URL}/en-sg/${destination}/${city}`,
-        'en-GB': `${BASE_URL}/en-gb/${destination}/${city}`,
-        'en-US': `${BASE_URL}/en-us/${destination}/${city}`,
-        'ms-MY': `${BASE_URL}/ms-my/${destination}/${city}`,
-        'id-ID': `${BASE_URL}/id-id/${destination}/${city}`,
-      },
+      languages: buildHreflangAlternates('/' + destination + '/' + city),
     },
     openGraph: {
       title,

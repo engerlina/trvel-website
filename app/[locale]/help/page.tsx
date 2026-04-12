@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { buildHreflangAlternates } from '@/lib/hreflang';
 import { Header, Footer } from '@/components/layout';
 import { Link } from '@/i18n/routing';
 import {
@@ -36,15 +37,7 @@ export async function generateMetadata({ params }: HelpPageProps): Promise<Metad
     description,
     alternates: {
       canonical: `${BASE_URL}/${locale}/help`,
-      languages: {
-        'x-default': `${BASE_URL}/en-au/help`,
-        'en-AU': `${BASE_URL}/en-au/help`,
-        'en-SG': `${BASE_URL}/en-sg/help`,
-        'en-GB': `${BASE_URL}/en-gb/help`,
-        'en-US': `${BASE_URL}/en-us/help`,
-        'ms-MY': `${BASE_URL}/ms-my/help`,
-        'id-ID': `${BASE_URL}/id-id/help`,
-      },
+      languages: buildHreflangAlternates('/help'),
     },
     openGraph: {
       title,

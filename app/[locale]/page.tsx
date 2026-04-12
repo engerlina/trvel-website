@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import dynamic from 'next/dynamic';
 import { getTranslations } from 'next-intl/server';
+import { buildHreflangAlternates } from '@/lib/hreflang';
 import { Header, Footer } from '@/components/layout';
 import { Hero, FloatingDestinationSelector } from '@/components/sections';
 import { DestinationProvider } from '@/contexts/DestinationContext';
@@ -42,15 +43,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     description: ogDescription,
     alternates: {
       canonical: `${BASE_URL}/${locale}`,
-      languages: {
-        'x-default': `${BASE_URL}/en-au`,
-        'en-AU': `${BASE_URL}/en-au`,
-        'en-SG': `${BASE_URL}/en-sg`,
-        'en-GB': `${BASE_URL}/en-gb`,
-        'en-US': `${BASE_URL}/en-us`,
-        'ms-MY': `${BASE_URL}/ms-my`,
-        'id-ID': `${BASE_URL}/id-id`,
-      },
+      languages: buildHreflangAlternates(''),
     },
     openGraph: {
       title: ogTitle,

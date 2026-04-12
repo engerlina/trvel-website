@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
+import { buildHreflangAlternates } from '@/lib/hreflang';
 import { Header, Footer } from '@/components/layout';
 import { BlogCard } from '@/components/blog';
 import { prisma, withRetry } from '@/lib/db';
@@ -21,15 +22,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     description: t('pageDescription'),
     alternates: {
       canonical: `${BASE_URL}/${locale}/blog`,
-      languages: {
-        'x-default': `${BASE_URL}/en-au/blog`,
-        'en-AU': `${BASE_URL}/en-au/blog`,
-        'en-SG': `${BASE_URL}/en-sg/blog`,
-        'en-GB': `${BASE_URL}/en-gb/blog`,
-        'en-US': `${BASE_URL}/en-us/blog`,
-        'ms-MY': `${BASE_URL}/ms-my/blog`,
-        'id-ID': `${BASE_URL}/id-id/blog`,
-      },
+      languages: buildHreflangAlternates('/blog'),
     },
     openGraph: {
       title: t('pageTitle'),
