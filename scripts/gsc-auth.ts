@@ -21,7 +21,7 @@ import { platform } from 'os';
 const CLIENT_ID = process.env.GOOGLE_ADS_CLIENT_ID;
 const CLIENT_SECRET = process.env.GOOGLE_ADS_CLIENT_SECRET;
 const REDIRECT_URI = 'http://localhost:3333/callback';
-const SCOPE = 'https://www.googleapis.com/auth/webmasters.readonly';
+const SCOPE = 'https://www.googleapis.com/auth/webmasters';
 
 if (!CLIENT_ID || !CLIENT_SECRET) {
   console.error('ERROR: Missing GOOGLE_ADS_CLIENT_ID or GOOGLE_ADS_CLIENT_SECRET in .env');
