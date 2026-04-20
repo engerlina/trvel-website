@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { prisma, withRetry } from '@/lib/db';
 import { notFound } from 'next/navigation';
-import { buildHreflangAlternates } from '@/lib/hreflang';
+import { buildCanonicalUrl, buildHreflangAlternates } from '@/lib/hreflang';
 import { Header, Footer } from '@/components/layout';
 import { Link, routing } from '@/i18n/routing';
 import {
@@ -41,7 +41,7 @@ export async function generateMetadata({ params }: BrandPageProps): Promise<Meta
     title,
     description,
     alternates: {
-      canonical: `${BASE_URL}/${locale}/compatibility/${brand}`,
+      canonical: buildCanonicalUrl(locale, '/compatibility/' + brand),
       languages: buildHreflangAlternates('/compatibility/' + brand),
     },
     openGraph: {

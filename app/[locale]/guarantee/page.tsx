@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { buildHreflangAlternates } from '@/lib/hreflang';
+import { buildCanonicalUrl, buildHreflangAlternates } from '@/lib/hreflang';
 import { Header, Footer } from '@/components/layout';
 import { Link } from '@/i18n/routing';
 import {
@@ -36,7 +36,7 @@ export async function generateMetadata({ params }: GuaranteePageProps): Promise<
     title,
     description,
     alternates: {
-      canonical: `${BASE_URL}/${locale}/guarantee`,
+      canonical: buildCanonicalUrl(locale, '/guarantee'),
       languages: buildHreflangAlternates('/guarantee'),
     },
     openGraph: {

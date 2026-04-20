@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { prisma, withRetry } from '@/lib/db';
 import { notFound } from 'next/navigation';
-import { buildHreflangAlternates } from '@/lib/hreflang';
+import { buildCanonicalUrl, buildHreflangAlternates } from '@/lib/hreflang';
 import { Header, Footer } from '@/components/layout';
 import { Link } from '@/i18n/routing';
 import {
@@ -88,7 +88,7 @@ export async function generateMetadata({ params }: CityPageProps): Promise<Metad
     title,
     description,
     alternates: {
-      canonical: `${BASE_URL}/${locale}/${destination}/${city}`,
+      canonical: buildCanonicalUrl(locale, '/' + destination + '/' + city),
       languages: buildHreflangAlternates('/' + destination + '/' + city),
     },
     openGraph: {

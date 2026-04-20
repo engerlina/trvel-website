@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { prisma, withRetry } from '@/lib/db';
 import { notFound } from 'next/navigation';
-import { buildHreflangAlternates } from '@/lib/hreflang';
+import { buildCanonicalUrl, buildHreflangAlternates } from '@/lib/hreflang';
 import { Header, Footer } from '@/components/layout';
 import { Link } from '@/i18n/routing';
 import {
@@ -142,8 +142,13 @@ export async function generateMetadata({ params }: DurationPageProps): Promise<M
   return {
     title,
     description,
+    // Duration-specific pages duplicate the destination page with a different
+    // pre-selected duration (3,420+ near-duplicate URLs). Keep them crawlable
+    // for ad landing flows, but exclude from the index so they stop diluting
+    // the primary destination page's signal.
+    robots: { index: false, follow: true },
     alternates: {
-      canonical: `${BASE_URL}/${locale}/esim/${destination}/${duration}`,
+      canonical: buildCanonicalUrl(locale, '/esim/' + destination + '/' + duration),
       languages: buildHreflangAlternates('/esim/' + destination + '/' + duration),
     },
     openGraph: {

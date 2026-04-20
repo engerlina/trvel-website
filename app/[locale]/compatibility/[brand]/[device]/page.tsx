@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { prisma, withRetry } from '@/lib/db';
 import { notFound } from 'next/navigation';
-import { buildHreflangAlternates } from '@/lib/hreflang';
+import { buildCanonicalUrl, buildHreflangAlternates } from '@/lib/hreflang';
 import { Header, Footer } from '@/components/layout';
 import { Link, routing } from '@/i18n/routing';
 import {
@@ -55,8 +55,13 @@ export async function generateMetadata({ params }: DevicePageProps): Promise<Met
   return {
     title,
     description,
+    // Per-device compatibility pages are stub entries (brand + model + yes/no
+    // eSIM flag + short notes). Thousands of near-identical URLs across 8
+    // locales. Keep them crawlable (they're reached from the EsimChecker), but
+    // noindex so they stop eating crawl budget intended for destination pages.
+    robots: { index: false, follow: true },
     alternates: {
-      canonical: `${BASE_URL}/${locale}/compatibility/${brand}/${device}`,
+      canonical: buildCanonicalUrl(locale, '/compatibility/' + brand + '/' + device),
       languages: buildHreflangAlternates('/compatibility/' + brand + '/' + device),
     },
     openGraph: {

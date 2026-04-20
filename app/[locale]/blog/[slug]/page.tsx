@@ -55,11 +55,18 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const defaultLocale = postLocales.find(p => p.locale === 'en-au')?.locale || postLocales[0]?.locale || 'en-au';
   languages['x-default'] = `${BASE_URL}/${defaultLocale}/blog/${slug}`;
 
+  // Consolidate canonical to en-au for English locales when an en-au version of
+  // the post exists; otherwise self-canonicalize. Non-English locales always
+  // self-canonicalize.
+  const ENGLISH_LOCALES = new Set(['en-au', 'en-sg', 'en-gb', 'en-us', 'en-ca', 'en-nz']);
+  const hasEnAu = postLocales.some((p) => p.locale === 'en-au');
+  const canonicalLocale = ENGLISH_LOCALES.has(locale) && hasEnAu ? 'en-au' : locale;
+
   return {
     title: post.title,
     description: post.excerpt || post.content.slice(0, 160),
     alternates: {
-      canonical: `${BASE_URL}/${locale}/blog/${slug}`,
+      canonical: `${BASE_URL}/${canonicalLocale}/blog/${slug}`,
       languages,
     },
     openGraph: {

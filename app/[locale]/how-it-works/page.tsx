@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
-import { buildHreflangAlternates } from '@/lib/hreflang';
+import { buildCanonicalUrl, buildHreflangAlternates } from '@/lib/hreflang';
 import { Header, Footer } from '@/components/layout';
 import { Link } from '@/i18n/routing';
 import { EsimChecker } from '@/components/compatibility/EsimChecker';
@@ -36,7 +36,7 @@ export async function generateMetadata({ params }: HowItWorksPageProps): Promise
     title,
     description,
     alternates: {
-      canonical: `${BASE_URL}/${locale}/how-it-works`,
+      canonical: buildCanonicalUrl(locale, '/how-it-works'),
       languages: buildHreflangAlternates('/how-it-works'),
     },
     openGraph: {

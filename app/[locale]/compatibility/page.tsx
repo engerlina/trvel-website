@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { buildHreflangAlternates } from '@/lib/hreflang';
+import { buildCanonicalUrl, buildHreflangAlternates } from '@/lib/hreflang';
 import { Header, Footer } from '@/components/layout';
 import { EsimChecker } from '@/components/compatibility/EsimChecker';
 import { Link } from '@/i18n/routing';
@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: CompatibilityPageProps): Prom
     title,
     description,
     alternates: {
-      canonical: `${BASE_URL}/${locale}/compatibility`,
+      canonical: buildCanonicalUrl(locale, '/compatibility'),
       languages: buildHreflangAlternates('/compatibility'),
     },
     openGraph: {

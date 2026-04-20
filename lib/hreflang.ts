@@ -14,6 +14,32 @@ const LOCALE_TO_HREFLANG: Record<string, string> = {
   'en-nz': 'en-NZ',
 };
 
+// English locales consolidate to en-au for canonical purposes. The six
+// English variants serve near-duplicate content (only prices/currency differ)
+// which triggered GSC "Duplicate, Google chose different canonical than user"
+// on hundreds of pages. Consolidating SEO signal to a single English canonical
+// fixes that; hreflang still points users in each country at their local price
+// variant.
+const CANONICAL_LOCALE: Record<string, string> = {
+  'en-au': 'en-au',
+  'en-sg': 'en-au',
+  'en-gb': 'en-au',
+  'en-us': 'en-au',
+  'en-ca': 'en-au',
+  'en-nz': 'en-au',
+  'ms-my': 'ms-my',
+  'id-id': 'id-id',
+};
+
+/**
+ * Return the canonical URL for the given locale/path. English locales point to
+ * the en-au variant; non-English locales self-canonicalize.
+ */
+export function buildCanonicalUrl(locale: string, path: string): string {
+  const canonicalLocale = CANONICAL_LOCALE[locale] || locale;
+  return `${BASE_URL}/${canonicalLocale}${path}`;
+}
+
 /**
  * Generate hreflang alternate links for all locales.
  * Used in generateMetadata to produce correct alternate language tags.

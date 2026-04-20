@@ -97,6 +97,11 @@ export async function generateMetadata({ params }: ComparisonPageProps): Promise
     return {
       title,
       description,
+      // Carrier-vs-eSIM pages are thin programmatic comparisons that duplicate
+      // content across destinations and locales. Keep them crawlable as link
+      // targets from ads/internal linking, but exclude from search index to
+      // conserve crawl budget.
+      robots: { index: false, follow: true },
       alternates: {
         canonical: `${BASE_URL}/${locale}/compare/${comparison}`,
       },

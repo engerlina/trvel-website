@@ -1,22 +1,10 @@
 import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
 import Script from 'next/script';
-import { headers } from 'next/headers';
 import { GoogleAdsCapture } from '@/components/GoogleAdsCapture';
 import { LazyElevenLabs } from '@/components/LazyElevenLabs';
 import { LazyGoogleAnalytics } from '@/components/LazyGoogleAnalytics';
 import './globals.css';
-
-const LOCALE_TO_LANG: Record<string, string> = {
-  'en-au': 'en-AU',
-  'en-sg': 'en-SG',
-  'en-gb': 'en-GB',
-  'en-us': 'en-US',
-  'ms-my': 'ms-MY',
-  'id-id': 'id-ID',
-  'en-ca': 'en-CA',
-  'en-nz': 'en-NZ',
-};
 
 const inter = Inter({
   subsets: ['latin'],
@@ -98,17 +86,18 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-export default async function RootLayout({
+// NOTE: Root layout is intentionally static (no headers() / cookies() / searchParams).
+// Using those APIs here opts EVERY route out of static rendering, which crushes
+// crawl budget on a 9,962-URL site. The `<html lang>` attribute stays as the
+// English default; Google uses hreflang + URL + content for locale detection,
+// so a localized `lang` attribute is not worth the SSG regression.
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const headersList = await headers();
-  const locale = headersList.get('x-locale') || 'en-au';
-  const lang = LOCALE_TO_LANG[locale] || 'en-AU';
-
   return (
-    <html lang={lang} data-theme="trvel">
+    <html lang="en-AU" data-theme="trvel">
       <head>
         {/* Preconnect to critical third-party origins for faster loading */}
         <link rel="preconnect" href="https://www.googletagmanager.com" />

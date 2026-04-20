@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import dynamic from 'next/dynamic';
 import { getTranslations } from 'next-intl/server';
-import { buildHreflangAlternates } from '@/lib/hreflang';
+import { buildCanonicalUrl, buildHreflangAlternates } from '@/lib/hreflang';
 import { Header, Footer } from '@/components/layout';
 import { Hero, FloatingDestinationSelector } from '@/components/sections';
 import { DestinationProvider } from '@/contexts/DestinationContext';
@@ -42,7 +42,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     title: ogTitle,
     description: ogDescription,
     alternates: {
-      canonical: `${BASE_URL}/${locale}`,
+      canonical: buildCanonicalUrl(locale, ''),
       languages: buildHreflangAlternates(''),
     },
     openGraph: {

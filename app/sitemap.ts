@@ -4,17 +4,11 @@ import { prisma } from '@/lib/db';
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.trvel.co';
 
-// Carrier mapping for comparison pages
-const LOCALE_CARRIERS: Record<string, string> = {
-  'en-au': 'telstra',
-  'en-us': 'att',
-  'en-sg': 'singtel',
-  'en-gb': 'ee',
-  'ms-my': 'maxis',
-  'id-id': 'telkomsel',
-  'en-ca': 'rogers',
-  'en-nz': 'spark',
-};
+// Sitemap lists URLs we want Google to discover and consider for indexing.
+// Pages marked `robots: { index: false }` (comparison, duration, device
+// compatibility) are intentionally EXCLUDED here — listing a noindex URL in a
+// sitemap is a mixed signal that wastes crawl budget. They remain accessible
+// and linked internally from EsimChecker, destination pages, and paid ads.
 
 const staticPages = [
   '',
@@ -28,9 +22,6 @@ const staticPages = [
   '/privacy',
   '/fair-use',
 ];
-
-// Duration options for Tier 3 pages
-const DURATIONS = [5, 7, 15] as const;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const routes: MetadataRoute.Sitemap = [];
@@ -57,16 +48,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       select: { slug: true, locale: true, updatedAt: true },
     });
 
-    // Fetch devices for compatibility pages (Tier 5)
-    const devices = await prisma.device.findMany({
-      select: {
-        slug: true,
-        updatedAt: true,
-        brand: { select: { slug: true } },
-      },
-    });
-
-    // Fetch device brands for brand listing pages
+    // Fetch device brands for brand listing pages (kept in sitemap — the
+    // per-device pages under each brand are noindex and excluded).
     const deviceBrands = await prisma.deviceBrand.findMany({
       select: { slug: true, updatedAt: true },
     });
@@ -83,7 +66,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         });
       }
 
-      // Destination pages (Tier 1)
+      // Destination pages (Tier 1) — primary money pages
       const localeDestinations = destinations.filter((d) => d.locale === locale);
       for (const dest of localeDestinations) {
         routes.push({
@@ -92,30 +75,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
           changeFrequency: 'weekly',
           priority: 0.9,
         });
-
-        // Comparison pages (Tier 4) - one per destination per locale
-        const carrier = LOCALE_CARRIERS[locale];
-        if (carrier) {
-          routes.push({
-            url: `${BASE_URL}/${locale}/compare/${carrier}-vs-esim-${dest.slug}`,
-            lastModified: new Date(),
-            changeFrequency: 'monthly',
-            priority: 0.7,
-          });
-        }
-
-        // Duration pages (Tier 3) - 3 durations per destination per locale
-        for (const duration of DURATIONS) {
-          routes.push({
-            url: `${BASE_URL}/${locale}/esim/${dest.slug}/${duration}-day`,
-            lastModified: dest.updatedAt,
-            changeFrequency: 'monthly',
-            priority: 0.75,
-          });
-        }
       }
 
-      // City pages (Tier 2)
+      // City pages (Tier 2) — carry unique content (airport, connectivity
+      // notes, popular areas) so they stay in the index.
       const localeCities = cities.filter((c) => c.locale === locale && c.destination);
       for (const city of localeCities) {
         routes.push({
@@ -137,23 +100,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         });
       }
 
-      // Device brand pages (Tier 5)
+      // Device brand pages (Tier 5) — fewer, more substantial pages per brand
       for (const brand of deviceBrands) {
         routes.push({
           url: `${BASE_URL}/${locale}/compatibility/${brand.slug}`,
           lastModified: brand.updatedAt,
           changeFrequency: 'monthly',
           priority: 0.65,
-        });
-      }
-
-      // Device compatibility pages (Tier 5)
-      for (const device of devices) {
-        routes.push({
-          url: `${BASE_URL}/${locale}/compatibility/${device.brand.slug}/${device.slug}`,
-          lastModified: device.updatedAt,
-          changeFrequency: 'monthly',
-          priority: 0.6,
         });
       }
     }

@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import { prisma, withRetry } from '@/lib/db';
 import { notFound } from 'next/navigation';
-import { buildHreflangAlternates } from '@/lib/hreflang';
+import { buildCanonicalUrl, buildHreflangAlternates } from '@/lib/hreflang';
 import { Header, Footer } from '@/components/layout';
 import { Link } from '@/i18n/routing';
 import {
@@ -109,7 +109,7 @@ export async function generateMetadata({ params }: DestinationPageProps): Promis
     title,
     description,
     alternates: {
-      canonical: `${BASE_URL}/${locale}/${destination}`,
+      canonical: buildCanonicalUrl(locale, '/' + destination),
       languages: buildHreflangAlternates('/' + destination),
     },
     openGraph: {

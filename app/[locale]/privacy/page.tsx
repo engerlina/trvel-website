@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { buildHreflangAlternates } from '@/lib/hreflang';
+import { buildCanonicalUrl, buildHreflangAlternates } from '@/lib/hreflang';
 import { Header, Footer } from '@/components/layout';
 import { Link } from '@/i18n/routing';
 import { Shield, ArrowRight } from 'lucide-react';
@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: PrivacyPageProps): Promise<Me
     title,
     description,
     alternates: {
-      canonical: `${BASE_URL}/${locale}/privacy`,
+      canonical: buildCanonicalUrl(locale, '/privacy'),
       languages: buildHreflangAlternates('/privacy'),
     },
     openGraph: {

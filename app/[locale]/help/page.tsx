@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { buildHreflangAlternates } from '@/lib/hreflang';
+import { buildCanonicalUrl, buildHreflangAlternates } from '@/lib/hreflang';
 import { Header, Footer } from '@/components/layout';
 import { Link } from '@/i18n/routing';
 import {
@@ -36,7 +36,7 @@ export async function generateMetadata({ params }: HelpPageProps): Promise<Metad
     title,
     description,
     alternates: {
-      canonical: `${BASE_URL}/${locale}/help`,
+      canonical: buildCanonicalUrl(locale, '/help'),
       languages: buildHreflangAlternates('/help'),
     },
     openGraph: {

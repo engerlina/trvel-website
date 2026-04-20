@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
-import { buildHreflangAlternates } from '@/lib/hreflang';
+import { buildCanonicalUrl, buildHreflangAlternates } from '@/lib/hreflang';
 import { Header, Footer } from '@/components/layout';
 import { BlogCard } from '@/components/blog';
 import { prisma, withRetry } from '@/lib/db';
@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     title: t('pageTitle'),
     description: t('pageDescription'),
     alternates: {
-      canonical: `${BASE_URL}/${locale}/blog`,
+      canonical: buildCanonicalUrl(locale, '/blog'),
       languages: buildHreflangAlternates('/blog'),
     },
     openGraph: {
